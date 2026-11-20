@@ -1,0 +1,13 @@
+{
+  "name": "yoogeonhee",
+  "logo": "yoogeonhee.dev",
+  "title": "yoogeonhee.dev · 게임 개발 블로그",
+  "description": "Unity로 게임을 만들고, 만드는 과정을 기록하는 yoogeonhee의 게임 개발 블로그",
+  "tagline": "Unity · C# · 게임플레이 프로그래밍",
+  "headline": ["Unity로 게임을 만들고,", "만드는 과정을 기록합니다."],
+  "bio": "Unity로 PC와 모바일 브라우저에서 바로 즐기는 게임을 만들어요.",
+  "skills": ["Unity", "C#", "URP 2D", "UI Toolkit", "WebGL"],
+  "github": "https://github.com/yoogeonhee0207",
+  "itch": "",
+  "email": ""
+}

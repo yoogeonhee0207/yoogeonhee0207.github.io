@@ -1,0 +1,94 @@
+---
+import Base from '../layouts/Base.astro';
+import GameCard from '../components/GameCard.astro';
+import Heatmap from '../components/Heatmap.astro';
+import { site, games, featuredGame, allCommits, posts, fmtDate } from '../lib/data.js';
+
+const recent = allCommits.slice(0, 6);
+const others = games.filter((g) => g !== featuredGame);
+---
+<Base>
+  <section class="intro">
+    <p class="mono small muted">{site.tagline}</p>
+    <h1>{site.headline[0]}<br />{site.headline[1]}</h1>
+    <p class="lead">
+      {site.name}의 게임 개발 블로그예요. 지금은 등불 하나로 어두운 던전을 내려가는 로그라이트 액션 게임{' '}
+      <a href={`/games/${featuredGame.slug}/`}>{featuredGame.title}</a>를 만들고 있어요.
+    </p>
+  </section>
+
+  {featuredGame && (
+    <section class="featured">
+      <GameCard game={featuredGame} big />
+    </section>
+  )}
+
+  {others.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>다른 게임</h2><a href="/games/" class="small">전체 보기 →</a></div>
+      <div class="grid">{others.map((g) => <GameCard game={g} />)}</div>
+    </section>
+  )}
+
+  <section class="section split">
+    <div class="stack" style="gap: 18px">
+      <div class="section-head" style="margin: 0">
+        <h2>최근 개발 활동</h2>
+        <span class="mono small muted">GitHub 커밋 자동 연동</span>
+      </div>
+      <Heatmap commits={allCommits} />
+      <ol class="recent">
+        {recent.map((c) => (
+          <li>
+            <time class="mono small muted" datetime={c.date}>{fmtDate(c.date)}</time>
+            <span class={`type ${c.type}`}>{c.type}</span>
+            <a href={`/games/${c.slug}/#devlog`} class="msg">{c.msg}</a>
+          </li>
+        ))}
+      </ol>
+      <p class="note">게임 저장소의 커밋 메시지만 자동으로 들어오고, 코드는 공개되지 않아요.</p>
+    </div>
+
+    <div class="stack" style="gap: 18px">
+      <div class="section-head" style="margin: 0"><h2>블로그</h2>{posts.length > 3 && <a href="/blog/" class="small">전체 보기 →</a>}</div>
+      {posts.length === 0 ? (
+        <p class="empty small">아직 쓴 글이 없어요. 첫 글이 올라오면 여기에 보여요.</p>
+      ) : (
+        <div class="stack">
+          {posts.slice(0, 3).map((p) => (
+            <a href={`/blog/${p.slug}/`} class="post">
+              <span class="t">{p.title}</span>
+              <span class="small muted">{fmtDate(p.date, true)}{p.description && ` · ${p.description}`}</span>
+            </a>
+          ))}
+        </div>
+      )}
+      <div class="about">
+        <h2>소개</h2>
+        <p class="small" style="color: var(--ink-2)">{site.bio}</p>
+        <div class="row" style="gap: 6px">{site.skills.map((s) => <span class="chip">{s}</span>)}</div>
+        <a href="/about/" class="small" style="font-weight: 500; color: var(--accent-ink)">소개 페이지 →</a>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .intro { display: flex; flex-direction: column; gap: 14px; max-width: 680px; }
+  h1 { font-size: clamp(30px, 4.4vw, 40px); line-height: 1.2; }
+  .lead { font-size: 17px; color: var(--ink-2); }
+  .lead a { color: var(--accent-ink); }
+  .featured { margin-top: 44px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px; }
+  .split { display: flex; flex-wrap: wrap; gap: 48px; }
+  .split > :first-child { flex: 1 1 460px; min-width: 0; }
+  .split > :last-child { flex: 1 1 300px; min-width: 0; }
+  .recent { list-style: none; margin: 0; padding: 0; }
+  .recent li { display: flex; gap: 12px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--line-2); }
+  .recent time { width: 42px; flex: none; }
+  .recent .msg { font-size: 15px; text-decoration: none; overflow-wrap: anywhere; }
+  .post { display: flex; flex-direction: column; gap: 2px; padding: 14px 0; border-bottom: 1px solid var(--line-2); text-decoration: none; }
+  .post .t { font-weight: 500; }
+  .about { margin-top: 8px; background: var(--soft); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+  .about h2 { font-size: 18px; }
+</style>

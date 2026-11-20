@@ -1,0 +1,86 @@
+---
+import { TYPES, fmtDate } from '../lib/data.js';
+// commits: [{sha,date,type,msg}]  milestones: { "커밋 메시지": "표시할 이름" }
+const { commits = [], milestones = {}, initial = 20 } = Astro.props;
+const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.filter((c) => c.type === b).length - commits.filter((c) => c.type === a).length);
+---
+<div class="tl" data-timeline data-initial={initial}>
+  {types.length > 1 && (
+    <div class="chips" role="group" aria-label="커밋 종류로 거르기">
+      <button type="button" class="f" data-f="all" aria-pressed="true">전체 <span>{commits.length}</span></button>
+      {types.map((t) => (
+        <button type="button" class="f" data-f={t} aria-pressed="false" title={TYPES[t] ?? t}>
+          {t} <span>{commits.filter((c) => c.type === t).length}</span>
+        </button>
+      ))}
+    </div>
+  )}
+  {commits.length === 0 ? (
+    <p class="empty">아직 가져온 커밋 기록이 없어요.</p>
+  ) : (
+    <ol class="list">
+      {commits.map((c, i) => (
+        <li data-type={c.type} class={`${c.type}${milestones[c.msg] ? ' ms' : ''}`} hidden={i >= initial}>
+          <span class="pin" aria-hidden="true"></span>
+          <div class="row meta">
+            <time class="mono small muted" datetime={c.date}>{fmtDate(c.date)}</time>
+            <span class={`type ${c.type}`}>{c.type}</span>
+            {milestones[c.msg] && <span class="badge dark">{milestones[c.msg]}</span>}
+          </div>
+          <p class="msg">{c.msg}</p>
+        </li>
+      ))}
+    </ol>
+  )}
+  {commits.length > initial && <button type="button" class="btn more" data-more>더 보기</button>}
+</div>
+
+<script>
+  document.querySelectorAll('[data-timeline]').forEach((root) => {
+    const step = Number(root.dataset.initial) || 20;
+    const items = [...root.querySelectorAll('li')];
+    const chips = [...root.querySelectorAll('.f')];
+    const more = root.querySelector('[data-more]');
+    let filter = 'all';
+    let shown = step;
+    const render = () => {
+      const match = items.filter((li) => filter === 'all' || li.dataset.type === filter);
+      items.forEach((li) => (li.hidden = true));
+      match.slice(0, shown).forEach((li) => (li.hidden = false));
+      if (more) more.hidden = match.length <= shown;
+    };
+    chips.forEach((b) =>
+      b.addEventListener('click', () => {
+        filter = b.dataset.f;
+        shown = step;
+        chips.forEach((c) => c.setAttribute('aria-pressed', String(c === b)));
+        render();
+      }),
+    );
+    more?.addEventListener('click', () => {
+      shown += step;
+      render();
+    });
+  });
+</script>
+
+<style>
+  .tl { display: flex; flex-direction: column; gap: 16px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .f { min-height: 36px; padding: 0 12px; border-radius: 999px; border: 1px solid var(--chip); background: var(--bg); color: var(--ink-2); font: 13px var(--mono); cursor: pointer; }
+  .f span { color: var(--muted); margin-left: 2px; }
+  .f[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+  .f[aria-pressed='true'] span { color: inherit; opacity: .7; }
+  .list { list-style: none; margin: 0; padding: 0 0 0 18px; border-left: 2px solid var(--line-2); display: flex; flex-direction: column; }
+  li { position: relative; padding: 0 0 20px 18px; }
+  li[hidden] { display: none; }
+  .pin { position: absolute; left: -26px; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid #9aa0ab; }
+  li.feat .pin { border-color: var(--accent); }
+  li.fix .pin { border-color: var(--blue); }
+  li.asset .pin, li.art .pin { border-color: var(--green); }
+  li.ms .pin { background: var(--ink); border-color: var(--ink); }
+  .meta { gap: 10px; }
+  .msg { margin-top: 3px; font-size: 15px; overflow-wrap: anywhere; }
+  .more { align-self: flex-start; }
+  .more[hidden] { display: none; }
+</style>

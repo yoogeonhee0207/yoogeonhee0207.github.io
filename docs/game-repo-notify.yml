@@ -1,0 +1,23 @@
+# 게임 저장소(LanternKeeper)에 넣는 워크플로 예시
+# 위치: LanternKeeper/.github/workflows/notify-blog.yml
+# 게임 저장소 main에 push할 때마다 블로그가 바로 다시 배포되어 커밋 기록이 즉시 갱신돼요.
+# 필요: 게임 저장소 Secrets에 BLOG_DISPATCH_TOKEN
+#       (블로그 저장소 yoogeonhee0207.github.io 에 Contents: Read and write 권한이 있는 fine-grained 토큰)
+# 이게 없어도 블로그는 매일 자정에 자동으로 갱신돼요.
+name: 블로그에 알리기
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 블로그 다시 배포 요청
+        run: |
+          curl -sS -f -X POST \
+            -H "Authorization: Bearer ${{ secrets.BLOG_DISPATCH_TOKEN }}" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/yoogeonhee0207/yoogeonhee0207.github.io/dispatches \
+            -d '{"event_type":"game-updated"}'

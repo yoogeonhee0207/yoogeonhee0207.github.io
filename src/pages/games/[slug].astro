@@ -1,0 +1,185 @@
+---
+import Base from '../../layouts/Base.astro';
+import CommitTimeline from '../../components/CommitTimeline.astro';
+import Heatmap from '../../components/Heatmap.astro';
+import { games, commitsFor, STATUS, site } from '../../lib/data.js';
+
+export function getStaticPaths() {
+  return games.map((game) => ({ params: { slug: game.slug }, props: { game } }));
+}
+
+const { game } = Astro.props;
+const commits = commitsFor(game.slug)?.commits ?? [];
+const playable = game.status !== '개발 중' && !!game.webgl;
+const art = (f) => `/games/${game.slug}/art/${f}`;
+---
+<Base title={game.title} description={game.summary} image={game.cover}>
+  <p class="crumb small muted"><a href="/games/">게임</a> / {game.title}</p>
+
+  <section class="head">
+    <div class="stack" style="gap: 10px; max-width: 660px">
+      <div class="row" style="gap: 8px">
+        <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{game.status}</span>
+        <span class="mono small muted">{game.genre}</span>
+      </div>
+      <h1>{game.title} {game.titleEn && <span class="en">{game.titleEn}</span>}</h1>
+      <p class="lead">{game.description}</p>
+      <div class="row" style="gap: 6px">{game.tags?.map((t) => <span class="chip">{t}</span>)}</div>
+    </div>
+    <div class="row" style="gap: 10px">
+      {commits.length > 0 && <a href="#devlog" class="btn">개발 기록</a>}
+      {game.itch && <a href={game.itch} class="btn">itch.io</a>}
+    </div>
+  </section>
+
+  <section class="stage" data-stage data-src={game.webgl}>
+    <img src={game.cover} alt={game.coverAlt ?? ''} class="pixel bg" width="640" height="360" />
+    <div class="shade" aria-hidden="true"></div>
+    {playable ? (
+      <div class="panel">
+        <button type="button" class="play" data-play aria-label={`${game.title} 시작`}>
+          <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#16181d" /></svg>
+        </button>
+        <p>클릭하면 브라우저에서 바로 실행돼요</p>
+      </div>
+    ) : (
+      <div class="panel">
+        <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ffcf7a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+        <p class="big">지금은 테스트 빌드만 있어요</p>
+        <p class="sub">PC와 모바일 브라우저에서 플레이할 수 있는 테스트 빌드가 있어요. 테스트에 참여하고 싶다면 연락 주세요.</p>
+        <a href="/about/#contact" class="btn primary">테스트 참여 문의</a>
+      </div>
+    )}
+  </section>
+  {playable && (
+    <div class="row stage-bar">
+      <button type="button" class="btn" data-full hidden>전체 화면</button>
+      <span class="note">처음 불러올 때 몇 초 걸릴 수 있어요.</span>
+    </div>
+  )}
+
+  {game.modes?.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>{game.modes.length === 2 ? '두 가지 모드' : '게임 모드'}</h2></div>
+      <div class="modes">
+        {game.modes.map((m) => (
+          <div class="mode">
+            <div class="row" style="gap: 10px">
+              <span class={`sq ${m.color}`} aria-hidden="true"></span>
+              <h3>{m.title}</h3>
+              {m.badge && <span class="badge gray">{m.badge}</span>}
+            </div>
+            <p style="color: var(--ink-2); font-size: 15px">{m.text}</p>
+            {m.detail && <p class="small muted">{m.detail}</p>}
+          </div>
+        ))}
+      </div>
+    </section>
+  )}
+
+  {game.cast?.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>등장 캐릭터</h2></div>
+      <ul class="cast">
+        {game.cast.map((c) => (
+          <li class:list={{ boss: c.boss }}>
+            <div class="sprite"><img src={art(c.img)} alt="" class="pixel" width={c.boss ? 64 : 32} height={c.boss ? 64 : 32} loading="lazy" /></div>
+            <span class="n">{c.name}</span>
+            <span class="r small muted">{c.role}</span>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )}
+
+  <section class="section split">
+    <div class="stack" style="gap: 32px">
+      {game.controls?.length > 0 && (
+        <div class="stack" style="gap: 12px">
+          <h2 class="h">조작법</h2>
+          <dl class="keys">
+            {game.controls.map((k) => (<><dt class="mono">{k.key}</dt><dd>{k.action}</dd></>))}
+          </dl>
+        </div>
+      )}
+      {game.info?.length > 0 && (
+        <div class="stack" style="gap: 12px">
+          <h2 class="h">제작 정보</h2>
+          <dl class="info">
+            {game.info.map((k) => (<><dt>{k.label}</dt><dd>{k.value}</dd></>))}
+          </dl>
+        </div>
+      )}
+    </div>
+
+    <div id="devlog" class="stack" style="gap: 16px">
+      <h2 class="h">개발 기록</h2>
+      {commits.length > 0 && <Heatmap commits={commits} weeks={12} />}
+      <CommitTimeline commits={commits} milestones={game.milestones} initial={15} />
+      <p class="note">게임 저장소의 커밋 메시지가 자동으로 들어와요. 검은 점은 주요 단계예요.</p>
+    </div>
+  </section>
+</Base>
+
+<script>
+  const stage = document.querySelector('[data-stage]');
+  const play = stage?.querySelector('[data-play]');
+  const full = document.querySelector('[data-full]');
+  play?.addEventListener('click', () => {
+    const iframe = document.createElement('iframe');
+    iframe.src = stage.dataset.src;
+    iframe.title = '게임 플레이 화면';
+    iframe.allow = 'fullscreen; autoplay; gamepad';
+    iframe.setAttribute('allowfullscreen', '');
+    stage.replaceChildren(iframe);
+    stage.classList.add('running');
+    iframe.focus();
+    if (full) full.hidden = false;
+  });
+  full?.addEventListener('click', () => stage.requestFullscreen?.().catch(() => {}));
+</script>
+
+<style>
+  .crumb { margin-bottom: 18px; }
+  .head { display: flex; flex-wrap: wrap; gap: 16px 24px; align-items: flex-end; justify-content: space-between; }
+  h1 { font-size: clamp(30px, 4.4vw, 40px); }
+  .en { font-size: 20px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .lead { font-size: 17px; color: var(--ink-2); }
+
+  .stage { margin-top: 28px; position: relative; aspect-ratio: 16 / 9; border-radius: 14px; overflow: hidden; background: var(--stage); display: grid; place-items: center; }
+  .stage .bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .shade { position: absolute; inset: 0; background: rgb(10 11 14 / .62); }
+  .panel { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; padding: 24px; color: #f1f2f5; max-width: 480px; }
+  .panel .big { font-size: 22px; font-weight: 700; }
+  .panel .sub { font-size: 15px; color: #c9cdd6; }
+  .panel .btn.primary { margin-top: 6px; min-height: 48px; padding: 0 22px; }
+  .play { width: 88px; height: 88px; border-radius: 50%; border: 0; background: var(--accent); display: grid; place-items: center; cursor: pointer; box-shadow: 0 0 0 10px rgb(232 163 61 / .22); }
+  .stage.running { display: block; }
+  .stage :global(iframe) { width: 100%; height: 100%; border: 0; display: block; }
+  .stage-bar { gap: 12px; margin-top: 10px; }
+  .stage-bar [hidden] { display: none; }
+
+  .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+  .mode { border: 1px solid var(--line); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px; }
+  .mode h3 { font-size: 19px; }
+  .sq { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); }
+  .sq.blue { background: var(--blue); } .sq.green { background: var(--green); }
+
+  .cast { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 12px; }
+  .cast li { display: flex; flex-direction: column; align-items: center; gap: 2px; text-align: center; padding: 14px 6px 12px; border: 1px solid var(--line); border-radius: 12px; }
+  .cast .sprite { width: 64px; height: 64px; display: grid; place-items: center; }
+  .cast img { width: 64px; height: 64px; }
+  .cast li:not(.boss) img { width: 56px; height: 56px; }
+  .cast .boss { background: var(--soft); }
+  .cast .n { font-weight: 500; font-size: 15px; margin-top: 6px; }
+
+  .split { display: flex; flex-wrap: wrap; gap: 48px; }
+  .split > :first-child { flex: 1 1 300px; min-width: 0; }
+  .split > :last-child { flex: 2 1 460px; min-width: 0; }
+  .h { font-size: 22px; }
+  .keys { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 16px; font-size: 15px; align-items: baseline; }
+  .keys dt { font-size: 13px; padding: 2px 8px; border: 1px solid var(--chip); border-bottom-width: 2px; border-radius: 6px; justify-self: start; white-space: nowrap; }
+  .info { margin: 0; display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 8px 16px; font-size: 15px; }
+  .info dt { color: var(--muted); }
+  dd { margin: 0; }
+</style>

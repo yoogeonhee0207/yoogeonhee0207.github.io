@@ -1,0 +1,20 @@
+---
+import Base from '../../layouts/Base.astro';
+import GameCard from '../../components/GameCard.astro';
+import { games } from '../../lib/data.js';
+---
+<Base title="게임" description="yoogeonhee가 만든 게임과 만들고 있는 게임">
+  <h1>게임</h1>
+  <p class="lead">만든 게임과 지금 만들고 있는 게임이에요.</p>
+  <div class="grid">
+    {games.map((g) => <GameCard game={g} />)}
+    {games.length < 3 && <div class="empty next">다음 게임 준비 중</div>}
+  </div>
+</Base>
+
+<style>
+  h1 { font-size: 36px; }
+  .lead { margin-top: 10px; color: var(--ink-2); font-size: 17px; }
+  .grid { margin-top: 32px; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 22px; }
+  .next { display: grid; place-items: center; min-height: 260px; }
+</style>

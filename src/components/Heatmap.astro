@@ -1,0 +1,33 @@
+---
+import { heatmap, daysAgo } from '../lib/data.js';
+const { commits, weeks = 16 } = Astro.props;
+const h = heatmap(commits, weeks);
+---
+<div class="heat-box">
+  <div class="heat" role="img" aria-label={`최근 ${weeks}주 동안 ${h.activeDays}일, 커밋 ${h.total}개`}>
+    {h.cols.map((col) => (
+      <div class="col">
+        {col.map((d) => (
+          <span class={`cell l${d.level}${d.future ? ' future' : ''}`} title={d.future ? '' : `${d.date} · 커밋 ${d.count}개`}></span>
+        ))}
+      </div>
+    ))}
+  </div>
+  <div class="stats small">
+    <span><b>{h.total}</b> 커밋</span>
+    <span><b>{h.activeDays}</b>일 작업</span>
+    {h.last && <span>마지막 업데이트 <b>{daysAgo(h.last)}</b></span>}
+  </div>
+</div>
+
+<style>
+  .heat-box { border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+  .heat { display: flex; gap: 3px; overflow-x: auto; padding-bottom: 2px; }
+  .col { display: flex; flex-direction: column; gap: 3px; }
+  .cell { width: 13px; height: 13px; border-radius: 3px; background: var(--heat-0); display: block; }
+  .cell.l1 { background: var(--heat-1); } .cell.l2 { background: var(--heat-2); }
+  .cell.l3 { background: var(--heat-3); } .cell.l4 { background: var(--heat-4); }
+  .cell.future { background: transparent; }
+  .stats { display: flex; flex-wrap: wrap; gap: 6px 20px; color: var(--ink-2); }
+  .stats b { color: var(--ink); }
+</style>

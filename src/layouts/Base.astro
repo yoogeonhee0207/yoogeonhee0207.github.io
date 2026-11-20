@@ -1,0 +1,73 @@
+---
+import '../styles/global.css';
+import { site } from '../lib/data.js';
+
+const { title, description = site.description, image = '/og.jpg' } = Astro.props;
+const fullTitle = title ? `${title} · ${site.logo}` : site.title;
+const path = Astro.url.pathname;
+const nav = [
+  { href: '/games/', label: '게임' },
+  { href: '/blog/', label: '블로그' },
+  { href: '/about/', label: '소개' },
+];
+const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
+---
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{fullTitle}</title>
+  <meta name="description" content={description} />
+  <meta property="og:title" content={fullTitle} />
+  <meta property="og:description" content={description} />
+  <meta property="og:image" content={imageUrl} />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap bar">
+      <a href="/" class="logo mono"><span class="dot" aria-hidden="true"></span>{site.logo}</a>
+      <nav aria-label="주 메뉴">
+        {nav.map((n) => (
+          <a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a>
+        ))}
+        <a href={site.github}>GitHub</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <slot />
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap bar small muted">
+      <span>© {new Date().getFullYear()} {site.name}</span>
+      <span class="row" style="gap: 18px">
+        <a href={site.github}>GitHub</a>
+        {site.itch && <a href={site.itch}>itch.io</a>}
+        {site.email && <span>{site.email}</span>}
+      </span>
+    </div>
+  </footer>
+</body>
+</html>
+
+<style>
+  .site-header { border-bottom: 1px solid var(--line); }
+  .bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 28px; padding-top: 14px; padding-bottom: 14px; }
+  .logo { font-weight: 500; font-size: 18px; text-decoration: none; margin-right: auto; display: flex; align-items: center; gap: 10px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 4px var(--amber-bg); }
+  nav { display: flex; flex-wrap: wrap; gap: 0 22px; font-size: 15px; }
+  nav a { text-decoration: none; padding: 10px 0; min-height: 44px; display: inline-flex; align-items: center; }
+  nav a[aria-current='page'] { color: var(--accent-ink); font-weight: 500; }
+  main { padding-top: 48px; padding-bottom: 32px; min-height: 60vh; }
+  .site-footer { margin-top: 80px; border-top: 1px solid var(--line); }
+  .site-footer .bar { justify-content: space-between; padding-top: 24px; padding-bottom: 24px; }
+</style>

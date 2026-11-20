@@ -1,0 +1,25 @@
+---
+import Base from '../../layouts/Base.astro';
+import { posts, fmtDate } from '../../lib/data.js';
+
+export function getStaticPaths() {
+  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+}
+const { post } = Astro.props;
+const { Content } = post;
+---
+<Base title={post.title} description={post.description}>
+  <article class="article">
+    <p class="small muted"><a href="/blog/">블로그</a> · <time datetime={post.date}>{fmtDate(post.date, true)}</time></p>
+    <h1>{post.title}</h1>
+    {post.description && <p class="lead">{post.description}</p>}
+    <div class="prose"><Content /></div>
+  </article>
+</Base>
+
+<style>
+  .article { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: clamp(28px, 4vw, 36px); margin-top: 12px; }
+  .lead { margin-top: 12px; color: var(--muted); font-size: 17px; }
+  .prose { margin-top: 36px; }
+</style>

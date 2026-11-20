@@ -1,0 +1,63 @@
+{
+  "slug": "lanternkeeper",
+  "title": "등불지기",
+  "titleEn": "Lantern Keeper",
+  "status": "개발 중",
+  "featured": true,
+  "order": 1,
+  "genre": "탑다운 로그라이트 액션",
+  "tags": ["Unity 6", "16비트 픽셀아트", "AI 활용 제작"],
+  "summary": "저주받은 지하 던전을 등불 하나에 의지해 내려가는 탑다운 로그라이트. 조작은 이동뿐이고, 공격은 등불 빛이 닿는 적에게 자동으로 나가요.",
+  "description": "등불 하나에 의지해 저주받은 지하 던전 두 구역을 뚫고 내려가세요. 조작은 이동뿐이고, 등불 빛 안에 들어온 적에게 무기가 자동으로 날아가요. 죽어도 모은 영혼 조각으로 새 무기와 업그레이드를 해금해 다음 판에 도전합니다.",
+  "cover": "/games/lanternkeeper/art/cover.webp",
+  "coverAlt": "등불지기 타이틀 그림: 등불을 든 주인공 앞에 해골왕과 거미 여왕이 서 있는 지하 던전",
+  "webgl": "",
+  "itch": "",
+  "repo": "yoogeonhee0207/LanternKeeper",
+  "modes": [
+    {
+      "title": "미로 탐험 + 보스 격파",
+      "badge": "",
+      "color": "amber",
+      "text": "들어갈 때마다 새로 만들어지는 미로를 원뿔 모양 등불 빛에 기대어 헤쳐 나가요. 잠든 적은 가까이 가면 깨어나 쫓아오고, 구역 끝에서 보스가 기다립니다.",
+      "detail": "무너진 지하묘지 → 해골왕 · 독버섯 동굴 → 거미 여왕"
+    },
+    {
+      "title": "생존 모드",
+      "badge": "기획 완료 · 개발 예정",
+      "color": "blue",
+      "text": "미로 없이 넓은 방 하나에서 시간이 갈수록 거세지는 적을 버티는 뱀서라이크 모드. 클리어는 없고, 가장 오래 버틴 시간이 기록돼요.",
+      "detail": "8분에 해골왕, 15분에 거미 여왕 등장 · 신기록이면 해금용 조각 보상"
+    }
+  ],
+  "cast": [
+    { "name": "등불지기", "img": "char_hero_idle_01.png", "role": "주인공" },
+    { "name": "해골 병사", "img": "enemy_skeleton_idle.png", "role": "지하묘지" },
+    { "name": "박쥐", "img": "enemy_bat_idle.png", "role": "지하묘지 · 동굴" },
+    { "name": "구울", "img": "enemy_ghoul_idle.png", "role": "지하묘지" },
+    { "name": "해골 궁수", "img": "enemy_archer_idle.png", "role": "지하묘지 · 동굴" },
+    { "name": "독 슬라임", "img": "enemy_slime_idle.png", "role": "동굴" },
+    { "name": "거미", "img": "enemy_spider_idle.png", "role": "동굴" },
+    { "name": "해골왕", "img": "boss_skeleton_king_idle.png", "role": "1구역 보스", "boss": true },
+    { "name": "거미 여왕", "img": "boss_spider_queen_idle.png", "role": "2구역 보스", "boss": true }
+  ],
+  "controls": [
+    { "key": "WASD · 방향키", "action": "이동" },
+    { "key": "자동", "action": "공격 (등불 빛 안의 가장 가까운 적을 조준)" },
+    { "key": "모바일", "action": "화면 왼쪽 절반을 터치하면 조이스틱이 생겨요" }
+  ],
+  "info": [
+    { "label": "엔진", "value": "Unity 6 · C# · URP 2D 빛 · UI Toolkit" },
+    { "label": "개발 시작", "value": "2026.11.18" },
+    { "label": "역할", "value": "1인 개발 · AI 활용" },
+    { "label": "제작 방식", "value": "기획·코드·픽셀아트 제작에 AI 도구(Claude, 힉스필드)를 활용하고, 방향 결정과 플레이 테스트는 직접 했어요" },
+    { "label": "규모", "value": "구역 2 · 보스 2 · 적 7종 · 무기 5 · 업그레이드 15" },
+    { "label": "플랫폼", "value": "PC · 모바일 브라우저 (WebGL)" }
+  ],
+  "milestones": {
+    "기획·설계 문서와 Unity 프로젝트 초기 설정": "개발 시작",
+    "거미 여왕 (부채꼴 거미줄·새끼 거미 소환·2페이즈 빛 축소) + 2구역 보스방": "보스 2종 완성",
+    "미로 생성 + 전투방 연결, 적 미리 배치·깨어남 (D-5)": "미로 모드",
+    "생존 모드(뱀서라이크) 기획 기록": "생존 모드 기획"
+  }
+}

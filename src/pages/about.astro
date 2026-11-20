@@ -1,0 +1,45 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, games } from '../lib/data.js';
+---
+<Base title="소개" description={site.bio}>
+  <div class="about">
+    <h1>안녕하세요, {site.name}입니다</h1>
+    <p class="lead">{site.bio}</p>
+
+    <section class="block">
+      <h2>쓰는 기술</h2>
+      <div class="row" style="gap: 6px">{site.skills.map((s) => <span class="chip">{s}</span>)}</div>
+    </section>
+
+    <section class="block">
+      <h2>만든 게임</h2>
+      <ul class="games">
+        {games.map((g) => (
+          <li><a href={`/games/${g.slug}/`}>{g.title}</a> <span class="muted small">· {g.genre} · {g.status}</span></li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="block" id="contact">
+      <h2>연락하기</h2>
+      <p class="small" style="color: var(--ink-2)">게임 테스트 참여, 협업, 채용 문의 모두 환영해요.</p>
+      <ul class="links">
+        {site.email && <li><span class="muted">메일</span> <span>{site.email}</span></li>}
+        <li><span class="muted">GitHub</span> <a href={site.github}>{site.github.replace('https://', '')}</a></li>
+        {site.itch && <li><span class="muted">itch.io</span> <a href={site.itch}>{site.itch.replace('https://', '')}</a></li>}
+      </ul>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .about { max-width: 720px; }
+  h1 { font-size: clamp(28px, 4vw, 36px); }
+  .lead { margin-top: 12px; font-size: 17px; color: var(--ink-2); }
+  .block { margin-top: 40px; display: flex; flex-direction: column; gap: 12px; }
+  h2 { font-size: 20px; }
+  .games, .links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .links li { display: grid; grid-template-columns: 5em minmax(0, 1fr); gap: 12px; }
+  .links a, .games a { color: var(--accent-ink); overflow-wrap: anywhere; }
+</style>

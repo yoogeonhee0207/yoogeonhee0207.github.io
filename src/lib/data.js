@@ -1,0 +1,81 @@
+// 사이트 데이터를 한곳에서 읽어오는 도우미.
+// 게임: src/data/games/*.json  ·  커밋: src/data/commits/*.json  ·  글: src/posts/*.md
+import site from '../data/site.json';
+
+const gameMods = import.meta.glob('../data/games/*.json', { eager: true, import: 'default' });
+const commitMods = import.meta.glob('../data/commits/*.json', { eager: true, import: 'default' });
+const postMods = import.meta.glob('../posts/*.md', { eager: true });
+
+export { site };
+
+export const games = Object.values(gameMods).sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
+export const featuredGame = games.find((g) => g.featured) ?? games[0];
+
+export const commitsFor = (slug) => commitMods[`../data/commits/${slug}.json`] ?? null;
+
+// 모든 게임의 커밋을 날짜순(최신 먼저)으로 합침
+export const allCommits = games
+  .flatMap((g, gi) =>
+    (commitsFor(g.slug)?.commits ?? []).map((c, i) => ({ ...c, game: g.title, slug: g.slug, _o: gi * 10000 + i })),
+  )
+  .sort((a, b) => (a.date === b.date ? a._o - b._o : a.date < b.date ? 1 : -1));
+
+export const posts = Object.entries(postMods)
+  .map(([p, m]) => ({ slug: p.split('/').pop().replace(/\.md$/, ''), ...m.frontmatter, Content: m.Content }))
+  .filter((p) => !p.draft)
+  .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+export const STATUS = {
+  '개발 중': 'amber',
+  '데모': 'blue',
+  '출시': 'green',
+};
+
+export const TYPES = {
+  feat: '새 기능',
+  asset: '그림·에셋',
+  art: '그림·에셋',
+  fix: '버그 수정',
+  docs: '문서·기획',
+  refactor: '정리',
+  perf: '성능',
+  etc: '기타',
+};
+
+export const kstToday = () => new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 10);
+
+export const fmtDate = (d, withYear = false) => {
+  const [y, m, day] = String(d).slice(0, 10).split('-');
+  return withYear ? `${y}.${m}.${day}` : `${m}.${day}`;
+};
+
+// GitHub 잔디처럼 최근 N주 × 7일 칸을 만듦 (일요일 시작)
+export function heatmap(commits, weeks = 16) {
+  const counts = {};
+  for (const c of commits) counts[c.date] = (counts[c.date] ?? 0) + 1;
+  const today = kstToday();
+  const t = new Date(today + 'T00:00:00Z');
+  const start = new Date(t);
+  start.setUTCDate(t.getUTCDate() - t.getUTCDay() - (weeks - 1) * 7);
+  const level = (n) => (n === 0 ? 0 : n < 5 ? 1 : n < 15 ? 2 : n < 30 ? 3 : 4);
+  const cols = [];
+  for (let w = 0; w < weeks; w++) {
+    const col = [];
+    for (let d = 0; d < 7; d++) {
+      const day = new Date(start);
+      day.setUTCDate(start.getUTCDate() + w * 7 + d);
+      const key = day.toISOString().slice(0, 10);
+      const n = counts[key] ?? 0;
+      col.push({ date: key, count: n, level: level(n), future: key > today });
+    }
+    cols.push(col);
+  }
+  const days = Object.keys(counts);
+  return { cols, total: commits.length, activeDays: days.length, last: days.sort().at(-1) };
+}
+
+export const daysAgo = (date) => {
+  if (!date) return '';
+  const diff = Math.round((new Date(kstToday()) - new Date(date)) / 86400000);
+  return diff <= 0 ? '오늘' : diff === 1 ? '어제' : `${diff}일 전`;
+};

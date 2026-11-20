@@ -1,0 +1,14 @@
+{
+  "name": "yoogeonhee-blog",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "commits": "node scripts/fetch-commits.mjs"
+  },
+  "dependencies": {
+    "astro": "^7.4.13"
+  }
+}

@@ -1,0 +1,52 @@
+---
+import { STATUS } from '../lib/data.js';
+const { game, big = false } = Astro.props;
+---
+<a href={`/games/${game.slug}/`} class:list={['card', { big }]}>
+  <div class="cover">
+    <img src={game.cover} alt={game.coverAlt ?? ''} class="pixel" loading={big ? 'eager' : 'lazy'} width="640" height="360" />
+  </div>
+  <div class="body">
+    <div class="row" style="gap: 8px">
+      <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{game.status}</span>
+      <span class="mono small muted">{game.genre}</span>
+    </div>
+    <h3>{game.title} {game.titleEn && <span class="en">{game.titleEn}</span>}</h3>
+    <p class="sum">{game.summary}</p>
+    {big && game.modes && (
+      <ul class="modes">
+        {game.modes.map((m) => (
+          <li><span class={`sq ${m.color}`} aria-hidden="true"></span>{m.title}{m.badge && <span class="muted"> · {m.badge}</span>}</li>
+        ))}
+      </ul>
+    )}
+    <div class="row tags">
+      {game.tags?.map((t) => <span class="chip">{t}</span>)}
+    </div>
+    {big && <span class="go">게임 페이지 보기 →</span>}
+  </div>
+</a>
+
+<style>
+  .card { display: flex; flex-direction: column; border: 1px solid var(--line); border-radius: 14px; overflow: hidden; text-decoration: none; color: inherit; transition: border-color .15s, transform .15s; }
+  .card:hover { border-color: var(--ink-2); color: inherit; transform: translateY(-2px); }
+  .cover { background: var(--stage); aspect-ratio: 16 / 9; overflow: hidden; }
+  .cover img { width: 100%; height: 100%; object-fit: cover; }
+  .body { padding: 20px 22px 22px; display: flex; flex-direction: column; gap: 10px; flex: 1; }
+  h3 { font-size: 22px; }
+  .en { font-size: 15px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .sum { color: var(--ink-2); font-size: 15px; }
+  .tags { gap: 6px; margin-top: auto; padding-top: 4px; }
+  .big { flex-direction: row; flex-wrap: wrap; }
+  .big .cover { flex: 1.2 1 440px; min-width: 0; aspect-ratio: auto; min-height: 300px; }
+  .big .body { flex: 1 1 360px; min-width: 0; padding: 30px; justify-content: center; gap: 12px; }
+  .big h3 { font-size: 32px; }
+  .big .en { font-size: 17px; }
+  .big .tags { margin-top: 0; }
+  .modes { list-style: none; margin: 2px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; font-size: 15px; }
+  .modes li { display: flex; align-items: center; gap: 10px; }
+  .sq { width: 8px; height: 8px; border-radius: 2px; background: var(--accent); flex: none; }
+  .sq.blue { background: var(--blue); }
+  .sq.green { background: var(--green); }
+  .go { margin-top: 4px; font-weight: 500; font-size: 15px; color: var(--accent-ink); }
+</style>
