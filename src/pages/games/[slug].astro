@@ -11,6 +11,12 @@ export function getStaticPaths() {
 const { game } = Astro.props;
 const commits = commitsFor(game.slug)?.commits ?? [];
 const playable = game.status !== '개발 중' && !!game.webgl;
+// 올라가 있는 WebGL 빌드 표시 (scripts/publish-webgl.sh가 게임 JSON의 build를 관리)
+const b = game.webgl ? game.build : null;
+const info = [
+  ...(game.info ?? []),
+  ...(b ? [{ label: '빌드', value: `v${b.version} · 빌드 ${b.number} · ${b.date.replaceAll('-', '.')}` }] : []),
+];
 const art = (f) => `/games/${game.slug}/art/${f}`;
 ---
 <Base title={game.title} description={game.summary} image={game.cover}>
@@ -102,11 +108,11 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
           </dl>
         </div>
       )}
-      {game.info?.length > 0 && (
+      {info.length > 0 && (
         <div class="stack" style="gap: 12px">
           <h2 class="h">제작 정보</h2>
           <dl class="info">
-            {game.info.map((k) => (<><dt>{k.label}</dt><dd>{k.value}</dd></>))}
+            {info.map((k) => (<><dt>{k.label}</dt><dd>{k.value}</dd></>))}
           </dl>
         </div>
       )}

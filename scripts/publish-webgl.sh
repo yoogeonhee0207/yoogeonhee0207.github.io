@@ -14,6 +14,9 @@
 #   --no-commit          복사·JSON 설정까지만 하고 커밋하지 않음
 #
 # 알아둘 것
+#   - 빌드 번호: 게임 JSON의 build.number + 1 을 Unity에 -buildNumber 로 넘긴다 (게임 화면에 "빌드 N" 표시).
+#     빌드가 결과 폴더에 build.json(version·build·date)을 남기면 그 값을 게임 JSON의 build에 적는다.
+#     build.json을 만들지 않는 게임은 번호 없이 그대로 올라간다.
 #   - 게임 JSON의 status는 건드리지 않는다. '개발 중'이면 블로그에 ▶ 버튼이 나오지 않는다.
 #     단, push한 빌드는 /games/<slug>/play/ 주소를 아는 사람이면 누구나 열 수 있다 (공개 저장소).
 #   - Unity 에디터가 그 프로젝트를 열고 있으면 batchmode 빌드가 안 되므로 멈춘다.
@@ -55,6 +58,10 @@ WEBGL_URL="/games/$SLUG/play/index.html"
 grep -q '"webgl"[[:space:]]*:' "$GAME_JSON" || stop "$SLUG.json에 \"webgl\" 항목이 없습니다."
 [ -f "$PROJECT/ProjectSettings/ProjectVersion.txt" ] || stop "Unity 프로젝트가 아닙니다: $PROJECT"
 
+# 게임 JSON의 "build": { "number": N, ... } 에서 지난 빌드 번호를 읽는다 (없으면 0)
+PREV_BUILD=$(sed -n 's/.*"build"[[:space:]]*:[[:space:]]*{[^}]*"number"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' "$GAME_JSON" | head -1)
+NEXT_BUILD=$(( ${PREV_BUILD:-0} + 1 ))
+
 # ── 1. Unity 빌드 ─────────────────────────────────────────────
 if [ "$SKIP_BUILD" -eq 0 ]; then
   SETTINGS="$PROJECT/ProjectSettings/ProjectSettings.asset"
@@ -83,9 +90,9 @@ if [ "$SKIP_BUILD" -eq 0 ]; then
   LOG="$PROJECT/Logs/publish-webgl.log"
   MARK=$(mktemp)
   run_unity() {
-    say "Unity $VERSION: $1 실행 중… (로그: $LOG)"
+    say "Unity $VERSION: $1 실행 중… (빌드 $NEXT_BUILD, 로그: $LOG)"
     if ! "$UNITY" -batchmode -quit -projectPath "$PROJECT" -buildTarget WebGL \
-          -executeMethod "$1" -logFile "$LOG"; then
+          -executeMethod "$1" -buildNumber "$NEXT_BUILD" -logFile "$LOG"; then
       grep -E "error CS|Error:|Exception|BuildScript|Build Finished" "$LOG" | tail -15 >&2 || true
       stop "$1 실패. 위 내용과 로그를 확인해 주세요."
     fi
@@ -118,6 +125,24 @@ say "복사: public/games/$SLUG/play/"
 
 WEBGL_URL="$WEBGL_URL" perl -0pi -e 's/("webgl"\s*:\s*)"[^"]*"/$1"$ENV{WEBGL_URL}"/' "$GAME_JSON"
 grep -q "\"webgl\"[[:space:]]*:[[:space:]]*\"$WEBGL_URL\"" "$GAME_JSON" || stop "$SLUG.json의 webgl을 설정하지 못했습니다."
+# 빌드가 남긴 build.json → 게임 JSON의 build (한 줄로 유지)
+BUILD_NOTE=""
+if [ -f "$SRC/build.json" ]; then
+  field() { sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\{0,1\}\([^\",}]*\).*/\1/p" "$SRC/build.json" | head -1 | tr -d ' '; }
+  B_NUM=$(field build); B_VER=$(field version); B_DATE=$(field date)
+  if [ "${B_NUM:-0}" -ge 1 ] 2>/dev/null; then
+    BUILD_LINE="\"build\": { \"number\": $B_NUM, \"version\": \"$B_VER\", \"date\": \"$B_DATE\" }"
+    if grep -q '"build"[[:space:]]*:' "$GAME_JSON"; then
+      BUILD_LINE="$BUILD_LINE" perl -0pi -e 's/"build"\s*:\s*\{[^}]*\}/$ENV{BUILD_LINE}/' "$GAME_JSON"
+    else
+      BUILD_LINE="$BUILD_LINE" perl -0pi -e 's/("webgl"\s*:\s*"[^"]*",?)/$1\n  $ENV{BUILD_LINE},/' "$GAME_JSON"
+    fi
+    BUILD_NOTE=" $B_NUM (v$B_VER"
+    say "build = v$B_VER · 빌드 $B_NUM · $B_DATE"
+  else
+    say "⚠️ 번호 없는 테스트 빌드입니다. 게임 JSON의 build는 바꾸지 않았습니다."
+  fi
+fi
 STATUS=$(sed -n 's/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$GAME_JSON" | head -1)
 TITLE=$(sed -n 's/.*"title"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$GAME_JSON" | head -1)
 say "webgl = $WEBGL_URL / status = $STATUS (바꾸지 않음)"
@@ -132,7 +157,9 @@ if git -C "$BLOG" diff --cached --quiet -- "${PATHS[@]}"; then
   exit 0
 fi
 GAME_REV=$(git -C "$PROJECT" rev-parse --short HEAD 2>/dev/null || echo "알 수 없음")
-git -C "$BLOG" commit --quiet -m "content: ${TITLE:-$SLUG} WebGL 빌드 갱신 (게임 커밋 $GAME_REV)" -- "${PATHS[@]}"
+if [ -n "$BUILD_NOTE" ]; then MSG="content: ${TITLE:-$SLUG} WebGL 빌드$BUILD_NOTE, 게임 커밋 $GAME_REV)"
+else MSG="content: ${TITLE:-$SLUG} WebGL 빌드 갱신 (게임 커밋 $GAME_REV)"; fi
+git -C "$BLOG" commit --quiet -m "$MSG" -- "${PATHS[@]}"
 say "커밋: $(git -C "$BLOG" log -1 --format='%h %s')"
 
 if [ "$DO_PUSH" -eq 1 ]; then
