@@ -28,6 +28,8 @@
 #   - 게임 JSON의 status는 건드리지 않는다. '개발 중'이면 블로그에 ▶ 버튼이 나오지 않는다.
 #     단, push한 빌드는 /games/<slug>/play/ 주소를 아는 사람이면 누구나 열 수 있다 (공개 저장소).
 #   - Unity 에디터가 그 프로젝트를 열고 있으면 batchmode 빌드가 안 되므로 멈춘다.
+#   - batchmode가 바꿔 놓는 ProjectSettings/UnityConnectSettings.asset은 빌드 뒤 자동으로 되돌린다
+#     (빌드 전에 이미 고쳐져 있었으면 그대로 둔다).
 #   - 파일 하나가 100MB를 넘으면 GitHub에 올라가지 않으므로 복사 전에 멈춘다.
 #   - Unity 위치를 못 찾으면 UNITY_PATH=/…/Unity.app/Contents/MacOS/Unity 로 알려준다.
 set -euo pipefail
@@ -128,10 +130,27 @@ if [ "$SKIP_BUILD" -eq 0 ]; then
   mkdir -p "$PROJECT/Logs"
   ULOG="$PROJECT/Logs/publish-webgl.log"
   MARK=$(mktemp)
+  # batchmode는 UnityConnectSettings.asset을 매번 바꿔 놓는다 → 빌드 전에 깨끗했을 때만 끝나고 되돌린다
+  # (이미 고쳐져 있었다면 직접 바꾼 것일 수 있으니 건드리지 않는다)
+  CONNECT="ProjectSettings/UnityConnectSettings.asset"
+  CONNECT_CLEAN=0
+  if git -C "$PROJECT" ls-files --error-unmatch "$CONNECT" >/dev/null 2>&1 \
+     && git -C "$PROJECT" diff --quiet HEAD -- "$CONNECT" 2>/dev/null; then
+    CONNECT_CLEAN=1
+  fi
+  restore_connect() {
+    [ "$CONNECT_CLEAN" -eq 1 ] || return 0
+    git -C "$PROJECT" diff --quiet HEAD -- "$CONNECT" 2>/dev/null && return 0
+    git -C "$PROJECT" restore --staged --worktree --source=HEAD -- "$CONNECT" 2>/dev/null \
+      && say "Unity가 바꾼 $CONNECT 을 되돌렸습니다." || say "⚠️ $CONNECT 을 되돌리지 못했습니다. 커밋하지 마세요."
+  }
   run_unity() {
     say "Unity $VERSION: $1 실행 중… (v$NEXT_VER 빌드 $NEXT_BUILD, 로그: $ULOG)"
-    if ! "$UNITY" -batchmode -quit -projectPath "$PROJECT" -buildTarget WebGL \
-          -executeMethod "$1" -buildVersion "$NEXT_VER" -buildNumber "$NEXT_BUILD" -logFile "$ULOG"; then
+    local ok=1
+    "$UNITY" -batchmode -quit -projectPath "$PROJECT" -buildTarget WebGL \
+          -executeMethod "$1" -buildVersion "$NEXT_VER" -buildNumber "$NEXT_BUILD" -logFile "$ULOG" || ok=0
+    restore_connect
+    if [ "$ok" -eq 0 ]; then
       grep -E "error CS|Error:|Exception|BuildScript|Build Finished" "$ULOG" | tail -15 >&2 || true
       stop "$1 실패. 위 내용과 로그를 확인해 주세요."
     fi
