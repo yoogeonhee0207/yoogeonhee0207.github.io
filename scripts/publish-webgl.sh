@@ -138,7 +138,8 @@ if [ "$SKIP_BUILD" -eq 0 ]; then
   }
   for m in ${PRE_METHODS[@]+"${PRE_METHODS[@]}"}; do run_unity "$m"; done
   run_unity "$METHOD"
-  [ "$SRC/index.html" -nt "$MARK" ] || { rm -f "$MARK"; stop "빌드는 끝났는데 $OUT/index.html이 새로 만들어지지 않았습니다. 로그를 확인해 주세요."; }
+  # Unity는 바뀌지 않은 index.html을 다시 쓰지 않는다 → 결과 폴더에 새로 쓰인 파일이 하나라도 있는지 본다
+  [ -n "$(find "$SRC" -type f -newer "$MARK" 2>/dev/null | head -1)" ] || { rm -f "$MARK"; stop "빌드는 끝났는데 $OUT 에 새로 만들어진 파일이 없습니다. 로그를 확인해 주세요."; }
   rm -f "$MARK"
 else
   say "Unity 빌드를 건너뜁니다 (--skip-build)."
