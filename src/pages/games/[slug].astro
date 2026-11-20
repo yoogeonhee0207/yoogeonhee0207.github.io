@@ -88,13 +88,28 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
       <div class="section-head"><h2>등장 캐릭터</h2></div>
       <ul class="cast">
         {game.cast.map((c) => (
-          <li class:list={{ boss: c.boss }}>
-            <div class="sprite"><img src={art(c.img)} alt="" class="pixel" width={c.boss ? 64 : 32} height={c.boss ? 64 : 32} loading="lazy" /></div>
+          <li class:list={{ boss: c.boss, small: c.small }}>
+            <div class="sprite"><img src={art(c.img)} alt="" class="pixel" width={c.boss ? 64 : c.small ? 16 : 32} height={c.boss ? 64 : c.small ? 16 : 32} loading="lazy" /></div>
             <span class="n">{c.name}</span>
             <span class="r small muted">{c.role}</span>
           </li>
         ))}
       </ul>
+    </section>
+  )}
+
+  {game.gallery?.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>에셋</h2></div>
+      <div class="gallery">
+        {game.gallery.map((g) => (
+          <figure>
+            <a href={art(g.img)} aria-label={`${g.title} 크게 보기`}><img src={art(g.img)} alt={g.alt ?? g.title} width={g.width} height={g.height} loading="lazy" /></a>
+            <figcaption><span class="n">{g.title}</span><span class="small muted">{g.text}</span></figcaption>
+          </figure>
+        ))}
+      </div>
+      {game.galleryNote && <p class="small muted gallery-note">{game.galleryNote}</p>}
     </section>
   )}
 
@@ -176,8 +191,17 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   .cast .sprite { width: 64px; height: 64px; display: grid; place-items: center; }
   .cast img { width: 64px; height: 64px; }
   .cast li:not(.boss) img { width: 56px; height: 56px; }
+  .cast li.small img { width: 28px; height: 28px; }
   .cast .boss { background: var(--soft); }
   .cast .n { font-weight: 500; font-size: 15px; margin-top: 6px; }
+
+  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 20px; }
+  .gallery figure { margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
+  .gallery a { display: grid; place-items: center; background: #16181d; padding: 8px; flex: 1; }
+  .gallery img { display: block; max-width: 100%; height: auto; }
+  .gallery figcaption { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px 14px; border-top: 1px solid var(--line); }
+  .gallery .n { font-weight: 500; font-size: 15px; }
+  .gallery-note { margin-top: 12px; }
 
   .split { display: flex; flex-wrap: wrap; gap: 48px; }
   .split > :first-child { flex: 1 1 300px; min-width: 0; }

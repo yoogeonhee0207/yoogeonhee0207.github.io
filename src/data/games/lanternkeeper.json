@@ -39,7 +39,7 @@
     { "name": "해골 궁수", "img": "enemy_archer_idle.png", "role": "지하묘지 · 뿌리 숲" },
     { "name": "독 슬라임", "img": "enemy_slime_idle.png", "role": "뿌리 숲" },
     { "name": "거미", "img": "enemy_spider_idle.png", "role": "뿌리 숲" },
-    { "name": "새끼 거미", "img": "enemy_spiderling_idle.png", "role": "거미 여왕이 소환" },
+    { "name": "새끼 거미", "img": "enemy_spiderling_idle.png", "role": "거미 여왕이 소환", "small": true },
     { "name": "꺼진 등불지기", "img": "enemy_cultist_idle.png", "role": "성채" },
     { "name": "빛 먹는 망령", "img": "enemy_wraith_idle.png", "role": "성채 · 벽 통과" },
     { "name": "저주 궁수", "img": "enemy_cursed_archer_idle.png", "role": "성채" },
@@ -48,6 +48,13 @@
     { "name": "거미 여왕", "img": "boss_spider_queen_idle.png", "role": "2구역 보스", "boss": true },
     { "name": "등불을 삼키는 자", "img": "boss_fallen_keeper_idle.png", "role": "3구역 보스", "boss": true }
   ],
+  "gallery": [
+    { "title": "캐릭터 움직임", "img": "gallery_characters.webp", "width": 1116, "height": 888, "text": "주인공 걷기(앞·뒤)와 적 11종의 대기 · 움직임 4장", "alt": "주인공과 적 11종의 걷기 동작을 모은 픽셀아트" },
+    { "title": "타일 · 소품", "img": "gallery_tiles.webp", "width": 1098, "height": 528, "text": "지하묘지 · 뿌리 숲 · 성채의 문 · 바닥 · 벽과 소품, 제단 · 화로", "alt": "세 구역의 타일과 소품을 모은 픽셀아트" },
+    { "title": "아이콘 · 무기", "img": "gallery_items.webp", "width": 816, "height": 352, "text": "업그레이드 · 무기 아이콘 20개, 무기와 투사체, 회복약과 영혼 조각", "alt": "업그레이드 아이콘과 무기, 투사체, 줍는 물건을 모은 픽셀아트" },
+    { "title": "효과", "img": "gallery_effects.webp", "width": 1084, "height": 814, "text": "타격 · 사망 · 번개 · 회복 같은 전투 효과와 바닥 · 예고 표시", "alt": "전투 효과와 바닥 예고 표시를 모은 픽셀아트" }
+  ],
+  "galleryNote": "게임에 들어 있는 그림을 종류별로 모았어요. 그림 제작에 AI 도구를 활용했어요.",
   "controls": [
     { "key": "WASD · 방향키", "action": "이동" },
     { "key": "자동", "action": "공격 (등불 빛이 비추는 가장 가까운 적을 조준, 벽 뒤의 적은 맞지 않아요)" },

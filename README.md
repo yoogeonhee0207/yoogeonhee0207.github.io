@@ -50,6 +50,12 @@ scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibra
 - 100MB를 넘는 파일이 있으면 복사 전에 멈추고 알려줘요.
 - 옵션: `--skip-build`(이미 있는 빌드 사용), `--no-push`(커밋까지만), `--no-commit`(복사까지만), `--method`·`--pre-method`·`--out`(게임마다 다른 빌드 메서드·결과 폴더). 자세한 건 스크립트 맨 위 설명.
 
+**게임 페이지 "에셋" 칸: `scripts/make-gallery.py`**
+```
+../.venv/bin/python scripts/make-gallery.py lanternkeeper ../LanternKeeper/Assets/Art --zones catacomb,forest,castle
+```
+게임 그림 폴더의 png를 파일 이름 앞머리(`char_`·`enemy_` / `tile_`·`prop_` / `icon_`·`weapon_`·`proj_`·`pickup_` / `fx_`)로 나눠 `public/games/<slug>/art/gallery_*.webp` 4장을 만들어요. 게임 JSON의 `gallery`(제목·그림·크기·설명)와 `galleryNote`는 직접 적어요. `gallery`가 없는 게임은 칸이 나오지 않아요. 게임 그림이 바뀌면 다시 실행하고, 출력에 나온 크기가 달라졌으면 `gallery`의 `width`·`height`도 고쳐요.
+
 ## 커밋 기록 자동 연동
 
 게임 저장소는 비공개라서 토큰이 필요해요. 커밋 메시지·날짜만 가져오고 코드는 가져오지 않아요.
