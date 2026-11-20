@@ -42,7 +42,8 @@ scripts/fetch-commits.mjs   커밋 기록 가져오기
 scripts/publish-webgl.sh <slug> <Unity 프로젝트 폴더> [옵션]
 scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibraryBuilder.Build
 ```
-Unity batchmode 빌드 → `public/games/<slug>/play/` 복사 → 게임 JSON의 `webgl` 설정 → 커밋·push까지 해요.
+버전 판단 → Unity batchmode 빌드 → `public/games/<slug>/play/` 복사 → 게임 JSON의 `webgl`·`build` 설정 → 커밋·push까지 해요.
+- 버전은 `v0.큰수정.작은수정`. 게임 저장소의 git 기록 전체에서 계산해요 (파일에 적지 않음): main에 들어온 PR 머지(또는 직접 커밋)마다 `feat:`이 들어 있으면 큰 수정(가운데 +1), `fix:`·`data:`·`asset:` 등만 있으면 작은 수정(끝자리 +1), `docs:`·`tool:`뿐이면 그대로. 정식 출시는 게임 저장소에 태그 `v1.0.0`을 붙이면 거기서부터 다시 세요. 빌드 번호는 올릴 때마다 +1. 게임 화면과 게임 페이지 "빌드" 줄에 같이 보여요.
 - Unity 에디터가 그 프로젝트를 열고 있으면 멈춰요. 에디터를 닫고 실행.
 - `status`는 바꾸지 않아요. `개발 중`이면 ▶ 버튼은 안 나오지만, push한 빌드는 `/games/<slug>/play/` 주소를 아는 사람이면 열 수 있어요.
 - 100MB를 넘는 파일이 있으면 복사 전에 멈추고 알려줘요.

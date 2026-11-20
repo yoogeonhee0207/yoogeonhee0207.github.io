@@ -14,9 +14,17 @@
 #   --no-commit          복사·JSON 설정까지만 하고 커밋하지 않음
 #
 # 알아둘 것
-#   - 빌드 번호: 게임 JSON의 build.number + 1 을 Unity에 -buildNumber 로 넘긴다 (게임 화면에 "빌드 N" 표시).
+#   - 버전 v0.큰수정.작은수정: 게임 저장소의 기록 전체에서 계산한다 (파일에 적지 않음).
+#     main에 들어온 단위(PR 머지 하나, 또는 직접 올린 커밋 하나)를 처음부터 차례로 보면서
+#       feat: 커밋이 들어 있으면 큰 수정 (가운데 +1, 끝자리 0)
+#       그 밖의 수정(fix:·data:·asset:·refactor: 등)만 있으면 작은 수정 (끝자리 +1)
+#       docs:·tool:·chore:·test:·ci:·style: 뿐이면 그대로
+#     그래서 PR이 머지될 때마다 버전이 오르고, 같은 커밋은 언제 빌드해도 같은 버전이다.
+#     정식 출시: 게임 저장소에 태그 v1.0.0 을 붙이면 그 커밋이 1.0.0 이고 거기서부터 다시 센다.
+#   - 빌드 번호: 게임 JSON의 build.number + 1. 버전과 함께 Unity에 -buildVersion, -buildNumber 로 넘긴다
+#     (게임 화면에 "v0.2.1 · 빌드 3 · 11.20" 표시).
 #     빌드가 결과 폴더에 build.json(version·build·date)을 남기면 그 값을 게임 JSON의 build에 적는다.
-#     build.json을 만들지 않는 게임은 번호 없이 그대로 올라간다.
+#     build.json을 만들지 않는 게임은 버전·번호 없이 그대로 올라간다.
 #   - 게임 JSON의 status는 건드리지 않는다. '개발 중'이면 블로그에 ▶ 버튼이 나오지 않는다.
 #     단, push한 빌드는 /games/<slug>/play/ 주소를 아는 사람이면 누구나 열 수 있다 (공개 저장소).
 #   - Unity 에디터가 그 프로젝트를 열고 있으면 batchmode 빌드가 안 되므로 멈춘다.
@@ -58,9 +66,40 @@ WEBGL_URL="/games/$SLUG/play/index.html"
 grep -q '"webgl"[[:space:]]*:' "$GAME_JSON" || stop "$SLUG.json에 \"webgl\" 항목이 없습니다."
 [ -f "$PROJECT/ProjectSettings/ProjectVersion.txt" ] || stop "Unity 프로젝트가 아닙니다: $PROJECT"
 
-# 게임 JSON의 "build": { "number": N, ... } 에서 지난 빌드 번호를 읽는다 (없으면 0)
-PREV_BUILD=$(sed -n 's/.*"build"[[:space:]]*:[[:space:]]*{[^}]*"number"[[:space:]]*:[[:space:]]*\([0-9][0-9]*\).*/\1/p' "$GAME_JSON" | head -1)
+# 게임 JSON의 "build": { "number", "version", "date", "rev" } 에서 지난 빌드 정보를 읽는다
+BUILD_OBJ=$(sed -n 's/.*"build"[[:space:]]*:[[:space:]]*{\([^}]*\)}.*/\1/p' "$GAME_JSON" | head -1)
+bfield() { printf '%s' "$BUILD_OBJ" | sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\{0,1\}\([^\",]*\).*/\1/p" | tr -d ' '; }
+PREV_BUILD=$(bfield number); PREV_VER=$(bfield version); PREV_REV=$(bfield rev)
 NEXT_BUILD=$(( ${PREV_BUILD:-0} + 1 ))
+GAME_REV=$(git -C "$PROJECT" rev-parse --short HEAD 2>/dev/null || echo "")
+
+# ── 0. 버전 계산 (빌드할 때만) ────────────────────────────────
+# 게임 저장소 기록에서 v큰.중.작 을 계산한다. 가장 가까운 vX.Y.Z 태그가 있으면 거기서부터, 없으면 처음부터.
+game_version() {
+  local base range a b c rev p1 p2 rest subjects
+  base=$(git -C "$PROJECT" describe --tags --first-parent --abbrev=0 --match 'v[0-9]*.[0-9]*.[0-9]*' HEAD 2>/dev/null || true)
+  if [ -n "$base" ]; then range="$base..HEAD"; IFS=. read -r a b c <<EOT
+${base#v}
+EOT
+  else range=HEAD; a=0; b=0; c=0; fi
+  while read -r rev p1 p2 rest; do
+    [ -n "$rev" ] || continue
+    if [ -n "$p2" ]; then subjects=$(git -C "$PROJECT" log --no-merges --format=%s "$p1..$p2")
+    else subjects=$(git -C "$PROJECT" log -1 --format=%s "$rev"); fi
+    if printf '%s\n' "$subjects" | grep -qE '^feat(\(|:|!)'; then b=$(( b + 1 )); c=0
+    elif printf '%s\n' "$subjects" | grep -vE '^(docs|tool|chore|test|ci|style)(\(|:|!)' | grep -q .; then c=$(( c + 1 )); fi
+  done <<EOT
+$(git -C "$PROJECT" rev-list --first-parent --reverse --parents $range)
+EOT
+  printf '%s.%s.%s' "$a" "$b" "$c"
+}
+NEXT_VER=""
+if [ "$SKIP_BUILD" -eq 0 ]; then
+  git -C "$PROJECT" rev-parse --git-dir >/dev/null 2>&1 || stop "게임 폴더가 git 저장소가 아니라 버전을 계산할 수 없습니다: $PROJECT"
+  NEXT_VER=$(game_version)
+  say "버전: v$NEXT_VER (게임 커밋 $GAME_REV 까지의 기록으로 계산, 지난번 올린 것은 v${PREV_VER:-없음})"
+  [ -n "$(git -C "$PROJECT" status --porcelain 2>/dev/null | grep -v 'UnityConnectSettings.asset' || true)" ] && say "⚠️ 게임 폴더에 커밋 안 된 변경이 있습니다. 버전은 커밋된 기록만 봅니다."
+fi
 
 # ── 1. Unity 빌드 ─────────────────────────────────────────────
 if [ "$SKIP_BUILD" -eq 0 ]; then
@@ -87,13 +126,13 @@ if [ "$SKIP_BUILD" -eq 0 ]; then
   fi
 
   mkdir -p "$PROJECT/Logs"
-  LOG="$PROJECT/Logs/publish-webgl.log"
+  ULOG="$PROJECT/Logs/publish-webgl.log"
   MARK=$(mktemp)
   run_unity() {
-    say "Unity $VERSION: $1 실행 중… (빌드 $NEXT_BUILD, 로그: $LOG)"
+    say "Unity $VERSION: $1 실행 중… (v$NEXT_VER 빌드 $NEXT_BUILD, 로그: $ULOG)"
     if ! "$UNITY" -batchmode -quit -projectPath "$PROJECT" -buildTarget WebGL \
-          -executeMethod "$1" -buildNumber "$NEXT_BUILD" -logFile "$LOG"; then
-      grep -E "error CS|Error:|Exception|BuildScript|Build Finished" "$LOG" | tail -15 >&2 || true
+          -executeMethod "$1" -buildVersion "$NEXT_VER" -buildNumber "$NEXT_BUILD" -logFile "$ULOG"; then
+      grep -E "error CS|Error:|Exception|BuildScript|Build Finished" "$ULOG" | tail -15 >&2 || true
       stop "$1 실패. 위 내용과 로그를 확인해 주세요."
     fi
   }
@@ -131,7 +170,7 @@ if [ -f "$SRC/build.json" ]; then
   field() { sed -n "s/.*\"$1\"[[:space:]]*:[[:space:]]*\"\{0,1\}\([^\",}]*\).*/\1/p" "$SRC/build.json" | head -1 | tr -d ' '; }
   B_NUM=$(field build); B_VER=$(field version); B_DATE=$(field date)
   if [ "${B_NUM:-0}" -ge 1 ] 2>/dev/null; then
-    BUILD_LINE="\"build\": { \"number\": $B_NUM, \"version\": \"$B_VER\", \"date\": \"$B_DATE\" }"
+    BUILD_LINE="\"build\": { \"number\": $B_NUM, \"version\": \"$B_VER\", \"date\": \"$B_DATE\", \"rev\": \"$GAME_REV\" }"
     if grep -q '"build"[[:space:]]*:' "$GAME_JSON"; then
       BUILD_LINE="$BUILD_LINE" perl -0pi -e 's/"build"\s*:\s*\{[^}]*\}/$ENV{BUILD_LINE}/' "$GAME_JSON"
     else
@@ -156,9 +195,8 @@ if git -C "$BLOG" diff --cached --quiet -- "${PATHS[@]}"; then
   say "이전 빌드와 달라진 것이 없어 커밋하지 않았습니다."
   exit 0
 fi
-GAME_REV=$(git -C "$PROJECT" rev-parse --short HEAD 2>/dev/null || echo "알 수 없음")
-if [ -n "$BUILD_NOTE" ]; then MSG="content: ${TITLE:-$SLUG} WebGL 빌드$BUILD_NOTE, 게임 커밋 $GAME_REV)"
-else MSG="content: ${TITLE:-$SLUG} WebGL 빌드 갱신 (게임 커밋 $GAME_REV)"; fi
+if [ -n "$BUILD_NOTE" ]; then MSG="content: ${TITLE:-$SLUG} WebGL 빌드$BUILD_NOTE, 게임 커밋 ${GAME_REV:-알 수 없음})"
+else MSG="content: ${TITLE:-$SLUG} WebGL 빌드 갱신 (게임 커밋 ${GAME_REV:-알 수 없음})"; fi
 git -C "$BLOG" commit --quiet -m "$MSG" -- "${PATHS[@]}"
 say "커밋: $(git -C "$BLOG" log -1 --format='%h %s')"
 

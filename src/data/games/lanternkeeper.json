@@ -12,7 +12,7 @@
   "cover": "/games/lanternkeeper/art/cover.webp",
   "coverAlt": "등불지기 타이틀 그림: 등불을 든 주인공 앞에 해골왕과 거미 여왕이 서 있는 지하 던전",
   "webgl": "/games/lanternkeeper/play/index.html",
-  "build": { "number": 2, "version": "0.1", "date": "2026-11-20" },
+  "build": { "number": 2, "version": "0.1", "date": "2026-11-20", "rev": "13e9820" },
   "itch": "",
   "repo": "yoogeonhee0207/LanternKeeper",
   "modes": [
