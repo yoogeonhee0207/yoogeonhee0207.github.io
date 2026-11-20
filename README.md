@@ -37,6 +37,17 @@ scripts/fetch-commits.mjs   커밋 기록 가져오기
 3. 게임 JSON에 `"webgl": "/games/<slug>/play/index.html"`, `status`를 `데모` 또는 `출시`로.
 4. 파일 하나가 100MB를 넘으면 GitHub에 올라가지 않아요. 넘으면 itch.io에 올리고 `itch`에 주소만.
 
+**위 과정을 한 번에: `scripts/publish-webgl.sh`**
+```
+scripts/publish-webgl.sh <slug> <Unity 프로젝트 폴더> [옵션]
+scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibraryBuilder.Build
+```
+Unity batchmode 빌드 → `public/games/<slug>/play/` 복사 → 게임 JSON의 `webgl` 설정 → 커밋·push까지 해요.
+- Unity 에디터가 그 프로젝트를 열고 있으면 멈춰요. 에디터를 닫고 실행.
+- `status`는 바꾸지 않아요. `개발 중`이면 ▶ 버튼은 안 나오지만, push한 빌드는 `/games/<slug>/play/` 주소를 아는 사람이면 열 수 있어요.
+- 100MB를 넘는 파일이 있으면 복사 전에 멈추고 알려줘요.
+- 옵션: `--skip-build`(이미 있는 빌드 사용), `--no-push`(커밋까지만), `--no-commit`(복사까지만), `--method`·`--pre-method`·`--out`(게임마다 다른 빌드 메서드·결과 폴더). 자세한 건 스크립트 맨 위 설명.
+
 ## 커밋 기록 자동 연동
 
 게임 저장소는 비공개라서 토큰이 필요해요. 커밋 메시지·날짜만 가져오고 코드는 가져오지 않아요.
