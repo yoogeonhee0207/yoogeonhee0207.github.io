@@ -6,7 +6,7 @@
 - 게임 하나 = `src/data/games/<slug>.json` 하나. 페이지·카드는 데이터에서 자동 생성되니 페이지 코드를 게임마다 복사하지 않는다.
 - `src/data/commits/*.json`은 `scripts/fetch-commits.mjs`가 만드는 파일. 손으로 고치지 않는다.
 - 게임 저장소(비공개 `yoogeonhee0207/LanternKeeper`)의 코드·문서 내용은 이 공개 저장소에 옮기지 않는다. 커밋 메시지·날짜, 공개해도 된다고 한 그림만.
-- 게임 제작에 AI를 활용했다는 표기(게임 개발은 Claude Code, 에셋 이미지는 Codex)는 지우지 않는다 (사용자 결정).
+- 게임 제작에 AI를 활용했다는 표기(게임 개발은 Claude Code, 에셋 이미지는 Codex·힉스필드)는 지우지 않는다 (사용자 결정).
 - 디자인: 흰 바탕 개발자 블로그, IBM Plex Sans KR + IBM Plex Mono, 강조색은 등불 호박색 `--accent` 하나. 다크 모드는 `prefers-color-scheme`로 자동. 색은 `src/styles/global.css` 변수만 쓴다.
 - 게임 상태는 `개발 중` / `데모` / `출시` 세 가지. 게임 저장소의 `docs/PROGRESS.md`가 바뀌면 게임 JSON의 설명·모드 badge가 실제 진행과 맞는지 확인한다.
 
