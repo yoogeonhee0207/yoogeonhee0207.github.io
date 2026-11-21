@@ -1,7 +1,16 @@
 ---
 import { TYPES, fmtDate } from '../lib/data.js';
-// commits: [{sha,date,type,msg}]  milestones: { "커밋 메시지": "표시할 이름" }
-const { commits = [], milestones = {}, initial = 20 } = Astro.props;
+// commits: [{sha,date,type,msg,dev?}]  milestones: { "커밋 메시지": "표시할 이름" }
+// build: 게임 JSON의 build ({number, version}). dev: true 인 커밋(올린 빌드 뒤에 쌓인 것)이 있으면
+// '개발 중'과 '빌드에 포함됨' 두 칸으로 나눠 보여 준다. 없으면 예전처럼 한 목록.
+const { commits = [], milestones = {}, initial = 20, build = null } = Astro.props;
+const dev = commits.filter((c) => c.dev);
+const groups = dev.length > 0
+  ? [
+      { id: 'dev', title: '개발 중', note: `다음 빌드에 들어갈 내용 · ${dev.length}개`, items: dev },
+      { id: 'in', title: build ? `v${build.version} · 빌드 ${build.number}에 포함` : '빌드에 포함', note: '', items: commits.filter((c) => !c.dev) },
+    ]
+  : [{ id: 'all', title: '', note: '', items: commits }];
 const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.filter((c) => c.type === b).length - commits.filter((c) => c.type === a).length);
 ---
 <div class="tl" data-timeline data-initial={initial}>
@@ -18,21 +27,28 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
   {commits.length === 0 ? (
     <p class="empty">아직 가져온 커밋 기록이 없어요.</p>
   ) : (
-    <ol class="list">
-      {commits.map((c, i) => (
-        <li data-type={c.type} class={`${c.type}${milestones[c.msg] ? ' ms' : ''}`} hidden={i >= initial}>
-          <span class="pin" aria-hidden="true"></span>
-          <div class="row meta">
-            <time class="mono small muted" datetime={c.date}>{fmtDate(c.date)}</time>
-            <span class={`type ${c.type}`}>{c.type}</span>
-            {milestones[c.msg] && <span class="badge dark">{milestones[c.msg]}</span>}
-          </div>
-          <p class="msg">{c.msg}</p>
-        </li>
-      ))}
-    </ol>
+    groups.map((g) => (
+      <div class={`group ${g.id}`} data-group>
+        {g.title && (
+          <p class="gh"><span class="gt">{g.title}</span>{g.note && <span class="small muted">{g.note}</span>}</p>
+        )}
+        <ol class="list">
+          {g.items.map((c, i) => (
+            <li data-type={c.type} class={`${c.type}${milestones[c.msg] ? ' ms' : ''}`} hidden={i >= initial}>
+              <span class="pin" aria-hidden="true"></span>
+              <div class="row meta">
+                <time class="mono small muted" datetime={c.date}>{fmtDate(c.date)}</time>
+                <span class={`type ${c.type}`}>{c.type}</span>
+                {milestones[c.msg] && <span class="badge dark">{milestones[c.msg]}</span>}
+              </div>
+              <p class="msg">{c.msg}</p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))
   )}
-  {commits.length > initial && <button type="button" class="btn more" data-more>더 보기</button>}
+  {groups.some((g) => g.items.length > initial) && <button type="button" class="btn more" data-more>더 보기</button>}
 </div>
 
 <script>
@@ -44,10 +60,16 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
     let filter = 'all';
     let shown = step;
     const render = () => {
-      const match = items.filter((li) => filter === 'all' || li.dataset.type === filter);
+      // 칸(개발 중 / 빌드에 포함)마다 따로 shown개까지 보여 준다
+      let rest = false;
       items.forEach((li) => (li.hidden = true));
-      match.slice(0, shown).forEach((li) => (li.hidden = false));
-      if (more) more.hidden = match.length <= shown;
+      root.querySelectorAll('[data-group]').forEach((g) => {
+        const match = [...g.querySelectorAll('li')].filter((li) => filter === 'all' || li.dataset.type === filter);
+        match.slice(0, shown).forEach((li) => (li.hidden = false));
+        g.hidden = match.length === 0; // 보일 커밋이 없는 칸은 제목까지 숨긴다
+        if (match.length > shown) rest = true;
+      });
+      if (more) more.hidden = !rest;
     };
     chips.forEach((b) =>
       b.addEventListener('click', () => {
@@ -72,6 +94,12 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
   .f[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
   .f[aria-pressed='true'] span { color: inherit; opacity: .7; }
   .list { list-style: none; margin: 0; padding: 0 0 0 18px; border-left: 2px solid var(--line-2); display: flex; flex-direction: column; }
+  .group { display: flex; flex-direction: column; gap: 14px; }
+  .group[hidden] { display: none; }
+  .gh { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0; }
+  .gt { font-weight: 500; font-size: 15px; }
+  .group.dev .gt { color: var(--accent-ink); }
+  .group.dev .list { border-left-style: dashed; }
   li { position: relative; padding: 0 0 20px 18px; }
   li[hidden] { display: none; }
   .pin { position: absolute; left: -26px; top: 7px; width: 12px; height: 12px; border-radius: 50%; background: var(--bg); border: 2px solid #9aa0ab; }

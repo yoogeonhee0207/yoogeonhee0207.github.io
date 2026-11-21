@@ -73,6 +73,8 @@ scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibra
 내 컴퓨터에서 직접 갱신: `node scripts/fetch-commits.mjs --local lanternkeeper=../LanternKeeper`
 
 커밋 메시지는 `feat: …` / `fix: …` / `asset: …` / `docs: …` 형식으로 쓰면 종류별로 걸러 볼 수 있어요.
+
+게임 페이지 "개발 기록"은 두 칸으로 나뉘어요. 블로그에 올린 빌드(게임 JSON의 `build.rev`) 뒤에 쌓인 커밋은 **개발 중**, 그 전 것은 **v… · 빌드 N에 포함**. `scripts/publish-webgl.sh`로 새 빌드를 올리면 경계가 저절로 옮겨져요. 올린 뒤 새 커밋이 없으면 나누지 않고 한 목록으로 보여요.
 주요 단계 표시는 게임 JSON의 `milestones`에 `"커밋 메시지": "표시 이름"`으로.
 
 ## 실행

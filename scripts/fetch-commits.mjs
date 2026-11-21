@@ -7,6 +7,9 @@
 //                (게임 저장소를 클론해 둔 폴더에서 git log 로 읽음, 토큰 필요 없음)
 //
 // 토큰이 없거나 가져오기에 실패하면 기존 파일을 그대로 둡니다 (사이트 빌드는 계속됨).
+//
+// 게임 JSON에 build.rev(블로그에 올린 빌드의 게임 커밋)가 있으면, 그 뒤에 쌓인 커밋에 dev: true 를 붙입니다.
+// 게임 페이지 '개발 기록'이 이것으로 '개발 중'과 '빌드에 포함됨'을 나눠 보여 줘요.
 
 import { readdir, readFile, writeFile, mkdir } from 'node:fs/promises';
 import { execFileSync } from 'node:child_process';
@@ -26,19 +29,24 @@ const parse = (subject) => {
   return m ? { type: m[1].toLowerCase(), msg: m[3].trim() } : { type: 'etc', msg: subject.trim() };
 };
 
+const ghGet = async (url, token) => {
+  const res = await fetch(url, {
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${token}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+  if (!res.ok) throw new Error(`GitHub API ${res.status}: ${await res.text()}`);
+  return res.json();
+};
+
 async function fromGitHub(repo, token) {
   const out = [];
   for (let page = 1; page <= Math.ceil(MAX_COMMITS / 100) + 2 && out.length < MAX_COMMITS; page++) {
-    const res = await fetch(`https://api.github.com/repos/${repo}/commits?per_page=100&page=${page}`, {
-      headers: {
-        Accept: 'application/vnd.github+json',
-        Authorization: `Bearer ${token}`,
-        'X-GitHub-Api-Version': '2022-11-28',
-      },
-    });
-    if (!res.ok) throw new Error(`GitHub API ${res.status}: ${await res.text()}`);
-    const list = await res.json();
+    const list = await ghGet(`https://api.github.com/repos/${repo}/commits?per_page=100&page=${page}`, token);
     if (!list.length) break;
+    if (page === 1) out.head = list[0].sha; // 기본 브랜치의 최신 커밋 (merge 포함)
     for (const c of list) {
       if (c.parents.length > 1) continue; // merge 커밋 제외
       const subject = c.commit.message.split('\n')[0];
@@ -46,6 +54,22 @@ async function fromGitHub(repo, token) {
     }
   }
   return out;
+}
+
+// 올린 빌드(rev) 뒤에 쌓인 커밋의 짧은 sha 모음. rev가 최신이면 빈 모음.
+async function devFromGitHub(repo, token, rev, head) {
+  const shas = new Set();
+  for (let page = 1; page <= Math.ceil(MAX_COMMITS / 100); page++) {
+    const cmp = await ghGet(`https://api.github.com/repos/${repo}/compare/${rev}...${head}?per_page=100&page=${page}`, token);
+    for (const c of cmp.commits ?? []) shas.add(c.sha.slice(0, 7));
+    if ((cmp.commits ?? []).length < 100) break;
+  }
+  return shas;
+}
+
+function devFromLocal(dir, rev) {
+  const out = execFileSync('git', ['-C', dir, 'rev-list', '--no-merges', '--abbrev-commit', '--abbrev=7', `${rev}..HEAD`], { encoding: 'utf8' });
+  return new Set(out.trim().split('\n').filter(Boolean).map((s) => s.slice(0, 7)));
 }
 
 function fromLocal(dir) {
@@ -85,10 +109,22 @@ for (const file of (await readdir(GAMES_DIR)).filter((f) => f.endsWith('.json'))
       console.log(`[commits] ${game.slug}: 토큰(GAME_REPO_TOKEN)이 없어 건너뜀 — 기존 기록 유지`);
       continue;
     }
+    const head = commits.head;
     commits = commits.slice(0, MAX_COMMITS);
+    let devCount = null;
+    const rev = game.webgl ? game.build?.rev : null;
+    if (rev) {
+      try {
+        const dev = localArgs[game.slug] ? devFromLocal(localArgs[game.slug], rev) : await devFromGitHub(game.repo, token, rev, head);
+        commits = commits.map((c) => (dev.has(c.sha) ? { ...c, dev: true } : c));
+        devCount = commits.filter((c) => c.dev).length;
+      } catch (err) {
+        console.warn(`[commits] ${game.slug}: 올린 빌드(${rev}) 뒤 커밋을 가리지 못함 — 나누지 않고 표시\n  ${err.message}`);
+      }
+    }
     const data = { repo: game.repo, updatedAt: new Date().toISOString(), total: commits.length, commits };
     await writeFile(path.join(OUT_DIR, `${game.slug}.json`), JSON.stringify(data, null, 1) + '\n');
-    console.log(`[commits] ${game.slug}: 커밋 ${commits.length}개 저장`);
+    console.log(`[commits] ${game.slug}: 커밋 ${commits.length}개 저장${devCount === null ? '' : ` (올린 빌드 뒤 ${devCount}개)`}`);
   } catch (err) {
     console.warn(`[commits] ${game.slug}: 가져오기 실패 — 기존 기록 유지\n  ${err.message}`);
   }
