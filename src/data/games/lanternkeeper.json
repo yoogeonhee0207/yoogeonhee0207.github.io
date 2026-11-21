@@ -7,68 +7,68 @@
   "order": 1,
   "genre": "탑다운 로그라이트 액션",
   "tags": ["Unity 6", "16비트 픽셀아트", "AI 활용 제작"],
-  "summary": "저주받은 지하 던전을 등불 하나에 의지해 내려가는 탑다운 로그라이트. 조작은 이동뿐이고, 공격은 등불 빛이 닿는 적에게 자동으로 나가요.",
-  "description": "등불 하나에 의지해 저주받은 지하 던전 세 구역을 뚫고 내려가세요. 조작은 이동뿐이고, 등불 빛 안에 들어온 적에게 무기가 자동으로 날아가요. 적이 떨어뜨린 영혼 조각으로 게이지를 채우면 업그레이드 셋 중 하나를 골라요. 죽어도 모은 영혼 조각으로 새 무기와 업그레이드를 해금해 다음 판에 도전합니다. 첫 판은 짧은 이야기로 시작하고, 구역마다 음악이 바뀌어요.",
+  "summary": "마을 등마루에서 출발해 등불 하나로 어두운 길을 내려가는 게임. 지금은 미로 던전을 내려가는 본편을 플레이할 수 있고, 같은 마을에서 다른 갈래의 게임으로 이어져요.",
+  "description": "등불지기는 마을 등마루에서 시작해 여러 갈래의 게임으로 들어가는 하나의 게임이에요. 본편은 등불 하나에 의지해 지하 던전 세 구역을 내려가는 탑다운 로그라이트예요. 조작은 이동뿐이고, 등불 빛 안에 들어온 적에게 무기가 자동으로 날아가요. 적이 떨어뜨린 영혼 조각으로 게이지를 채우면 카드 셋 중 하나를 고르고, 쓰러져도 모은 조각으로 마을의 제단에서 능력을 강화해 다시 내려갑니다.",
   "cover": "/games/lanternkeeper/art/cover.webp",
   "coverAlt": "등불지기 타이틀 그림: 등불을 든 주인공 앞에 해골왕, 등불을 삼키는 자, 거미 여왕이 서 있는 지하 던전",
   "webgl": "/games/lanternkeeper/play/index.html",
-  "build": { "number": 9, "version": "0.66.0", "date": "2026-11-21", "rev": "60053af" },
+  "build": {"number": 9, "version": "0.66.0", "date": "2026-11-21", "rev": "60053af"},
   "itch": "",
   "repo": "yoogeonhee0207/LanternKeeper",
-  "modes": [
-    {
-      "title": "미로 탐험 + 보스 격파",
-      "badge": "기능 완성 · 테스트 중",
-      "color": "amber",
-      "text": "들어갈 때마다 새로 만들어지는 미로를 원뿔 모양 등불 빛에 기대어 헤쳐 나가요. 지나온 길은 작은 미니맵에 남고, 미니맵을 누르면 방 전체 지도가 펼쳐져요. 잠든 적은 가까이 가면 깨어나 쫓아오고, 멀리 따돌리면 제자리로 돌아가 다시 잠들어요. 구역마다 쉼터에서 숨을 고르고, 화로를 모두 밝혀야 보스 문이 열립니다. 막다른 길에는 작은 보상이 숨어 있어요. 도중에 나가도 타이틀에서 이어서 할 수 있어요.",
-      "detail": "무너진 지하묘지 → 해골왕 · 지하 뿌리 숲 → 거미 여왕 · 저주받은 성채 → 등불을 삼키는 자"
-    },
-    {
-      "title": "생존 모드",
-      "badge": "기획 완료 · 개발 예정",
-      "color": "blue",
-      "text": "미로 없이 넓은 방 하나에서 시간이 갈수록 거세지는 적을 버티는 뱀서라이크 모드. 클리어는 없고, 가장 오래 버틴 시간이 기록돼요.",
-      "detail": "8분에 해골왕, 15분에 거미 여왕 등장 · 신기록이면 해금용 조각 보상"
-    }
+  "world": {
+    "title": "세계관",
+    "lines": ["이 세계에서 등불은 죽은 이의 영혼을 저편으로 이끄는 불이고, 등불지기는 그 길을 안내하는 사람이에요.", "마을 아래 던전은 원래 영혼이 내려가던 장례 길이에요. 묻는 곳에서 뿌리 길을 지나, 저편으로 가는 문을 지키는 성채까지 이어져요.", "그 길이 막히면서 지상의 등불이 하나둘 꺼져 가요. 마지막 등불지기가 등불 하나를 들고 길을 다시 열러 내려갑니다."]
+  },
+  "hub": {
+    "title": "등마루에서 갈 수 있는 곳",
+    "text": "게임을 켜면 마을 등마루에 서 있어요. 마을을 걸어 입구 앞에 서면 그곳의 게임으로 들어가요. 등불지기는 이 마을 하나에 여러 갈래의 게임이 모이는 게임이고, 입구는 하나씩 늘어나요."
+  },
+  "places": [
+    {"title": "던전", "kind": "본편 · 미로 로그라이트", "badge": "플레이 가능", "state": "open", "color": "amber", "text": "들어갈 때마다 새로 만들어지는 미로를 원뿔 모양 등불 빛에 기대어 헤쳐 나가요. 지나온 길은 작은 미니맵에 남고, 미니맵을 누르면 방 전체 지도가 펼쳐져요. 잠든 적은 가까이 가면 깨어나 쫓아오고, 멀리 따돌리면 제자리로 돌아가 다시 잠들어요. 구역마다 쉼터에서 숨을 고르고, 화로를 모두 밝혀야 보스 문이 열립니다. 막다른 길에는 작은 보상이 숨어 있어요. 도중에 마을로 나가도 던전 입구에서 이어서 할 수 있어요.", "detail": "무너진 지하묘지 → 해골왕 · 지하 뿌리 숲 → 거미 여왕 · 저주받은 성채 → 등불을 삼키는 자"},
+    {"title": "제단", "kind": "강화 · 판 사이의 성장", "badge": "플레이 가능", "state": "open", "color": "green", "text": "던전에서 모은 영혼 조각으로 체력·공격력 같은 기본 능력 일곱 가지를 다섯 단계까지 키워요. 한 번 올린 강화는 모든 판에 이어져요.", "detail": "무기와 기술 카드는 잠금 없이 처음부터 전부 나와요"},
+    {"title": "막힌 길목", "kind": "생존 모드 · 뱀서라이크", "badge": "기획 완료 · 개발 예정", "state": "planned", "color": "blue", "text": "미로 없이 넓은 방 하나에서 시간이 갈수록 거세지는 적을 버티는 뱀서라이크 모드. 클리어는 없고, 가장 오래 버틴 시간이 기록돼요.", "detail": "8분에 해골왕, 15분에 거미 여왕 등장 · 강화는 던전과 함께 써요"},
+    {"title": "다른 길", "kind": "다른 장르의 게임", "badge": "준비 중", "state": "planned", "color": "gray", "text": "조작이나 화면이 다른 게임은 마을 가장자리의 길목으로 들어가게 돼요. 지금은 울타리와 바위로 막혀 있고, 게임이 생기면 길이 열려요.", "detail": "어떤 게임이 될지는 아직 정하지 않았어요"}
   ],
   "cast": [
-    { "name": "등불지기", "img": "char_hero_idle_01.png", "role": "주인공" },
-    { "name": "해골 병사", "img": "enemy_skeleton_idle.png", "role": "지하묘지" },
-    { "name": "박쥐", "img": "enemy_bat_idle.png", "role": "지하묘지 · 뿌리 숲" },
-    { "name": "구울", "img": "enemy_ghoul_idle.png", "role": "지하묘지" },
-    { "name": "해골 궁수", "img": "enemy_archer_idle.png", "role": "지하묘지 · 뿌리 숲" },
-    { "name": "독 슬라임", "img": "enemy_slime_idle.png", "role": "뿌리 숲" },
-    { "name": "거미", "img": "enemy_spider_idle.png", "role": "뿌리 숲" },
-    { "name": "새끼 거미", "img": "enemy_spiderling_idle.png", "role": "거미 여왕이 소환", "small": true },
-    { "name": "꺼진 등불지기", "img": "enemy_cultist_idle.png", "role": "성채" },
-    { "name": "빛 먹는 망령", "img": "enemy_wraith_idle.png", "role": "성채 · 벽 통과" },
-    { "name": "저주 궁수", "img": "enemy_cursed_archer_idle.png", "role": "성채" },
-    { "name": "저주 기사", "img": "enemy_cursed_knight_idle.png", "role": "성채" },
-    { "name": "해골왕", "img": "boss_skeleton_king_idle.png", "role": "1구역 보스", "boss": true },
-    { "name": "거미 여왕", "img": "boss_spider_queen_idle.png", "role": "2구역 보스", "boss": true },
-    { "name": "등불을 삼키는 자", "img": "boss_fallen_keeper_idle.png", "role": "3구역 보스", "boss": true }
+    {"name": "등불지기", "img": "char_hero_idle_01.png", "role": "주인공"},
+    {"name": "해골 병사", "img": "enemy_skeleton_idle.png", "role": "지하묘지"},
+    {"name": "박쥐", "img": "enemy_bat_idle.png", "role": "지하묘지 · 뿌리 숲"},
+    {"name": "구울", "img": "enemy_ghoul_idle.png", "role": "지하묘지"},
+    {"name": "해골 궁수", "img": "enemy_archer_idle.png", "role": "지하묘지 · 뿌리 숲"},
+    {"name": "독 슬라임", "img": "enemy_slime_idle.png", "role": "뿌리 숲"},
+    {"name": "거미", "img": "enemy_spider_idle.png", "role": "뿌리 숲"},
+    {"name": "새끼 거미", "img": "enemy_spiderling_idle.png", "role": "거미 여왕이 소환", "small": true},
+    {"name": "꺼진 등불지기", "img": "enemy_cultist_idle.png", "role": "성채"},
+    {"name": "빛 먹는 망령", "img": "enemy_wraith_idle.png", "role": "성채 · 벽 통과"},
+    {"name": "저주 궁수", "img": "enemy_cursed_archer_idle.png", "role": "성채"},
+    {"name": "저주 기사", "img": "enemy_cursed_knight_idle.png", "role": "성채"},
+    {"name": "해골왕", "img": "boss_skeleton_king_idle.png", "role": "1구역 보스", "boss": true},
+    {"name": "거미 여왕", "img": "boss_spider_queen_idle.png", "role": "2구역 보스", "boss": true},
+    {"name": "등불을 삼키는 자", "img": "boss_fallen_keeper_idle.png", "role": "3구역 보스", "boss": true}
   ],
   "gallery": [
-    { "title": "캐릭터 움직임", "img": "gallery_characters.webp", "width": 1116, "height": 888, "text": "주인공 걷기(앞·뒤)와 적 11종의 대기 · 움직임 4장", "alt": "주인공과 적 11종의 걷기 동작을 모은 픽셀아트" },
-    { "title": "타일 · 소품", "img": "gallery_tiles.webp", "width": 1098, "height": 528, "text": "지하묘지 · 뿌리 숲 · 성채의 문 · 바닥 · 벽과 소품, 제단 · 화로", "alt": "세 구역의 타일과 소품을 모은 픽셀아트" },
-    { "title": "아이콘 · 무기", "img": "gallery_items.webp", "width": 816, "height": 352, "text": "업그레이드 · 무기 아이콘 20개, 무기와 투사체, 회복약과 영혼 조각", "alt": "업그레이드 아이콘과 무기, 투사체, 줍는 물건을 모은 픽셀아트" },
-    { "title": "효과", "img": "gallery_effects.webp", "width": 1084, "height": 814, "text": "타격 · 사망 · 번개 · 회복 같은 전투 효과와 바닥 · 예고 표시", "alt": "전투 효과와 바닥 예고 표시를 모은 픽셀아트" }
+    {"title": "캐릭터 움직임", "img": "gallery_characters.webp", "width": 1116, "height": 888, "text": "주인공 걷기(앞·뒤)와 적 11종의 대기 · 움직임 4장", "alt": "주인공과 적 11종의 걷기 동작을 모은 픽셀아트"},
+    {"title": "마을 등마루", "img": "gallery_village.webp", "width": 1136, "height": 500, "text": "마을 바닥 타일과 집 · 던전 입구 · 제단 · 등불 줄 같은 소품", "alt": "마을 등마루의 타일과 집, 던전 입구, 소품을 모은 픽셀아트"},
+    {"title": "던전 타일 · 소품", "img": "gallery_tiles.webp", "width": 1098, "height": 528, "text": "지하묘지 · 뿌리 숲 · 성채의 문 · 바닥 · 벽과 소품, 제단 · 화로", "alt": "세 구역의 타일과 소품을 모은 픽셀아트"},
+    {"title": "아이콘 · 무기", "img": "gallery_items.webp", "width": 816, "height": 352, "text": "업그레이드 · 무기 아이콘 20개, 무기와 투사체, 회복약과 영혼 조각", "alt": "업그레이드 아이콘과 무기, 투사체, 줍는 물건을 모은 픽셀아트"},
+    {"title": "효과", "img": "gallery_effects.webp", "width": 1084, "height": 814, "text": "타격 · 사망 · 번개 · 회복 같은 전투 효과와 바닥 · 예고 표시", "alt": "전투 효과와 바닥 예고 표시를 모은 픽셀아트"}
   ],
   "galleryNote": "게임에 들어 있는 그림을 종류별로 모았어요. 에셋 이미지는 Codex와 힉스필드로 만들었어요.",
   "controls": [
-    { "key": "WASD · 방향키", "action": "이동" },
-    { "key": "자동", "action": "공격 (등불 빛이 비추는 가장 가까운 적을 조준, 벽 뒤의 적은 맞지 않아요)" },
-    { "key": "M · 미니맵 터치", "action": "방 전체 지도 열기 · 닫기" },
-    { "key": "모바일", "action": "화면 왼쪽 절반을 터치하면 조이스틱이 생겨요" }
+    {"key": "WASD · 방향키", "action": "이동"},
+    {"key": "자동", "action": "공격 (등불 빛이 비추는 가장 가까운 적을 조준, 벽 뒤의 적은 맞지 않아요)"},
+    {"key": "Space · Enter · 안내 줄 터치", "action": "마을에서 입구로 들어가기"},
+    {"key": "M · 미니맵 터치", "action": "방 전체 지도 열기 · 닫기"},
+    {"key": "모바일", "action": "화면 왼쪽 절반을 터치하면 조이스틱이 생겨요"}
   ],
   "info": [
-    { "label": "엔진", "value": "Unity 6 · C# · URP 2D 빛 · UI Toolkit" },
-    { "label": "개발 시작", "value": "2026.11.18" },
-    { "label": "역할", "value": "1인 개발 · AI 활용 (Claude Code · Codex · 힉스필드)" },
-    { "label": "제작 방식", "value": "게임 개발(기획·코드)은 Claude Code로, 에셋 이미지는 Codex와 힉스필드로 만들었어요. 방향 결정과 플레이 테스트는 직접 했어요" },
-    { "label": "규모", "value": "구역 3 · 보스 3 · 적 11종 · 한 판에 방 18개 · 무기 5 · 업그레이드 15 · 음악 6곡" },
-    { "label": "플랫폼", "value": "PC · 모바일 브라우저 (WebGL)" },
-    { "label": "사운드·폰트", "value": "음악 AlkaKrab (Pixel Fantasy Music Pack) · 효과음 Kenney, artisticdude, Leohpaz · 폰트 Galmuri" }
+    {"label": "엔진", "value": "Unity 6 · C# · URP 2D 빛 · UI Toolkit"},
+    {"label": "개발 시작", "value": "2026.11.18"},
+    {"label": "역할", "value": "1인 개발 · AI 활용 (Claude Code · Codex · 힉스필드)"},
+    {"label": "제작 방식", "value": "게임 개발(기획·코드)은 Claude Code로, 에셋 이미지는 Codex와 힉스필드로 만들었어요. 방향 결정과 플레이 테스트는 직접 했어요"},
+    {"label": "규모", "value": "구역 3 · 보스 3 · 적 11종 · 한 판에 방 18개 · 무기 5 · 기술 카드 8 · 강화 7종 · 음악 6곡"},
+    {"label": "플랫폼", "value": "PC · 모바일 브라우저 (WebGL)"},
+    {"label": "사운드·폰트", "value": "음악 AlkaKrab (Pixel Fantasy Music Pack) · 효과음 Kenney, artisticdude, Leohpaz · 폰트 Galmuri"}
   ],
   "milestones": {
     "기획·설계 문서와 Unity 프로젝트 초기 설정": "개발 시작",
@@ -84,6 +84,8 @@
     "등불 켜기 방 추가 (구역마다 2번째 방, 화로 3개를 켜야 문이 열림)": "등불 켜기 방",
     "3구역 저주받은 성채 뼈대 추가 (꺼진 등불지기·성채 소품·debug.startZone)": "3구역",
     "3구역 보스 '등불을 삼키는 자'(빛 흡수·탄막·소환·원뿔 빛) 추가, 2구역 뒤에 3구역 연결": "보스 3종 완성",
-    "미로 방에 지나간 길만 보여 주는 반투명 미니맵 추가": "미니맵"
+    "미로 방에 지나간 길만 보여 주는 반투명 미니맵 추가": "미니맵",
+    "해금을 강화로 전환 (강화 화면·세이브 v3·수치 카드 삭제)": "강화",
+    "등마루 허브 H-3 완성 (타이틀 덮개 → 마을이 기본 화면)": "마을 등마루"
   }
 }

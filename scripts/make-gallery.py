@@ -2,8 +2,8 @@
 """게임 그림 폴더 → 블로그 게임 페이지 '에셋' 칸에 쓰는 종류별 모음 그림.
 
 사용법 (Pillow가 있는 파이썬으로 실행)
-  ../.venv/bin/python scripts/make-gallery.py <slug> <게임 그림 폴더> [--zones a,b,c]
-  예) ../.venv/bin/python scripts/make-gallery.py lanternkeeper ../LanternKeeper/Assets/Art --zones catacomb,forest,castle
+  ../.venv/bin/python scripts/make-gallery.py <slug> <게임 그림 폴더> [--zones a,b,c] [--own x,y]
+  예) ../.venv/bin/python scripts/make-gallery.py lanternkeeper ../LanternKeeper/Assets/Art --zones catacomb,forest,castle --own village,hub
 
 하는 일
   - 그림 폴더(하위 폴더 포함)의 png를 파일 이름 앞머리로 나눠 모음 그림 4장을 만든다.
@@ -11,6 +11,7 @@
       tile_·prop_            → gallery_tiles.webp       (타일·소품, --zones 순서로 한 줄씩)
       icon_·weapon_·proj_·pickup_ → gallery_items.webp  (아이콘·무기)
       fx_                    → gallery_effects.webp     (효과)
+      --own 에 적은 이름이 든 tile_·prop_ 는 gallery_<첫 이름>.webp 로 따로 (마을처럼 큰 그림이 많은 곳)
   - 도트가 흐려지지 않게 정수배로만 키운다. 결과는 public/games/<slug>/art/ 에 저장.
   - 게임 JSON(src/data/games/<slug>.json)의 cast 순서가 있으면 적을 그 순서로 놓는다.
   - 게임 JSON은 고치지 않는다. "gallery" 항목은 직접 적는다 (README 참고).
@@ -92,11 +93,17 @@ def render(path, sections, imgs, scale):
 
 
 def main():
-    args, zones = sys.argv[1:], []
-    if "--zones" in args:
-        i = args.index("--zones")
-        zones = args[i + 1].split(",") if i + 1 < len(args) else []
+    args = sys.argv[1:]
+
+    def opt(name):
+        if name not in args:
+            return []
+        i = args.index(name)
+        val = args[i + 1].split(",") if i + 1 < len(args) else []
         del args[i:i + 2]
+        return val
+
+    zones, own = opt("--zones"), opt("--own")
     if len(args) != 2:
         sys.exit(__doc__)
     slug, folder = args
@@ -123,6 +130,11 @@ def main():
     def zone_of(n):
         return next((z for z in zones if f"_{z}_" in n), None)
     tp = pick("tile_", "prop_")
+    if own:   # 따로 한 장: 타일 한 묶음 + 소품은 하나씩 (폭을 넘으면 줄바꿈)
+        mine = [n for n in tp if any(f"_{o}_" in n for o in own)]
+        tp = [n for n in tp if n not in mine]
+        render(out / f"gallery_{own[0]}.webp",
+               [[[n for n in mine if n.startswith("tile_")]], [[n] for n in mine if n.startswith("prop_")]], imgs, 2)
     secs = [[[n for n in tp if n.startswith("tile_") and zone_of(n) == z],
              [n for n in tp if n.startswith("prop_") and zone_of(n) == z]] for z in zones]
     secs.append([[n for n in tp if n.startswith("tile_") and not zone_of(n)],

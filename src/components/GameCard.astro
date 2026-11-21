@@ -13,10 +13,10 @@ const { game, big = false } = Astro.props;
     </div>
     <h3>{game.title} {game.titleEn && <span class="en">{game.titleEn}</span>}</h3>
     <p class="sum">{game.summary}</p>
-    {big && game.modes && (
+    {big && game.places && (
       <ul class="modes">
-        {game.modes.map((m) => (
-          <li><span class={`sq ${m.color}`} aria-hidden="true"></span>{m.title}{m.badge && <span class="muted"> · {m.badge}</span>}</li>
+        {game.places.map((m) => (
+          <li><span class={`sq ${m.color ?? ''}`} aria-hidden="true"></span>{m.title}{m.badge && <span class="muted"> · {m.badge}</span>}</li>
         ))}
       </ul>
     )}
@@ -48,5 +48,6 @@ const { game, big = false } = Astro.props;
   .sq { width: 8px; height: 8px; border-radius: 2px; background: var(--accent); flex: none; }
   .sq.blue { background: var(--blue); }
   .sq.green { background: var(--green); }
+  .sq.gray { background: var(--chip); }
   .go { margin-top: 4px; font-weight: 500; font-size: 15px; color: var(--accent-ink); }
 </style>

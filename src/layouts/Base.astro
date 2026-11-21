@@ -1,12 +1,12 @@
 ---
 import '../styles/global.css';
-import { site } from '../lib/data.js';
+import { site, featuredGame } from '../lib/data.js';
 
 const { title, description = site.description, image = '/og.jpg' } = Astro.props;
 const fullTitle = title ? `${title} · ${site.logo}` : site.title;
 const path = Astro.url.pathname;
 const nav = [
-  { href: '/games/', label: '게임' },
+  { href: `/games/${featuredGame.slug}/`, label: featuredGame.title, match: '/games/' },
   { href: '/blog/', label: '블로그' },
   { href: '/about/', label: '소개' },
 ];
@@ -35,7 +35,7 @@ const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
       <a href="/" class="logo mono"><span class="dot" aria-hidden="true"></span>{site.logo}</a>
       <nav aria-label="주 메뉴">
         {nav.map((n) => (
-          <a href={n.href} aria-current={path.startsWith(n.href) ? 'page' : undefined}>{n.label}</a>
+          <a href={n.href} aria-current={path.startsWith(n.match ?? n.href) ? 'page' : undefined}>{n.label}</a>
         ))}
         <a href={site.github}>GitHub</a>
       </nav>

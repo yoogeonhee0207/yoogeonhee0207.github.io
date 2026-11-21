@@ -20,8 +20,6 @@ const info = [
 const art = (f) => `/games/${game.slug}/art/${f}`;
 ---
 <Base title={game.title} description={game.summary} image={game.cover}>
-  <p class="crumb small muted"><a href="/games/">게임</a> / {game.title}</p>
-
   <section class="head">
     <div class="stack" style="gap: 10px; max-width: 660px">
       <div class="row" style="gap: 8px">
@@ -64,17 +62,28 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
     </div>
   )}
 
-  {game.modes?.length > 0 && (
+  {game.world && (
     <section class="section">
-      <div class="section-head"><h2>{game.modes.length === 2 ? '두 가지 모드' : '게임 모드'}</h2></div>
+      <div class="section-head"><h2>{game.world.title ?? '세계관'}</h2></div>
+      <div class="world">
+        {game.world.lines.map((l) => <p>{l}</p>)}
+      </div>
+    </section>
+  )}
+
+  {game.places?.length > 0 && (
+    <section class="section">
+      <div class="section-head"><h2>{game.hub?.title ?? '게임 안의 게임들'}</h2></div>
+      {game.hub?.text && <p class="hub-lead">{game.hub.text}</p>}
       <div class="modes">
-        {game.modes.map((m) => (
-          <div class="mode">
+        {game.places.map((m) => (
+          <div class:list={['mode', m.state]}>
             <div class="row" style="gap: 10px">
-              <span class={`sq ${m.color}`} aria-hidden="true"></span>
+              <span class={`sq ${m.color ?? ''}`} aria-hidden="true"></span>
               <h3>{m.title}</h3>
-              {m.badge && <span class="badge gray">{m.badge}</span>}
+              {m.badge && <span class:list={['badge', m.state === 'open' ? 'amber' : 'gray']}>{m.badge}</span>}
             </div>
+            {m.kind && <p class="mono small muted">{m.kind}</p>}
             <p style="color: var(--ink-2); font-size: 15px">{m.text}</p>
             {m.detail && <p class="small muted">{m.detail}</p>}
           </div>
@@ -180,9 +189,15 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   .stage-bar { gap: 12px; margin-top: 10px; }
   .stage-bar [hidden] { display: none; }
 
-  .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 20px; }
+  .modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 20px; }
   .mode { border: 1px solid var(--line); border-radius: 12px; padding: 24px; display: flex; flex-direction: column; gap: 10px; }
   .mode h3 { font-size: 19px; }
+  .mode.planned { border-style: dashed; }
+  .mode.planned h3 { color: var(--ink-2); }
+  .sq.gray { background: var(--chip); }
+  .hub-lead { margin: -6px 0 20px; max-width: 660px; color: var(--ink-2); font-size: 16px; }
+  .world { max-width: 660px; display: flex; flex-direction: column; gap: 10px; padding-left: 18px; border-left: 2px solid var(--accent); }
+  .world p { margin: 0; color: var(--ink-2); font-size: 16px; }
   .sq { width: 10px; height: 10px; border-radius: 3px; background: var(--accent); }
   .sq.blue { background: var(--blue); } .sq.green { background: var(--green); }
 

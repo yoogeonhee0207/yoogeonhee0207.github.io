@@ -1,6 +1,6 @@
 # yoogeonhee.dev
 
-yoogeonhee의 게임 개발 블로그 · 포트폴리오. [Astro](https://astro.build)로 만들고 GitHub Pages로 배포해요.
+yoogeonhee의 게임 개발 블로그. 게임 **등불지기** 하나를 다뤄요 (마을 등마루에서 여러 갈래의 게임으로 들어가는 게임). [Astro](https://astro.build)로 만들고 GitHub Pages로 배포해요.
 
 주소: https://yoogeonhee0207.github.io
 
@@ -12,7 +12,7 @@ src/
   data/games/<slug>.json    게임 하나 = 파일 하나 (카드·상세 페이지 자동 생성)
   data/commits/<slug>.json  게임 저장소 커밋 기록 (자동 생성, 직접 고치지 않음)
   posts/*.md                블로그 글 (파일 하나 = 글 하나)
-  pages/                    페이지 (홈·게임·블로그·소개)
+  pages/                    페이지 (홈·등불지기·블로그·소개. /games/ 는 등불지기 페이지로 넘어감)
   components/  layouts/  lib/data.js  styles/global.css
 public/
   games/<slug>/art/         게임 표지·캐릭터 그림
@@ -25,7 +25,11 @@ scripts/fetch-commits.mjs   커밋 기록 가져오기
 
 **글 쓰기**: `src/posts/_글쓰기-예시.md`를 복사해 `src/posts/글-주소.md`로 저장, `draft: true` 지우고 push.
 
-**게임 추가**: `src/data/games/lanternkeeper.json`을 복사해 새 slug로 저장 → 그림은 `public/games/<slug>/art/`. 게임 저장소가 있으면 `repo`에 `소유자/이름`.
+**게임 안의 게임(모드·장르) 추가**: `src/data/games/lanternkeeper.json`의 `places`에 한 줄 추가 — `title`(마을의 입구 이름), `kind`(어떤 게임인지), `badge`, `state`(`open` 플레이 가능 / `planned` 예정, 점선 카드), `color`, `text`, `detail`. 게임 페이지 "등마루에서 갈 수 있는 곳"과 홈 카드에 같이 나와요. 칸 제목·소개는 `hub`, 세계관 요약은 `world.lines`.
+
+**세계관 글**: 게임 저장소의 설정 문서는 비공개라 그대로 옮기지 않아요. 뼈대만 짧게 다시 쓰고, 보스의 정체와 엔딩은 적지 않아요.
+
+**다른 게임을 따로 추가** (지금은 쓰지 않음): `src/data/games/`에 JSON을 하나 더 두면 페이지는 생기지만, 메뉴와 홈은 `featured` 게임 하나만 보여 줘요.
 
 **게임 상태 바꾸기**: 게임 JSON의 `status`를 `개발 중` / `데모` / `출시` 중 하나로.
 - `개발 중`: 플레이 화면 대신 "테스트 참여 문의"
@@ -52,9 +56,9 @@ scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibra
 
 **게임 페이지 "에셋" 칸: `scripts/make-gallery.py`**
 ```
-../.venv/bin/python scripts/make-gallery.py lanternkeeper ../LanternKeeper/Assets/Art --zones catacomb,forest,castle
+../.venv/bin/python scripts/make-gallery.py lanternkeeper ../LanternKeeper/Assets/Art --zones catacomb,forest,castle --own village,hub
 ```
-게임 그림 폴더의 png를 파일 이름 앞머리(`char_`·`enemy_` / `tile_`·`prop_` / `icon_`·`weapon_`·`proj_`·`pickup_` / `fx_`)로 나눠 `public/games/<slug>/art/gallery_*.webp` 4장을 만들어요. 게임 JSON의 `gallery`(제목·그림·크기·설명)와 `galleryNote`는 직접 적어요. `gallery`가 없는 게임은 칸이 나오지 않아요. 게임 그림이 바뀌면 다시 실행하고, 출력에 나온 크기가 달라졌으면 `gallery`의 `width`·`height`도 고쳐요.
+게임 그림 폴더의 png를 파일 이름 앞머리(`char_`·`enemy_` / `tile_`·`prop_` / `icon_`·`weapon_`·`proj_`·`pickup_` / `fx_`)로 나눠 `public/games/<slug>/art/gallery_*.webp`를 만들어요. `--own`에 적은 이름(마을)의 타일·소품은 `gallery_village.webp`로 따로 한 장. 게임 JSON의 `gallery`(제목·그림·크기·설명)와 `galleryNote`는 직접 적어요. `gallery`가 없는 게임은 칸이 나오지 않아요. 게임 그림이 바뀌면 다시 실행하고, 출력에 나온 크기가 달라졌으면 `gallery`의 `width`·`height`도 고쳐요.
 
 ## 커밋 기록 자동 연동
 

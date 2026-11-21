@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import GameCard from '../components/GameCard.astro';
 import Heatmap from '../components/Heatmap.astro';
-import { site, games, featuredGame, allCommits, posts, fmtDate } from '../lib/data.js';
+import { site, featuredGame, allCommits, posts, fmtDate } from '../lib/data.js';
 
 // 올린 빌드 뒤에 쌓인 커밋(dev)이 있으면 '개발 중'과 '올린 빌드에 포함'으로 나눠 보여 준다
 const devAll = allCommits.filter((c) => c.dev);
@@ -12,28 +12,17 @@ const recentGroups = devAll.length > 0
       { id: 'in', title: '올린 빌드에 포함', note: '', items: allCommits.filter((c) => !c.dev).slice(0, 3) },
     ]
   : [{ id: 'all', title: '', note: '', items: allCommits.slice(0, 6) }];
-const others = games.filter((g) => g !== featuredGame);
 ---
 <Base>
   <section class="intro">
     <p class="mono small muted">{site.tagline}</p>
     <h1>{site.headline[0]}<br />{site.headline[1]}</h1>
-    <p class="lead">
-      {site.name}의 게임 개발 블로그예요. 지금은 등불 하나로 어두운 던전을 내려가는 로그라이트 액션 게임{' '}
-      <a href={`/games/${featuredGame.slug}/`}>{featuredGame.title}</a>를 만들고 있어요.
-    </p>
+    <p class="lead">{site.lead}</p>
   </section>
 
   {featuredGame && (
     <section class="featured">
       <GameCard game={featuredGame} big />
-    </section>
-  )}
-
-  {others.length > 0 && (
-    <section class="section">
-      <div class="section-head"><h2>다른 게임</h2><a href="/games/" class="small">전체 보기 →</a></div>
-      <div class="grid">{others.map((g) => <GameCard game={g} />)}</div>
     </section>
   )}
 
@@ -91,7 +80,6 @@ const others = games.filter((g) => g !== featuredGame);
   .lead { font-size: 17px; color: var(--ink-2); }
   .lead a { color: var(--accent-ink); }
   .featured { margin-top: 44px; }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 20px; }
   .split { display: flex; flex-wrap: wrap; gap: 48px; }
   .split > :first-child { flex: 1 1 460px; min-width: 0; }
   .split > :last-child { flex: 1 1 300px; min-width: 0; }
