@@ -3,7 +3,8 @@ import { TYPES, fmtDate } from '../lib/data.js';
 // commits: [{sha,date,type,msg,dev?}]  milestones: { "커밋 메시지": "표시할 이름" }
 // build: 게임 JSON의 build ({number, version}). dev: true 인 커밋(올린 빌드 뒤에 쌓인 것)이 있으면
 // '개발 중'과 '빌드에 포함됨' 두 칸으로 나눠 보여 준다. 없으면 예전처럼 한 목록.
-const { commits = [], milestones = {}, initial = 20, build = null } = Astro.props;
+// initial: 칸마다 처음 보이는 개수, step: '더 보기'를 누를 때마다 늘어나는 개수
+const { commits = [], milestones = {}, initial = 20, step = initial, build = null } = Astro.props;
 const dev = commits.filter((c) => c.dev);
 const groups = dev.length > 0
   ? [
@@ -13,7 +14,7 @@ const groups = dev.length > 0
   : [{ id: 'all', title: '', note: '', items: commits }];
 const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.filter((c) => c.type === b).length - commits.filter((c) => c.type === a).length);
 ---
-<div class="tl" data-timeline data-initial={initial}>
+<div class="tl" data-timeline data-initial={initial} data-step={step}>
   {types.length > 1 && (
     <div class="chips" role="group" aria-label="커밋 종류로 거르기">
       <button type="button" class="f" data-f="all" aria-pressed="true">전체 <span>{commits.length}</span></button>
@@ -53,12 +54,13 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
 
 <script>
   document.querySelectorAll('[data-timeline]').forEach((root) => {
-    const step = Number(root.dataset.initial) || 20;
+    const first = Number(root.dataset.initial) || 20;
+    const step = Number(root.dataset.step) || first;
     const items = [...root.querySelectorAll('li')];
     const chips = [...root.querySelectorAll('.f')];
     const more = root.querySelector('[data-more]');
     let filter = 'all';
-    let shown = step;
+    let shown = first;
     const render = () => {
       // 칸(개발 중 / 빌드에 포함)마다 따로 shown개까지 보여 준다
       let rest = false;
@@ -74,7 +76,7 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
     chips.forEach((b) =>
       b.addEventListener('click', () => {
         filter = b.dataset.f;
-        shown = step;
+        shown = first;
         chips.forEach((c) => c.setAttribute('aria-pressed', String(c === b)));
         render();
       }),

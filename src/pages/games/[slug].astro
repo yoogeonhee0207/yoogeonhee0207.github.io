@@ -145,7 +145,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
     <div id="devlog" class="stack" style="gap: 16px">
       <h2 class="h">개발 기록</h2>
       {commits.length > 0 && <Heatmap commits={commits} weeks={12} />}
-      <CommitTimeline commits={commits} milestones={game.milestones} initial={15} build={b} />
+      <CommitTimeline commits={commits} milestones={game.milestones} initial={2} step={20} build={b} />
       <p class="note">게임 저장소의 커밋 메시지가 자동으로 들어와요. 검은 점은 주요 단계예요.</p>
     </div>
   </section>
