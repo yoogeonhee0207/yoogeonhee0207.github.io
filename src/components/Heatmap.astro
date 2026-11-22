@@ -1,9 +1,10 @@
 ---
 import { heatmap, daysAgo } from '../lib/data.js';
-const { commits, weeks = 16 } = Astro.props;
+// wide: 잔디와 숫자를 한 줄(가로 띠)로 — 폭이 넓은 칸에서 씀
+const { commits, weeks = 16, wide = false } = Astro.props;
 const h = heatmap(commits, weeks);
 ---
-<div class="heat-box">
+<div class:list={["heat-box", { wide }]}>
   <div class="heat" role="img" aria-label={`최근 ${weeks}주 동안 ${h.activeDays}일, 커밋 ${h.total}개`}>
     {h.cols.map((col) => (
       <div class="col">
@@ -30,4 +31,16 @@ const h = heatmap(commits, weeks);
   .cell.future { background: transparent; }
   .stats { display: flex; flex-wrap: wrap; gap: 6px 20px; color: var(--ink-2); }
   .stats b { color: var(--ink); }
+  .wide { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px; padding: 16px 20px; }
+  .wide .heat { flex: 0 1 auto; min-width: 0; }
+  .wide .stats { flex-direction: column; gap: 4px; font-size: 14px; }
+  .wide .stats b { font-size: 20px; font-family: var(--mono); margin-right: 4px; }
+  .wide .heat { scrollbar-width: none; }
+  .wide .heat::-webkit-scrollbar { display: none; }
+  /* 좁은 화면에서는 최근 12주만 (옛 주가 앞에 있어 최근 커밋이 잘리지 않게) */
+  @media (max-width: 640px) {
+    .wide .col:nth-last-child(n + 13) { display: none; }
+    .wide .stats { flex-direction: row; gap: 4px 18px; }
+    .wide .stats b { font-size: 16px; }
+  }
 </style>
