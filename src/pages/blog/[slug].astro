@@ -3,9 +3,10 @@ import Base from '../../layouts/Base.astro';
 import { posts, fmtDate } from '../../lib/data.js';
 
 export function getStaticPaths() {
-  return posts.map((post) => ({ params: { slug: post.slug }, props: { post } }));
+  // posts는 최신 글이 먼저 → 바로 뒤가 이전 글, 바로 앞이 다음 글
+  return posts.map((post, i) => ({ params: { slug: post.slug }, props: { post, prev: posts[i + 1], next: posts[i - 1] } }));
 }
-const { post } = Astro.props;
+const { post, prev, next } = Astro.props;
 const { Content } = post;
 ---
 <Base title={post.title} description={post.description}>
@@ -14,6 +15,12 @@ const { Content } = post;
     <h1>{post.title}</h1>
     {post.description && <p class="lead">{post.description}</p>}
     <div class="prose"><Content /></div>
+    {(prev || next) && (
+      <nav class="pager" aria-label="다른 글">
+        {prev ? <a href={`/blog/${prev.slug}/`} class="prev"><span class="small muted">← 이전 글</span><span class="t">{prev.title}</span></a> : <span></span>}
+        {next ? <a href={`/blog/${next.slug}/`} class="next"><span class="small muted">다음 글 →</span><span class="t">{next.title}</span></a> : <span></span>}
+      </nav>
+    )}
   </article>
 </Base>
 
@@ -24,4 +31,9 @@ const { Content } = post;
   .prose { margin-top: 36px; }
   /* 게임 그림은 도트가 흐려지지 않게, 모서리만 살짝 둥글게 */
   .prose :global(img) { image-rendering: pixelated; border-radius: 10px; margin: 8px 0; }
+  .pager { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+  .pager a { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; }
+  .pager a:hover { border-color: var(--ink-2); color: inherit; }
+  .pager .next { text-align: right; }
+  .pager .t { font-weight: 500; font-size: 15px; }
 </style>
