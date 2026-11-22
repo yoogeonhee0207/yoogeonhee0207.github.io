@@ -36,7 +36,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
     </div>
   </section>
 
-  <section class="stage" data-stage data-src={game.webgl}>
+  <section class="stage" data-stage data-src={b ? `${game.webgl}?v=${b.number}` : game.webgl}>
     <img src={game.cover} alt={game.coverAlt ?? ''} class="pixel bg" width="640" height="360" />
     <div class="shade" aria-hidden="true"></div>
     {playable ? (

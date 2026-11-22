@@ -52,6 +52,8 @@ scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibra
 - 빌드할 때 Unity가 바꿔 놓는 `ProjectSettings/UnityConnectSettings.asset`은 끝나고 자동으로 되돌려요 (빌드 전에 이미 고쳐져 있었으면 그대로 둬요).
 - `status`는 바꾸지 않아요. `개발 중`이면 ▶ 버튼은 안 나오지만, push한 빌드는 `/games/<slug>/play/` 주소를 아는 사람이면 열 수 있어요.
 - 100MB를 넘는 파일이 있으면 복사 전에 멈추고 알려줘요.
+- 복사한 `index.html`의 `Build/` 파일 주소 끝에 `?v=<빌드 번호>`를 붙여요. 파일 이름이 매번 같아서, 붙이지 않으면 브라우저나 아이폰 홈 화면 앱이 예전 파일과 새 파일을 섞어 불러와 게임이 안 열릴 수 있어요. 게임 페이지의 게임 주소에도 같은 번호가 붙어요.
+- `--skip-build`는 게임 폴더 `Builds/WebGL`에 있는 것을 그대로 올려요. 게임 세션이 확인용 테스트 빌드를 거기 만들어 두었을 수 있으니(빌드 번호 0) 올리기 전에 `Builds/WebGL/build.json`을 확인해요.
 - 옵션: `--skip-build`(이미 있는 빌드 사용), `--no-push`(커밋까지만), `--no-commit`(복사까지만), `--method`·`--pre-method`·`--out`(게임마다 다른 빌드 메서드·결과 폴더). 자세한 건 스크립트 맨 위 설명.
 
 **게임 페이지 "에셋" 칸: `scripts/make-gallery.py`**

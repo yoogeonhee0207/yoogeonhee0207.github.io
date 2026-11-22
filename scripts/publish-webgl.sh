@@ -28,6 +28,8 @@
 #   - 게임 JSON의 status는 건드리지 않는다. '개발 중'이면 블로그에 ▶ 버튼이 나오지 않는다.
 #     단, push한 빌드는 /games/<slug>/play/ 주소를 아는 사람이면 누구나 열 수 있다 (공개 저장소).
 #   - Unity 에디터가 그 프로젝트를 열고 있으면 batchmode 빌드가 안 되므로 멈춘다.
+#   - 복사한 index.html의 Build/ 파일 주소 끝에 ?v=<빌드 번호>를 붙인다. 파일 이름이 매번 같아서
+#     브라우저나 아이폰 홈 화면 앱이 예전 파일과 새 파일을 섞어 불러오면 게임이 안 열리기 때문.
 #   - batchmode가 바꿔 놓는 ProjectSettings/UnityConnectSettings.asset은 빌드 뒤 자동으로 되돌린다
 #     (빌드 전에 이미 고쳐져 있었으면 그대로 둔다).
 #   - 파일 하나가 100MB를 넘으면 GitHub에 올라가지 않으므로 복사 전에 멈춘다.
@@ -202,6 +204,16 @@ if [ -f "$SRC/build.json" ]; then
     say "⚠️ 번호 없는 테스트 빌드입니다. 게임 JSON의 build는 바꾸지 않았습니다."
   fi
 fi
+
+# 빌드 파일 이름은 매번 같다 (WebGL.loader.js 등). 브라우저·아이폰 홈 화면 앱이 예전 파일 일부를 붙들고 있으면
+# 새 파일과 섞여 게임이 안 열리므로, index.html의 Build/ 주소 끝에 ?v=<빌드 번호>를 붙여 매번 새 주소로 받게 한다.
+VTAG=${B_NUM:-}
+[ "${VTAG:-0}" -ge 1 ] 2>/dev/null || VTAG=$(date +%Y%m%d%H%M%S)
+VTAG="$VTAG" perl -pi -e 's#(Build/[^"?]+)(\?v=[^"]*)?"#$1?v=$ENV{VTAG}"#g' "$DEST/index.html"
+NV=$(grep -o "Build/[^\"?]*?v=$VTAG\"" "$DEST/index.html" | wc -l | tr -d ' ')
+NB=$(grep -o 'Build/[^"]*"' "$DEST/index.html" | wc -l | tr -d ' ')
+if [ "$NB" -ge 1 ] && [ "$NV" = "$NB" ]; then say "빌드 파일 주소에 ?v=$VTAG 붙임 ($NV곳)"
+else say "⚠️ index.html의 빌드 파일 주소에 ?v=$VTAG 를 붙이지 못했습니다 ($NV/$NB). 업데이트 직후 예전 파일과 섞일 수 있어요."; fi
 STATUS=$(sed -n 's/.*"status"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$GAME_JSON" | head -1)
 TITLE=$(sed -n 's/.*"title"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$GAME_JSON" | head -1)
 say "webgl = $WEBGL_URL / status = $STATUS (바꾸지 않음)"
