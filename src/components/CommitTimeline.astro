@@ -28,7 +28,7 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
   {commits.length === 0 ? (
     <p class="empty">아직 가져온 커밋 기록이 없어요.</p>
   ) : (
-    groups.map((g) => (
+    <div class="groups">{groups.map((g) => (
       <section class={`group ${g.id}`} data-group>
         {(g.title || g.tag) && (
           <header class="gh">
@@ -51,7 +51,7 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
           ))}
         </ol>
       </section>
-    ))
+    ))}</div>
   )}
   {groups.some((g) => g.items.length > initial) && <button type="button" class="more" data-more>더 보기</button>}
 </div>
@@ -109,7 +109,8 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
   .f[aria-pressed='true'] { background: var(--ink); border-color: var(--ink); color: var(--bg); }
   .f[aria-pressed='true'] span { color: inherit; opacity: .7; }
 
-  /* 칸 = 카드 하나 */
+  /* 칸 = 카드 하나, 두 칸은 가로로 나란히 (좁으면 위아래) */
+  .groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 16px; align-items: start; }
   .group { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--bg); }
   .group[hidden] { display: none; }
   .group.dev { border-color: color-mix(in srgb, var(--accent) 45%, var(--line)); }

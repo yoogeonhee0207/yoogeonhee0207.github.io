@@ -123,7 +123,6 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   )}
 
   <section class="section split">
-    <div class="stack" style="gap: 32px">
       {game.controls?.length > 0 && (
         <div class="stack" style="gap: 12px">
           <h2 class="h">조작법</h2>
@@ -140,14 +139,17 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
           </dl>
         </div>
       )}
-    </div>
+  </section>
 
-    <div id="devlog" class="stack" style="gap: 16px">
-      <h2 class="h">개발 기록</h2>
+  <section id="devlog" class="section devlog">
+    <div class="devlog-head">
+      <div class="stack" style="gap: 6px">
+        <h2 class="h">개발 기록</h2>
+        <p class="note">게임 저장소의 커밋 메시지가 자동으로 들어와요. ★ 표시는 주요 단계예요.</p>
+      </div>
       {commits.length > 0 && <Heatmap commits={commits} weeks={12} />}
-      <CommitTimeline commits={commits} milestones={game.milestones} initial={2} step={20} build={b} />
-      <p class="note">게임 저장소의 커밋 메시지가 자동으로 들어와요. ★ 표시는 주요 단계예요.</p>
     </div>
+    <CommitTimeline commits={commits} milestones={game.milestones} initial={2} step={20} build={b} />
   </section>
 </Base>
 
@@ -219,8 +221,10 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   .gallery-note { margin-top: 12px; }
 
   .split { display: flex; flex-wrap: wrap; gap: 48px; }
-  .split > :first-child { flex: 1 1 300px; min-width: 0; }
-  .split > :last-child { flex: 2 1 460px; min-width: 0; }
+  .split > * { flex: 1 1 380px; min-width: 0; }
+  .devlog-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px 32px; margin-bottom: 18px; }
+  .devlog-head > :first-child { flex: 1 1 260px; }
+  .devlog-head > :last-child { flex: 0 1 420px; min-width: 0; }
   .h { font-size: 22px; }
   .keys { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 16px; font-size: 15px; align-items: baseline; }
   .keys dt { font-size: 13px; padding: 2px 8px; border: 1px solid var(--chip); border-bottom-width: 2px; border-radius: 6px; justify-self: start; white-space: nowrap; }
