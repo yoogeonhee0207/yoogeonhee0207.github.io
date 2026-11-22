@@ -4,7 +4,8 @@ import { TYPES, fmtDate } from '../lib/data.js';
 // build: 게임 JSON의 build ({number, version}). dev: true 인 커밋(올린 빌드 뒤에 쌓인 것)이 있으면
 // '개발 중'과 '빌드에 포함됨' 두 칸으로 나눠 보여 준다. 없으면 예전처럼 한 목록.
 // initial: 칸마다 처음 보이는 개수, step: '더 보기'를 누를 때마다 늘어나는 개수
-const { commits = [], milestones = {}, initial = 20, step = initial, build = null } = Astro.props;
+// chips: 종류 거르기 버튼, moreHref: '더 보기' 버튼 대신 이 주소로 가는 링크 (홈 화면처럼 짧게 보여 줄 때)
+const { commits = [], milestones = {}, initial = 20, step = initial, build = null, chips = true, moreHref = '' } = Astro.props;
 const dev = commits.filter((c) => c.dev);
 const groups = dev.length > 0
   ? [
@@ -15,7 +16,7 @@ const groups = dev.length > 0
 const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.filter((c) => c.type === b).length - commits.filter((c) => c.type === a).length);
 ---
 <div class="tl" data-timeline data-initial={initial} data-step={step}>
-  {types.length > 1 && (
+  {chips && types.length > 1 && (
     <div class="chips" role="group" aria-label="커밋 종류로 거르기">
       <button type="button" class="f" data-f="all" aria-pressed="true">전체 <span>{commits.length}</span></button>
       {types.map((t) => (
@@ -53,7 +54,9 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
       </section>
     ))}</div>
   )}
-  {groups.some((g) => g.items.length > initial) && <button type="button" class="more" data-more>더 보기</button>}
+  {moreHref
+    ? <a href={moreHref} class="more more-link">개발 기록 전체 보기 →</a>
+    : groups.some((g) => g.items.length > initial) && <button type="button" class="more" data-more>더 보기</button>}
 </div>
 
 <script>
@@ -141,4 +144,5 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
   .more { min-height: 44px; border: 1px dashed var(--chip); border-radius: 10px; background: transparent; color: var(--ink-2); font: 500 14px var(--sans); cursor: pointer; }
   .more:hover { border-color: var(--ink-2); color: var(--ink); }
   .more[hidden] { display: none; }
+  .more-link { display: grid; place-items: center; text-decoration: none; }
 </style>

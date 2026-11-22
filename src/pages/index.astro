@@ -2,16 +2,12 @@
 import Base from '../layouts/Base.astro';
 import GameCard from '../components/GameCard.astro';
 import Heatmap from '../components/Heatmap.astro';
-import { site, featuredGame, allCommits, posts, fmtDate } from '../lib/data.js';
+import CommitTimeline from '../components/CommitTimeline.astro';
+import { site, featuredGame, allCommits, posts, fmtDate, commitsFor } from '../lib/data.js';
 
-// 올린 빌드 뒤에 쌓인 커밋(dev)이 있으면 '개발 중'과 '올린 빌드에 포함'으로 나눠 보여 준다
-const devAll = allCommits.filter((c) => c.dev);
-const recentGroups = devAll.length > 0
-  ? [
-      { id: 'dev', title: '개발 중', note: `다음 빌드에 들어갈 내용 · ${devAll.length}개`, items: devAll.slice(0, 3) },
-      { id: 'in', title: '올린 빌드에 포함', note: '', items: allCommits.filter((c) => !c.dev).slice(0, 3) },
-    ]
-  : [{ id: 'all', title: '', note: '', items: allCommits.slice(0, 6) }];
+// 최근 개발 활동: 게임 페이지의 개발 기록과 같은 카드 (칸마다 최신 3개, 거르기 버튼 없이)
+const homeCommits = commitsFor(featuredGame.slug)?.commits ?? [];
+const homeBuild = featuredGame.webgl ? featuredGame.build : null;
 ---
 <Base>
   <section class="intro">
@@ -33,20 +29,7 @@ const recentGroups = devAll.length > 0
         <span class="mono small muted">GitHub 커밋 자동 연동</span>
       </div>
       <Heatmap commits={allCommits} />
-      {recentGroups.map((g) => (
-        <div class={`rgroup ${g.id}`}>
-          {g.title && <p class="gh"><span class="gt">{g.title}</span>{g.note && <span class="small muted">{g.note}</span>}</p>}
-          <ol class="recent">
-            {g.items.map((c) => (
-              <li>
-                <time class="mono small muted" datetime={c.date}>{fmtDate(c.date)}</time>
-                <span class={`type ${c.type}`}>{c.type}</span>
-                <a href={`/games/${c.slug}/#devlog`} class="msg">{c.msg}</a>
-              </li>
-            ))}
-          </ol>
-        </div>
-      ))}
+      <CommitTimeline commits={homeCommits} milestones={featuredGame.milestones} initial={3} build={homeBuild} chips={false} moreHref={`/games/${featuredGame.slug}/#devlog`} />
       <p class="note">게임 저장소의 커밋 메시지만 자동으로 들어오고, 코드는 공개되지 않아요.</p>
     </div>
 
@@ -83,14 +66,6 @@ const recentGroups = devAll.length > 0
   .split { display: flex; flex-wrap: wrap; gap: 48px; }
   .split > :first-child { flex: 1 1 460px; min-width: 0; }
   .split > :last-child { flex: 1 1 300px; min-width: 0; }
-  .gh { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; margin: 0 0 2px; }
-  .gt { font-weight: 500; font-size: 15px; }
-  .rgroup.dev .gt { color: var(--accent-ink); }
-  .rgroup.dev .recent li { border-bottom-style: dashed; }
-  .recent { list-style: none; margin: 0; padding: 0; }
-  .recent li { display: flex; gap: 12px; align-items: baseline; padding: 11px 0; border-bottom: 1px solid var(--line-2); }
-  .recent time { width: 42px; flex: none; }
-  .recent .msg { font-size: 15px; text-decoration: none; overflow-wrap: anywhere; }
   .post { display: flex; flex-direction: column; gap: 2px; padding: 14px 0; border-bottom: 1px solid var(--line-2); text-decoration: none; }
   .post .t { font-weight: 500; }
   .about { margin-top: 8px; background: var(--soft); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 10px; }
