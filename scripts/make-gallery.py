@@ -7,10 +7,12 @@
 
 하는 일
   - 그림 폴더(하위 폴더 포함)의 png를 파일 이름 앞머리로 나눠 모음 그림 4장을 만든다.
-      char_·enemy_           → gallery_characters.webp  (캐릭터 움직임)
+      char_·enemy_·boss_     → gallery_characters.webp  (캐릭터 움직임·보스)
       tile_·prop_            → gallery_tiles.webp       (타일·소품, --zones 순서로 한 줄씩)
-      icon_·weapon_·proj_·pickup_ → gallery_items.webp  (아이콘·무기)
+      icon_·weapon_·proj_·obj_·pickup_ → gallery_items.webp  (아이콘·무기·소환수)
       fx_                    → gallery_effects.webp     (효과)
+      ui_                    → gallery_ui.webp          (화면 UI)
+  - 어느 모음에도 들어가지 않은 그림이 있으면 끝에 이름을 알려 준다 (title_ 은 표지라 제외).
       --own 에 적은 이름이 든 tile_·prop_ 는 gallery_<첫 이름>.webp 로 따로 (마을처럼 큰 그림이 많은 곳)
   - 도트가 흐려지지 않게 정수배로만 키운다. 결과는 public/games/<slug>/art/ 에 저장.
   - 게임 JSON(src/data/games/<slug>.json)의 cast 순서가 있으면 적을 그 순서로 놓는다.
@@ -114,17 +116,22 @@ def main():
     if not imgs:
         sys.exit(f"png가 없습니다: {folder}")
 
+    used = set()
+
     def pick(*prefixes):
-        return [n for n in imgs if n.startswith(prefixes)]
+        got = [n for n in imgs if n.startswith(prefixes)]
+        used.update(got)
+        return got
 
     # 1. 캐릭터 움직임 — 주인공, 그다음 적 (게임 JSON cast 순서)
     order = []
     data = root / "src" / "data" / "games" / f"{slug}.json"
     if data.exists():
         order = [FRAME.sub("", Path(c["img"]).stem) for c in json.loads(data.read_text()).get("cast", [])]
-    chars = groups_of(pick("char_", "enemy_"))
+    chars = groups_of(pick("char_", "enemy_", "boss_"))
     keys = sorted(chars, key=lambda k: (order.index(k) if k in order else len(order), k))
-    render(out / "gallery_characters.webp", [[chars[k] for k in keys]], imgs, 3)
+    render(out / "gallery_characters.webp",   # 보스는 마지막 줄에 따로
+           [[chars[k] for k in keys if not k.startswith("boss_")], [chars[k] for k in keys if k.startswith("boss_")]], imgs, 3)
 
     # 2. 타일·소품 — 구역마다 한 줄, 구역 이름이 없는 것은 마지막 줄
     def zone_of(n):
@@ -144,13 +151,21 @@ def main():
     # 3. 아이콘·무기 — 아이콘은 10개씩, 무기·투사체·줍는 물건은 한 줄
     icons = pick("icon_")
     secs = [[icons[i:i + 10]] for i in range(0, len(icons), 10)]
-    secs.append([pick("weapon_"), pick("proj_"), pick("pickup_")])
+    secs.append([pick("weapon_"), pick("proj_"), pick("obj_"), pick("pickup_")])
     render(out / "gallery_items.webp", secs, imgs, 4)
 
     # 4. 효과 — 같은 효과의 프레임끼리 묶고 작은 것부터
     fx = groups_of(pick("fx_"))
     keys = sorted(fx, key=lambda k: (max(imgs[n].width for n in fx[k]), k))
     render(out / "gallery_effects.webp", [[fx[k] for k in keys]], imgs, 2)
+
+    # 5. 화면 UI — 버튼(눌림 포함)·틀·바·조이스틱 등, 이름 순 (누른 모양이 바로 옆에 옴)
+    ui = pick("ui_")
+    render(out / "gallery_ui.webp", [[[n] for n in ui]], imgs, 3)
+
+    left = sorted(n for n in imgs if n not in used and not n.startswith("title_"))
+    if left:
+        print(f"  ⚠️ 모음에 안 들어간 그림 {len(left)}장: {' '.join(left)}")
 
 
 if __name__ == "__main__":
