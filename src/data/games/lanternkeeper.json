@@ -12,7 +12,7 @@
   "cover": "/games/lanternkeeper/art/cover.webp",
   "coverAlt": "등불지기 타이틀 그림: 등불을 든 주인공 앞에 해골왕, 등불을 삼키는 자, 거미 여왕이 서 있는 지하 던전",
   "webgl": "/games/lanternkeeper/play/index.html",
-  "build": { "number": 14, "version": "0.99.2", "date": "2026-11-23", "rev": "8837da5" },
+  "build": { "number": 15, "version": "0.100.0", "date": "2026-11-23", "rev": "53e9292" },
   "itch": "",
   "repo": "yoogeonhee0207/LanternKeeper",
   "world": {
@@ -72,7 +72,7 @@
     {"label": "개발 시작", "value": "2026.11.18"},
     {"label": "역할", "value": "1인 개발 · AI 활용 (Claude Code · Codex · 힉스필드)"},
     {"label": "제작 방식", "value": "게임 개발(기획·코드)은 Claude Code로, 에셋 이미지는 Codex와 힉스필드로 만들었어요. 방향 결정과 플레이 테스트는 직접 했어요"},
-    {"label": "규모", "value": "던전 3 · 보스 3 · 적 11종 · 던전마다 방 6개 · 기술 30 (기본 공격 2 · 액티브 28) · 패시브 9 · 강화 9종 · 음악 6곡"},
+    {"label": "규모", "value": "던전 3 · 보스 3 · 적 11종 · 던전마다 방 6개 · 기술 30 (기본 공격 2 · 액티브 28) · 패시브 9 · 강화 9종 · 음악 7곡"},
     {"label": "플랫폼", "value": "PC · 모바일 브라우저 (WebGL)"},
     {"label": "사운드·폰트", "value": "음악 AlkaKrab (Pixel Fantasy Music Pack) · 효과음 Kenney, artisticdude, Leohpaz · 폰트 Galmuri"}
   ],
