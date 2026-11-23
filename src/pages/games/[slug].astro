@@ -137,6 +137,9 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
           <dl class="info">
             {info.map((k) => (<><dt>{k.label}</dt><dd>{k.value}</dd></>))}
           </dl>
+          {game.slug === 'lanternkeeper' && (
+            <p class="small muted">진행은 기기와 Unity 서버에 저장돼요 · <a href={`/games/${game.slug}/privacy/`} class="policy-link">개인정보처리방침</a></p>
+          )}
         </div>
       )}
   </section>
@@ -227,5 +230,6 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   .keys dt { font-size: 13px; padding: 2px 8px; border: 1px solid var(--chip); border-bottom-width: 2px; border-radius: 6px; justify-self: start; white-space: nowrap; }
   .info { margin: 0; display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 8px 16px; font-size: 15px; }
   .info dt { color: var(--muted); }
+  .policy-link { color: var(--accent-ink); }
   dd { margin: 0; }
 </style>

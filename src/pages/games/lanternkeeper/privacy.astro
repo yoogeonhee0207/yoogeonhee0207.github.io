@@ -1,0 +1,67 @@
+---
+import Base from '../../../layouts/Base.astro';
+import { site } from '../../../lib/data.js';
+
+// 게임 안 구글 로그인(Google OAuth 동의 화면)이 가리키는 주소라 경로를 바꾸지 않는다.
+const updated = '2026-11-23';
+---
+<Base title="등불지기 개인정보처리방침" description="등불지기가 진행 저장과 로그인에 쓰는 정보와 보관 방법을 안내해요.">
+  <article class="policy">
+    <p class="crumb small"><a href="/games/lanternkeeper/">← 등불지기</a></p>
+    <h1>등불지기 개인정보처리방침</h1>
+    <p class="muted small">시행일 {updated} · 운영: {site.name} (1인 개발)</p>
+
+    <p class="lead">등불지기는 진행을 저장하고 여러 기기에서 이어 하기 위해 꼭 필요한 정보만 다뤄요. 광고는 없고, 정보를 팔거나 다른 곳에 넘기지 않아요.</p>
+
+    <section>
+      <h2>1. 어떤 정보를 쓰나요</h2>
+      <ul>
+        <li><b>게임 진행</b> — 모은 조각, 강화 단계, 고른 기술, 주운 이야기, 설정 같은 세이브 데이터.</li>
+        <li><b>플레이어 번호</b> — 게임을 처음 켜면 자동으로 만들어지는 익명 번호. 이름이나 연락처와 묶이지 않아요.</li>
+        <li><b>아이디·비밀번호</b> — 직접 계정을 만들 때만. 비밀번호는 로그인 서비스가 암호화해서 보관하고, 개발자도 볼 수 없어요.</li>
+        <li><b>구글 계정 고유 번호</b> — [구글로 계속하기]로 로그인할 때만. 같은 구글 계정으로 다시 들어왔는지 알아보는 데에만 써요. 구글 계정의 이메일·이름·프로필 사진은 저장하지 않아요.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. 어디에 보관하나요</h2>
+      <ul>
+        <li><b>내 기기</b> — 진행은 먼저 브라우저(또는 PC 앱) 안에 저장돼요.</li>
+        <li><b>Unity Gaming Services</b> — 다른 기기에서 이어 할 수 있도록 플레이어 번호·계정 정보·진행 세이브를 Unity Technologies의 서버(Authentication·Cloud Save)에 보관해요. Unity의 처리 방식은 <a href="https://unity.com/legal/game-player-and-app-user-privacy-policy">Unity 개인정보처리방침</a>을 따라요.</li>
+        <li><b>Google</b> — 구글 로그인 창은 Google이 직접 띄우고 처리해요. 등불지기는 로그인 확인용 증표만 받아 Unity에 넘겨요.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. 얼마나 보관하나요</h2>
+      <p>계정을 지워 달라고 하시거나 게임 서비스를 끝낼 때까지 보관해요. 오랫동안 쓰지 않은 익명 진행은 Unity의 정책에 따라 정리될 수 있어요.</p>
+    </section>
+
+    <section>
+      <h2>4. 지우고 싶을 때</h2>
+      <p>아래 메일로 게임 안 계정 창에 보이는 아이디(또는 '구글 연결됨' 상태와 대략의 마지막 플레이 날짜)를 알려 주시면 서버에 있는 진행과 계정 정보를 지우고 답장드려요. 기기에 남은 진행은 브라우저의 사이트 데이터를 지우면 함께 지워져요.</p>
+    </section>
+
+    <section>
+      <h2>5. 문의</h2>
+      <ul class="links">
+        {site.email && <li><span class="muted">메일</span> <span>{site.email}</span></li>}
+      </ul>
+      <p class="small muted">이 방침이 바뀌면 이 페이지에 시행일과 함께 고쳐 올려요.</p>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .policy { max-width: 720px; display: flex; flex-direction: column; gap: 14px; }
+  .crumb a { color: var(--accent-ink); }
+  h1 { font-size: clamp(26px, 4vw, 34px); }
+  .lead { font-size: 17px; color: var(--ink-2); }
+  section { margin-top: 18px; display: flex; flex-direction: column; gap: 10px; }
+  h2 { font-size: 19px; }
+  ul { margin: 0; padding-left: 1.2em; display: flex; flex-direction: column; gap: 8px; color: var(--ink-2); }
+  p { color: var(--ink-2); }
+  a { color: var(--accent-ink); overflow-wrap: anywhere; }
+  .links { list-style: none; padding: 0; }
+  .links li { display: grid; grid-template-columns: 5em minmax(0, 1fr); gap: 12px; }
+</style>
