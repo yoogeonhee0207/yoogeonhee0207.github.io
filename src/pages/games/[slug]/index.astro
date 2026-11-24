@@ -2,7 +2,7 @@
 import Base from '../../../layouts/Base.astro';
 import CommitTimeline from '../../../components/CommitTimeline.astro';
 import Heatmap from '../../../components/Heatmap.astro';
-import { games, commitsFor, STATUS, site } from '../../../lib/data.js';
+import { games, commitsFor, dailyFor, STATUS, site } from '../../../lib/data.js';
 
 export function getStaticPaths() {
   return games.map((game) => ({ params: { slug: game.slug }, props: { game } }));
@@ -155,7 +155,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
       <h2 class="h">개발 기록</h2>
       <p class="note">게임 저장소의 커밋 메시지가 자동으로 들어와요. ★ 표시는 주요 단계예요.</p>
     </div>
-    {commits.length > 0 && <div class="devlog-heat"><Heatmap commits={commits} weeks={24} wide /></div>}
+    {commits.length > 0 && <div class="devlog-heat"><Heatmap commits={dailyFor(game.slug)} weeks={24} wide /></div>}
     <CommitTimeline commits={commits} milestones={game.milestones} initial={2} step={20} build={b} />
   </section>
 </Base>

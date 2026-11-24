@@ -1,13 +1,13 @@
 ---
 import Base from '../layouts/Base.astro';
 import Heatmap from '../components/Heatmap.astro';
-import { site, games, gameBySlug, allCommits, posts, postsFor, storyFor, commitsFor, fmtDate, STATUS } from '../lib/data.js';
+import { site, games, gameBySlug, allCommits, allDaily, sumDaily, dailyFor, posts, postsFor, storyFor, fmtDate, STATUS } from '../lib/data.js';
 
 // 전체 홈: 어느 게임에도 속하지 않는 화면. 만든 사람 → 게임 목록(줄) → 전체 활동·최근 글 순서.
 // 게임 그림을 크게 걸지 않는다 (게임 홈 /games/<게임>/ 과 헷갈리지 않게).
 const rows = games.map((game) => {
   const base = `/games/${game.slug}/`;
-  const last = (commitsFor(game.slug)?.commits ?? []).map((c) => c.date).sort().at(-1);
+  const last = Object.keys(dailyFor(game.slug)).sort().at(-1);
   const b = game.webgl ? game.build : null;
   return {
     game,
@@ -21,12 +21,11 @@ const rows = games.map((game) => {
     ],
   };
 });
-const days = new Set(allCommits.map((c) => c.date)).size;
 const stats = [
   { n: games.length, label: '게임' },
   { n: posts.length, label: '글' },
-  { n: allCommits.length, label: '커밋' },
-  { n: days, label: '작업한 날' },
+  { n: sumDaily(allDaily), label: '커밋' },
+  { n: Object.keys(allDaily).length, label: '작업한 날' },
 ];
 ---
 <Base>
@@ -77,7 +76,7 @@ const stats = [
         <h2>개발 활동</h2>
         <span class="mono small muted">모든 게임 · GitHub 커밋 자동 연동</span>
       </div>
-      <Heatmap commits={allCommits} />
+      <Heatmap commits={allDaily} />
       {allCommits.length > 0 && (
         <ul class="log">
           {allCommits.slice(0, 6).map((c) => (

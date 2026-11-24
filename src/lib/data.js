@@ -14,6 +14,18 @@ export const gameBySlug = (slug) => games.find((g) => g.slug === slug) ?? null;
 
 export const commitsFor = (slug) => commitMods[`../data/commits/${slug}.json`] ?? null;
 
+// 날짜별 커밋 수 { '2026-11-20': 47 } — 기록 전체 기준 (목록 commits는 최근 300개뿐이라 숫자·잔디는 이것으로 센다)
+const countByDate = (commits) => commits.reduce((m, c) => ((m[c.date] = (m[c.date] ?? 0) + 1), m), {});
+export const dailyFor = (slug) => {
+  const f = commitsFor(slug);
+  return f?.daily ?? countByDate(f?.commits ?? []);
+};
+export const allDaily = games.reduce((m, g) => {
+  for (const [d, n] of Object.entries(dailyFor(g.slug))) m[d] = (m[d] ?? 0) + n;
+  return m;
+}, {});
+export const sumDaily = (daily) => Object.values(daily).reduce((a, b) => a + b, 0);
+
 // 모든 게임의 커밋을 날짜순(최신 먼저)으로 합침
 export const allCommits = games
   .flatMap((g, gi) =>
@@ -78,10 +90,9 @@ export const fmtDate = (d, withYear = false) => {
   return withYear ? `${y}.${m}.${day}` : `${m}.${day}`;
 };
 
-// GitHub 잔디처럼 최근 N주 × 7일 칸을 만듦 (일요일 시작)
-export function heatmap(commits, weeks = 16) {
-  const counts = {};
-  for (const c of commits) counts[c.date] = (counts[c.date] ?? 0) + 1;
+// GitHub 잔디처럼 최근 N주 × 7일 칸을 만듦 (일요일 시작). source: 커밋 배열 또는 날짜별 개수(dailyFor)
+export function heatmap(source, weeks = 16) {
+  const counts = Array.isArray(source) ? countByDate(source) : source;
   const today = kstToday();
   const t = new Date(today + 'T00:00:00Z');
   const start = new Date(t);
@@ -100,7 +111,7 @@ export function heatmap(commits, weeks = 16) {
     cols.push(col);
   }
   const days = Object.keys(counts);
-  return { cols, total: commits.length, activeDays: days.length, last: days.sort().at(-1) };
+  return { cols, total: sumDaily(counts), activeDays: days.length, last: days.sort().at(-1) };
 }
 
 export const daysAgo = (date) => {

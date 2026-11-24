@@ -1,5 +1,6 @@
 // 게임 저장소의 커밋 기록을 가져와 src/data/commits/<slug>.json 으로 저장합니다.
 // 코드는 가져오지 않고, 커밋 메시지·날짜만 저장해요.
+// 목록(commits)은 최근 300개까지만, 전체 수(total)와 날짜별 개수(daily)는 기록 전체를 세서 저장해요.
 //
 // 사용법
 //   GitHub에서:   GAME_REPO_TOKEN=토큰 node scripts/fetch-commits.mjs
@@ -18,7 +19,8 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..');
 const GAMES_DIR = path.join(ROOT, 'src/data/games');
 const OUT_DIR = path.join(ROOT, 'src/data/commits');
-const MAX_COMMITS = 300;
+const MAX_COMMITS = 300; // 목록으로 보여 줄 최근 커밋 수
+const MAX_PAGES = 100; // 전체 기록을 셀 때 읽는 쪽수 상한 (100개씩 → 1만 개)
 
 const kstDate = (iso) =>
   new Date(iso).toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 10);
@@ -43,7 +45,7 @@ const ghGet = async (url, token) => {
 
 async function fromGitHub(repo, token) {
   const out = [];
-  for (let page = 1; page <= Math.ceil(MAX_COMMITS / 100) + 2 && out.length < MAX_COMMITS; page++) {
+  for (let page = 1; page <= MAX_PAGES; page++) {
     const list = await ghGet(`https://api.github.com/repos/${repo}/commits?per_page=100&page=${page}`, token);
     if (!list.length) break;
     if (page === 1) out.head = list[0].sha; // 기본 브랜치의 최신 커밋 (merge 포함)
@@ -73,8 +75,9 @@ function devFromLocal(dir, rev) {
 }
 
 function fromLocal(dir) {
-  const log = execFileSync('git', ['-C', dir, 'log', '--no-merges', '--format=%h%x09%aI%x09%s', '-n', String(MAX_COMMITS)], {
+  const log = execFileSync('git', ['-C', dir, 'log', '--no-merges', '--format=%h%x09%aI%x09%s'], {
     encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
   });
   return log
     .trim()
@@ -110,6 +113,10 @@ for (const file of (await readdir(GAMES_DIR)).filter((f) => f.endsWith('.json'))
       continue;
     }
     const head = commits.head;
+    // 기록 전체로 날짜별 개수를 센 뒤, 목록은 최근 것만 남긴다
+    const total = commits.length;
+    const daily = {};
+    for (const c of commits) daily[c.date] = (daily[c.date] ?? 0) + 1;
     commits = commits.slice(0, MAX_COMMITS);
     let devCount = null;
     const rev = game.webgl ? game.build?.rev : null;
@@ -122,9 +129,9 @@ for (const file of (await readdir(GAMES_DIR)).filter((f) => f.endsWith('.json'))
         console.warn(`[commits] ${game.slug}: 올린 빌드(${rev}) 뒤 커밋을 가리지 못함 — 나누지 않고 표시\n  ${err.message}`);
       }
     }
-    const data = { repo: game.repo, updatedAt: new Date().toISOString(), total: commits.length, commits };
+    const data = { repo: game.repo, updatedAt: new Date().toISOString(), total, daily, commits };
     await writeFile(path.join(OUT_DIR, `${game.slug}.json`), JSON.stringify(data, null, 1) + '\n');
-    console.log(`[commits] ${game.slug}: 커밋 ${commits.length}개 저장${devCount === null ? '' : ` (올린 빌드 뒤 ${devCount}개)`}`);
+    console.log(`[commits] ${game.slug}: 전체 ${total}개 · ${Object.keys(daily).length}일, 목록 ${commits.length}개 저장${devCount === null ? '' : ` (올린 빌드 뒤 ${devCount}개)`}`);
   } catch (err) {
     console.warn(`[commits] ${game.slug}: 가져오기 실패 — 기존 기록 유지\n  ${err.message}`);
   }

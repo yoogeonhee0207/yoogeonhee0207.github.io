@@ -1,6 +1,6 @@
 ---
 import Base from '../../../../layouts/Base.astro';
-import { games, commitsFor, postsFor, storyFor, STATUS, site, fmtDate } from '../../../../lib/data.js';
+import { games, commitsFor, dailyFor, sumDaily, postsFor, storyFor, STATUS, site, fmtDate } from '../../../../lib/data.js';
 
 // 게임 소개: 그 게임이 어떤 게임이고 어떻게 만들고 있는지. 만든 사람 소개는 /about/ 하나를 같이 쓴다.
 export function getStaticPaths() {
@@ -16,12 +16,13 @@ const info = [
 const commits = commitsFor(game.slug)?.commits ?? [];
 const posts = postsFor(game.slug);
 const story = storyFor(game.slug);
-const last = commits.map((c) => c.date).sort().at(-1);
+const daily = dailyFor(game.slug);
+const last = Object.keys(daily).sort().at(-1);
 const links = [
   { href: base, label: game.title, text: '플레이 화면 · 등장 캐릭터 · 에셋 · 조작법' },
   ...(story.length > 0 ? [{ href: base + 'story/', label: `소설${game.story?.title ? ` 『${game.story.title}』` : ''}`, text: `${story.length}편` }] : []),
   { href: base + 'blog/', label: '블로그', text: posts.length > 0 ? `개발 일지 ${posts.length}편` : '아직 쓴 글이 없어요' },
-  ...(commits.length > 0 ? [{ href: base + '#devlog', label: '개발 기록', text: `커밋 ${commits.length}개${last ? ` · 마지막 작업 ${fmtDate(last, true)}` : ''}` }] : []),
+  ...(commits.length > 0 ? [{ href: base + '#devlog', label: '개발 기록', text: `커밋 ${sumDaily(daily)}개${last ? ` · 마지막 작업 ${fmtDate(last, true)}` : ''}` }] : []),
 ];
 ---
 <Base title={`${game.title} 소개`} description={game.summary} image={game.cover}>

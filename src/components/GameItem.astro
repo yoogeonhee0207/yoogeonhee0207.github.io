@@ -1,10 +1,10 @@
 ---
 import GameCard from './GameCard.astro';
-import { commitsFor, postsFor, storyFor, fmtDate } from '../lib/data.js';
+import { dailyFor, postsFor, storyFor, fmtDate } from '../lib/data.js';
 // 게임 목록의 한 칸: 카드 + 그 게임 구역으로 가는 링크(소설·블로그·소개)와 올린 빌드·마지막 작업일
 const { game } = Astro.props;
 const base = `/games/${game.slug}/`;
-const last = (commitsFor(game.slug)?.commits ?? []).map((c) => c.date).sort().at(-1);
+const last = Object.keys(dailyFor(game.slug)).sort().at(-1);
 const b = game.webgl ? game.build : null;
 const links = [
   ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
