@@ -1,5 +1,5 @@
 // 사이트 데이터를 한곳에서 읽어오는 도우미.
-// 게임: src/data/games/*.json  ·  커밋: src/data/commits/*.json  ·  글: src/posts/*.md
+// 게임: src/data/games/*.json  ·  커밋: src/data/commits/*.json  ·  글: src/posts/*.md  ·  소설: src/story/*/*.md
 import site from '../data/site.json';
 
 const gameMods = import.meta.glob('../data/games/*.json', { eager: true, import: 'default' });
@@ -24,6 +24,14 @@ export const posts = Object.entries(postMods)
   .map(([p, m]) => ({ slug: p.split('/').pop().replace(/\.md$/, ''), ...m.frontmatter, Content: m.Content }))
   .filter((p) => !p.draft)
   .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+// 소설: src/story/<게임 slug>/*.md (scripts/import-story.py가 게임 저장소 원고에서 만듦)
+const storyMods = import.meta.glob('../story/*/*.md', { eager: true });
+export const storyFor = (slug) =>
+  Object.entries(storyMods)
+    .filter(([p]) => p.split('/').at(-2) === slug)
+    .map(([p, m]) => ({ slug: p.split('/').pop().replace(/^\d+-/, '').replace(/\.md$/, ''), ...m.frontmatter, Content: m.Content }))
+    .sort((a, b) => a.order - b.order);
 
 export const STATUS = {
   '개발 중': 'amber',

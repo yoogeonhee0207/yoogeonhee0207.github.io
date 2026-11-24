@@ -62,6 +62,12 @@ scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibra
 ```
 게임 그림 폴더의 png를 파일 이름 앞머리(`char_`·`enemy_` / `tile_`·`prop_` / `icon_`·`weapon_`·`proj_`·`obj_`·`pickup_` / `fx_` / `ui_`, 보스 `boss_`)로 나눠 `public/games/<slug>/art/gallery_*.webp`를 만들어요. `--own`에 적은 이름(마을)의 타일·소품은 `gallery_village.webp`로 따로 한 장. `boss_`는 `gallery_bosses.webp`에 보스마다 한 줄(자세 그림 포함), `obj_`(소환수)는 아이콘·무기 모음, `ui_`는 `gallery_ui.webp`. 어느 모음에도 안 들어간 그림이 있으면 끝에 이름을 알려 줘요(새 앞머리가 생기면 스크립트에 추가). 게임 JSON의 `gallery`(제목·그림·크기·설명)와 `galleryNote`는 직접 적어요. `gallery`가 없는 게임은 칸이 나오지 않아요. 게임 그림이 바뀌면 다시 실행하고, 출력에 나온 크기가 달라졌으면 `gallery`의 `width`·`height`도 고쳐요.
 
+**소설 『긴밤길』: `scripts/import-story.py`**
+```
+python3 scripts/import-story.py ../LanternKeeper/docs/story
+```
+게임 저장소의 원고 `00_prologue.md`~`06_epilogue.md`를 `src/story/lanternkeeper/`로 옮겨요. 첫 줄 `# 프롤로그 — 꺼지는 불`이 앞머리(편 이름·제목·글자 수)가 되고 본문은 그대로예요. 목차는 `/games/lanternkeeper/story/`, 편마다 `/games/lanternkeeper/story/<원고 이름>/`. 원고를 고치면 다시 실행해요(옮긴 파일은 손으로 고치지 않음). 게임 페이지 세계관 칸 아래 링크는 게임 JSON `world.story`.
+
 ## 커밋 기록 자동 연동
 
 게임 저장소는 비공개라서 토큰이 필요해요. 커밋 메시지·날짜만 가져오고 코드는 가져오지 않아요.

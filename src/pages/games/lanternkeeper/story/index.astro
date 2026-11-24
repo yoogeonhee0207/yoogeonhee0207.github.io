@@ -1,0 +1,47 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import { storyFor } from '../../../../lib/data.js';
+
+// 원고는 게임 저장소 docs/story/ — 고친 뒤 scripts/import-story.py로 다시 옮긴다.
+const chapters = storyFor('lanternkeeper');
+const total = chapters.reduce((n, c) => n + c.chars, 0);
+const approx = (n) => `약 ${(Math.round(n / 100) * 100).toLocaleString('ko-KR')}자`;
+---
+<Base title="긴밤길 — 등불지기 소설" description="등불지기 본편의 이야기를 옮긴 연작 소설. 마지막 등불지기가 등불 하나를 들고 장례 길을 내려가요.">
+  <article class="story">
+    <p class="crumb small"><a href="/games/lanternkeeper/">← 등불지기</a></p>
+    <p class="kicker mono small">등불지기 소설</p>
+    <h1>긴밤길</h1>
+    <p class="lead">등불지기 본편의 이야기를 소설로 옮겼어요. 등마루의 마지막 등불지기가 등불 하나를 들고, 막혀 버린 장례 길을 끝까지 내려가는 이야기예요.</p>
+    <p class="note small">게임 본편의 이야기와 결말이 들어 있어요. 게임을 먼저 하고 싶다면 나중에 읽어 주세요.</p>
+
+    <ol class="toc">
+      {chapters.map((c) => (
+        <li>
+          <a href={`/games/lanternkeeper/story/${c.slug}/`}>
+            <span class="label mono small">{c.label}</span>
+            <span class="t">{c.title}</span>
+            <span class="len small muted">{approx(c.chars)}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+    <p class="small muted">{chapters.length}편 · 모두 {approx(total)}</p>
+  </article>
+</Base>
+
+<style>
+  .story { max-width: 720px; margin: 0 auto; }
+  .crumb a { text-decoration: none; }
+  .kicker { margin-top: 24px; color: var(--accent-ink); letter-spacing: .04em; }
+  h1 { font-size: clamp(30px, 5vw, 40px); margin-top: 6px; }
+  .lead { margin-top: 14px; color: var(--ink-2); font-size: 17px; }
+  .note { margin-top: 14px; padding: 10px 14px; border-left: 2px solid var(--accent); background: var(--soft); border-radius: 0 8px 8px 0; color: var(--ink-2); }
+  .toc { list-style: none; margin: 32px 0 14px; padding: 0; border-top: 1px solid var(--line); }
+  .toc li { border-bottom: 1px solid var(--line); }
+  .toc a { display: grid; grid-template-columns: 76px 1fr auto; align-items: baseline; gap: 12px; padding: 16px 4px; text-decoration: none; }
+  .toc a:hover { color: inherit; background: var(--soft); }
+  .toc .label { color: var(--muted); }
+  .toc .t { font-weight: 500; font-size: 17px; min-width: 0; }
+  @media (max-width: 480px) { .toc a { grid-template-columns: 64px 1fr; } .toc .len { grid-column: 2; } }
+</style>
