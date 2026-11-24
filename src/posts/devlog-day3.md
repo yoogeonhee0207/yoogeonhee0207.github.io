@@ -35,7 +35,7 @@ date: 2026-11-20
 
 Claude가 한 칸씩 찍은 그림을 외부 생성 도구로 만든 그림으로 바꿨어요. 해골왕·거미 여왕, 1·2구역 적 일곱 종을 한 그림체의 시트로 다시 그리고, 타이틀도 Galmuri 픽셀 로고가 들어간 그림으로 바꿨어요. 세 번째 구역 보스의 그림도 이때 미리 만들어 뒀어요.
 
-![지금의 캐릭터와 보스들](/games/lanternkeeper/art/gallery_characters.webp)
+![지금의 주인공과 적들](/games/lanternkeeper/art/gallery_characters.webp)
 
 ## 5. 방 종류 섞기
 

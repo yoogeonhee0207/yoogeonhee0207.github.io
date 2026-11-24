@@ -3,11 +3,12 @@
 
 사용법 (Pillow가 있는 파이썬으로 실행)
   ../.venv/bin/python scripts/make-gallery.py <slug> <게임 그림 폴더> [--zones a,b,c] [--own x,y]
-  예) ../.venv/bin/python scripts/make-gallery.py lanternkeeper ../LanternKeeper/Assets/Art --zones catacomb,forest,castle --own village,hub
+  예) ../.venv/bin/python scripts/make-gallery.py lanternkeeper ../LanternKeeper/Assets/Art --zones catacomb,forest,cave,corridor,castle --own village,hub
 
 하는 일
   - 그림 폴더(하위 폴더 포함)의 png를 파일 이름 앞머리로 나눠 모음 그림 4장을 만든다.
-      char_·enemy_·boss_     → gallery_characters.webp  (캐릭터 움직임·보스)
+      char_·enemy_           → gallery_characters.webp  (캐릭터 움직임)
+      boss_                  → gallery_bosses.webp      (보스 자세, 보스마다 한 줄)
       tile_·prop_            → gallery_tiles.webp       (타일·소품, --zones 순서로 한 줄씩)
       icon_·weapon_·proj_·obj_·pickup_ → gallery_items.webp  (아이콘·무기·소환수)
       fx_                    → gallery_effects.webp     (효과)
@@ -28,7 +29,7 @@ from PIL import Image
 
 BG = (22, 24, 29)        # 그림 바탕 (밝은 효과 그림이 보이도록 어둡게)
 MAX_W = 1100             # 한 줄 최대 폭 (키운 뒤 픽셀)
-FRAME = re.compile(r"_(idle|walk|fly|move)(_.*)?$|_\d+$")
+FRAME = re.compile(r"_(idle|walk|fly|move|atk|breath|open)(_.*)?$|_\d+$")
 
 
 def load(folder):
@@ -130,8 +131,9 @@ def main():
         order = [FRAME.sub("", Path(c["img"]).stem) for c in json.loads(data.read_text()).get("cast", [])]
     chars = groups_of(pick("char_", "enemy_", "boss_"))
     keys = sorted(chars, key=lambda k: (order.index(k) if k in order else len(order), k))
-    render(out / "gallery_characters.webp",   # 보스는 마지막 줄에 따로
-           [[chars[k] for k in keys if not k.startswith("boss_")], [chars[k] for k in keys if k.startswith("boss_")]], imgs, 3)
+    render(out / "gallery_characters.webp", [[chars[k] for k in keys if not k.startswith("boss_")]], imgs, 3)
+    # 보스는 따로 한 장 (대기·걷기·공격·빈틈 자세, 보스마다 한 줄), 크기가 커서 2배
+    render(out / "gallery_bosses.webp", [[chars[k]] for k in keys if k.startswith("boss_")], imgs, 2)
 
     # 2. 타일·소품 — 구역마다 한 줄, 구역 이름이 없는 것은 마지막 줄
     def zone_of(n):
