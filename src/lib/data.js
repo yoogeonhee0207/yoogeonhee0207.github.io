@@ -42,12 +42,12 @@ export const storyFor = (slug) =>
     .map(([p, m]) => ({ slug: p.split('/').pop().replace(/^\d+-/, '').replace(/\.md$/, ''), ...m.frontmatter, Content: m.Content }))
     .sort((a, b) => a.order - b.order);
 
-// 게임 구역 메뉴: 게임 홈 · 소설(원고가 있을 때만) · 블로그 · 소개
+// 게임 구역 메뉴 줄 (게임 이름 옆에 붙음): 게임 홈 · 소설(원고가 있을 때만) · 블로그 · 소개
 export const gameNav = (game) => {
   const base = `/games/${game.slug}/`;
   const subs = ['story/', 'blog/', 'about/'].map((s) => base + s);
   return [
-    { href: base, label: game.title, not: subs },
+    { href: base, label: '게임 홈', not: subs },
     ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
     { href: base + 'blog/', label: '블로그' },
     { href: base + 'about/', label: '소개' },

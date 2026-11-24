@@ -31,7 +31,7 @@ scripts/fetch-commits.mjs   커밋 기록 가져오기
 
 **세계관 글**: 게임 저장소의 설정 문서는 비공개라 그대로 옮기지 않아요. 뼈대만 짧게 다시 쓰고, 보스의 정체와 엔딩은 적지 않아요.
 
-**새 게임 추가**: `src/data/games/<slug>.json`을 하나 더 두면 (등불지기 것을 본떠서, `order`는 다음 번호) 그 게임 구역이 통째로 생겨요 — 홈 `/games/<slug>/`, 블로그 `/games/<slug>/blog/`, 소개 `/games/<slug>/about/`. 그 구역 안에서는 오른쪽 위 메뉴가 그 게임 것으로 바뀌어요. 그림은 `public/games/<slug>/art/`, 글은 `src/posts/<slug>/`, 소설이 있으면 아래 `import-story.py`로 옮기고 JSON에 `story`(제목 `title`, 소개 문장 `lead`, 안내 `note`)를 적어요. 게임이 둘 이상이면 전체 홈이 큰 카드 하나 대신 카드 목록으로 바뀌어요.
+**새 게임 추가**: `src/data/games/<slug>.json`을 하나 더 두면 (등불지기 것을 본떠서, `order`는 다음 번호) 그 게임 구역이 통째로 생겨요 — 홈 `/games/<slug>/`, 블로그 `/games/<slug>/blog/`, 소개 `/games/<slug>/about/`. 그 구역 안에서는 맨 위 메뉴 아래에 그 게임 메뉴 줄이 하나 더 붙어요. 그림은 `public/games/<slug>/art/`, 글은 `src/posts/<slug>/`, 소설이 있으면 아래 `import-story.py`로 옮기고 JSON에 `story`(제목 `title`, 소개 문장 `lead`, 안내 `note`)를 적어요. 전체 홈의 게임 목록에도 한 줄이 저절로 늘어요.
 
 **게임 상태 바꾸기**: 게임 JSON의 `status`를 `개발 중` / `데모` / `출시` 중 하나로.
 - `개발 중`: 플레이 화면 대신 "테스트 참여 문의"

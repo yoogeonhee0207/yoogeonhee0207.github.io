@@ -1,48 +1,99 @@
 ---
 import Base from '../layouts/Base.astro';
-import GameCard from '../components/GameCard.astro';
 import Heatmap from '../components/Heatmap.astro';
-import CommitTimeline from '../components/CommitTimeline.astro';
-import { site, games, gameBySlug, allCommits, posts, fmtDate, commitsFor } from '../lib/data.js';
+import { site, games, gameBySlug, allCommits, posts, postsFor, storyFor, commitsFor, fmtDate, STATUS } from '../lib/data.js';
 
-// 최근 개발 활동: 가장 최근에 작업한 게임의 개발 기록 카드 (칸마다 최신 3개, 거르기 버튼 없이)
-const recent = gameBySlug(allCommits[0]?.slug) ?? games[0];
-const homeCommits = recent ? commitsFor(recent.slug)?.commits ?? [] : [];
-const homeBuild = recent?.webgl ? recent.build : null;
-const many = games.length > 1;
+// 전체 홈: 어느 게임에도 속하지 않는 화면. 만든 사람 → 게임 목록(줄) → 전체 활동·최근 글 순서.
+// 게임 그림을 크게 걸지 않는다 (게임 홈 /games/<게임>/ 과 헷갈리지 않게).
+const rows = games.map((game) => {
+  const base = `/games/${game.slug}/`;
+  const last = (commitsFor(game.slug)?.commits ?? []).map((c) => c.date).sort().at(-1);
+  const b = game.webgl ? game.build : null;
+  return {
+    game,
+    base,
+    when: [b && `v${b.version} · 빌드 ${b.number}`, last && `마지막 작업 ${fmtDate(last)}`].filter(Boolean).join(' · '),
+    links: [
+      { href: base, label: '게임 홈' },
+      ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
+      { href: base + 'blog/', label: `블로그 ${postsFor(game.slug).length}` },
+      { href: base + 'about/', label: '소개' },
+    ],
+  };
+});
+const days = new Set(allCommits.map((c) => c.date)).size;
+const stats = [
+  { n: games.length, label: '게임' },
+  { n: posts.length, label: '글' },
+  { n: allCommits.length, label: '커밋' },
+  { n: days, label: '작업한 날' },
+];
 ---
 <Base>
   <section class="intro">
     <p class="mono small muted">{site.tagline}</p>
     <h1>{site.headline[0]}<br />{site.headline[1]}</h1>
     <p class="lead">{site.lead}</p>
+    <div class="row" style="gap: 10px; margin-top: 6px">
+      <a href="/games/" class="btn primary">게임 보기</a>
+      <a href="/blog/" class="btn">블로그</a>
+      <a href="/about/" class="btn">소개</a>
+    </div>
+    <dl class="stats">
+      {stats.map((s) => (<div><dt>{s.label}</dt><dd class="mono">{s.n.toLocaleString('ko-KR')}</dd></div>))}
+    </dl>
   </section>
 
-  {games.length === 1 && (
-    <section class="featured">
-      <GameCard game={games[0]} big />
-    </section>
-  )}
-  {many && (
-    <section class="featured">
-      <div class="section-head"><h2>게임</h2><a href="/games/" class="small">전체 보기 →</a></div>
-      <div class="cards">{games.map((g) => <GameCard game={g} />)}</div>
-    </section>
-  )}
+  <section class="section">
+    <div class="section-head">
+      <h2>게임</h2>
+      <span class="mono small muted">게임마다 홈 · 블로그 · 소개가 따로 있어요</span>
+    </div>
+    <ul class="games">
+      {rows.map((r, i) => (
+        <li>
+          <span class="no mono muted" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <div class="main">
+            <div class="row" style="gap: 6px 10px">
+              <a href={r.base} class="name">{r.game.title}</a>
+              {r.game.titleEn && <span class="en">{r.game.titleEn}</span>}
+              <span class={`badge ${STATUS[r.game.status] ?? 'gray'}`}>{r.game.status}</span>
+            </div>
+            <p class="mono small muted">{r.game.genre}</p>
+            <p class="sum">{r.game.summary}</p>
+            <div class="links small">
+              {r.links.map((l) => <a href={l.href}>{l.label}</a>)}
+              {r.when && <span class="mono muted when">{r.when}</span>}
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </section>
 
   <section class="section split">
     <div class="stack" style="gap: 18px">
       <div class="section-head" style="margin: 0">
-        <h2>최근 개발 활동</h2>
-        <span class="mono small muted">{many && recent ? `${recent.title} · ` : ''}GitHub 커밋 자동 연동</span>
+        <h2>개발 활동</h2>
+        <span class="mono small muted">모든 게임 · GitHub 커밋 자동 연동</span>
       </div>
       <Heatmap commits={allCommits} />
-      {recent && <CommitTimeline commits={homeCommits} milestones={recent.milestones} initial={3} build={homeBuild} chips={false} moreHref={`/games/${recent.slug}/#devlog`} />}
+      {allCommits.length > 0 && (
+        <ul class="log">
+          {allCommits.slice(0, 6).map((c) => (
+            <li>
+              <time class="mono small muted" datetime={c.date}>{fmtDate(c.date)}</time>
+              <span class={`type ${c.type}`}>{c.type}</span>
+              <span class="msg"><a href={`/games/${c.slug}/#devlog`} class="g">{c.game}</a> {c.msg}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       <p class="note">게임 저장소의 커밋 메시지만 자동으로 들어오고, 코드는 공개되지 않아요.</p>
     </div>
 
     <div class="stack" style="gap: 18px">
-      <div class="section-head" style="margin: 0"><h2>블로그</h2>{posts.length > 3 && <a href="/blog/" class="small">전체 보기 →</a>}</div>
+      <div class="section-head" style="margin: 0"><h2>최근 글</h2>{posts.length > 3 && <a href="/blog/" class="small">전체 보기 →</a>}</div>
       {posts.length === 0 ? (
         <p class="empty small">아직 쓴 글이 없어요. 첫 글이 올라오면 여기에 보여요.</p>
       ) : (
@@ -50,14 +101,14 @@ const many = games.length > 1;
           {posts.slice(0, 3).map((p) => (
             <a href={p.url} class="post">
               <span class="t">{p.title}</span>
-              <span class="small muted">{fmtDate(p.date, true)}{many && p.game && ` · ${gameBySlug(p.game).title}`}{p.description && ` · ${p.description}`}</span>
+              <span class="small muted">{fmtDate(p.date, true)}{p.game && ` · ${gameBySlug(p.game).title}`}</span>
             </a>
           ))}
         </div>
       )}
       <div class="about">
-        <h2>소개</h2>
-        <p class="small" style="color: var(--ink-2)">{site.bio}</p>
+        <h2>만든 사람</h2>
+        <p class="small" style="color: var(--ink-2)">{site.name} · {site.bio}</p>
         <div class="row" style="gap: 6px">{site.skills.map((s) => <span class="chip">{s}</span>)}</div>
         <a href="/about/" class="small" style="font-weight: 500; color: var(--accent-ink)">소개 페이지 →</a>
       </div>
@@ -66,17 +117,36 @@ const many = games.length > 1;
 </Base>
 
 <style>
-  .intro { display: flex; flex-direction: column; gap: 14px; max-width: 680px; }
-  h1 { font-size: clamp(30px, 4.4vw, 40px); line-height: 1.2; }
+  .intro { display: flex; flex-direction: column; gap: 14px; max-width: 720px; padding-top: 16px; }
+  h1 { font-size: clamp(32px, 5vw, 46px); line-height: 1.2; }
   .lead { font-size: 17px; color: var(--ink-2); }
-  .lead a { color: var(--accent-ink); }
-  .featured { margin-top: 44px; }
-  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 24px; }
+  .stats { margin: 22px 0 0; display: flex; flex-wrap: wrap; gap: 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .stats div { flex: 1 1 110px; padding: 14px 16px 14px 0; display: flex; flex-direction: column; gap: 2px; }
+  .stats dt { font-size: 13px; color: var(--muted); }
+  .stats dd { margin: 0; font-size: 24px; font-weight: 500; }
+
+  .games { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--line); }
+  .games li { display: grid; grid-template-columns: 3em minmax(0, 1fr); gap: 0 12px; padding: 22px 0; border-bottom: 1px solid var(--line); }
+  .games .no { font-size: 14px; padding-top: 5px; }
+  .games .main { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .games .name { font-size: 22px; font-weight: 700; letter-spacing: -0.02em; text-decoration: none; }
+  .games .en { font-size: 15px; color: var(--muted); }
+  .games .sum { color: var(--ink-2); font-size: 15px; max-width: 680px; }
+  .links { display: flex; flex-wrap: wrap; gap: 2px 18px; align-items: center; margin-top: 4px; }
+  .links a { color: var(--accent-ink); font-weight: 500; text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+  .links .when { margin-left: auto; }
+
   .split { display: flex; flex-wrap: wrap; gap: 48px; }
   .split > :first-child { flex: 1 1 460px; min-width: 0; }
   .split > :last-child { flex: 1 1 300px; min-width: 0; }
+  .log { list-style: none; margin: 0; padding: 0; }
+  .log li { display: grid; grid-template-columns: 3.2em 4.2em minmax(0, 1fr); gap: 0 10px; align-items: baseline; padding: 9px 0; border-bottom: 1px solid var(--line-2); font-size: 15px; }
+  .log .type { justify-self: start; }
+  .log .g { color: var(--muted); text-decoration: none; margin-right: 4px; }
+  .log .msg { overflow-wrap: anywhere; }
   .post { display: flex; flex-direction: column; gap: 2px; padding: 14px 0; border-bottom: 1px solid var(--line-2); text-decoration: none; }
   .post .t { font-weight: 500; }
   .about { margin-top: 8px; background: var(--soft); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 10px; }
   .about h2 { font-size: 18px; }
+  @media (max-width: 480px) { .games li { grid-template-columns: minmax(0, 1fr); } .games .no { display: none; } .links .when { margin-left: 0; flex-basis: 100%; } }
 </style>
