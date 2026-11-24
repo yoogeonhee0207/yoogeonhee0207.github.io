@@ -1,0 +1,76 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import { games, commitsFor, postsFor, storyFor, STATUS, site, fmtDate } from '../../../../lib/data.js';
+
+// 게임 소개: 그 게임이 어떤 게임이고 어떻게 만들고 있는지. 만든 사람 소개는 /about/ 하나를 같이 쓴다.
+export function getStaticPaths() {
+  return games.map((game) => ({ params: { slug: game.slug }, props: { game } }));
+}
+const { game } = Astro.props;
+const base = `/games/${game.slug}/`;
+const b = game.webgl ? game.build : null;
+const info = [
+  ...(game.info ?? []),
+  ...(b ? [{ label: '빌드', value: `v${b.version} · 빌드 ${b.number} · ${b.date.replaceAll('-', '.')}` }] : []),
+];
+const commits = commitsFor(game.slug)?.commits ?? [];
+const posts = postsFor(game.slug);
+const story = storyFor(game.slug);
+const last = commits.map((c) => c.date).sort().at(-1);
+const links = [
+  { href: base, label: game.title, text: '플레이 화면 · 등장 캐릭터 · 에셋 · 조작법' },
+  ...(story.length > 0 ? [{ href: base + 'story/', label: `소설${game.story?.title ? ` 『${game.story.title}』` : ''}`, text: `${story.length}편` }] : []),
+  { href: base + 'blog/', label: '블로그', text: posts.length > 0 ? `개발 일지 ${posts.length}편` : '아직 쓴 글이 없어요' },
+  ...(commits.length > 0 ? [{ href: base + '#devlog', label: '개발 기록', text: `커밋 ${commits.length}개${last ? ` · 마지막 작업 ${fmtDate(last, true)}` : ''}` }] : []),
+];
+---
+<Base title={`${game.title} 소개`} description={game.summary} image={game.cover}>
+  <div class="about">
+    <div class="row" style="gap: 8px">
+      <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{game.status}</span>
+      <span class="mono small muted">{game.genre}</span>
+    </div>
+    <h1>{game.title} {game.titleEn && <span class="en">{game.titleEn}</span>}</h1>
+    <p class="lead">{game.description}</p>
+    <div class="row" style="gap: 6px">{game.tags?.map((t) => <span class="chip">{t}</span>)}</div>
+
+    {info.length > 0 && (
+      <section class="block">
+        <h2>제작 정보</h2>
+        <dl class="info">
+          {info.map((k) => (<><dt>{k.label}</dt><dd>{k.value}</dd></>))}
+        </dl>
+      </section>
+    )}
+
+    <section class="block">
+      <h2>둘러보기</h2>
+      <ul class="links">
+        {links.map((l) => (
+          <li><a href={l.href}>{l.label}</a> <span class="muted small">· {l.text}</span></li>
+        ))}
+      </ul>
+    </section>
+
+    <section class="block maker">
+      <h2>만든 사람</h2>
+      <p class="small" style="color: var(--ink-2)">{site.name} · {site.bio}</p>
+      <p class="small"><a href="/about/">만든 사람 소개 →</a> <span class="muted">·</span> <a href="/about/#contact">테스트 참여 · 문의 →</a></p>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .about { max-width: 720px; display: flex; flex-direction: column; gap: 12px; }
+  h1 { font-size: clamp(28px, 4vw, 36px); }
+  .en { font-size: 19px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+  .lead { font-size: 17px; color: var(--ink-2); }
+  .block { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; }
+  h2 { font-size: 20px; }
+  .info { margin: 0; display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 8px 16px; font-size: 15px; }
+  .info dt { color: var(--muted); }
+  dd { margin: 0; }
+  .links { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+  .links a, .maker a { color: var(--accent-ink); }
+  .maker { background: var(--soft); border-radius: 12px; padding: 22px; }
+</style>

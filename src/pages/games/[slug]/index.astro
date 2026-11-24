@@ -1,8 +1,8 @@
 ---
-import Base from '../../layouts/Base.astro';
-import CommitTimeline from '../../components/CommitTimeline.astro';
-import Heatmap from '../../components/Heatmap.astro';
-import { games, commitsFor, STATUS, site } from '../../lib/data.js';
+import Base from '../../../layouts/Base.astro';
+import CommitTimeline from '../../../components/CommitTimeline.astro';
+import Heatmap from '../../../components/Heatmap.astro';
+import { games, commitsFor, STATUS, site } from '../../../lib/data.js';
 
 export function getStaticPaths() {
   return games.map((game) => ({ params: { slug: game.slug }, props: { game } }));
@@ -143,8 +143,8 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
           <dl class="info">
             {info.map((k) => (<><dt>{k.label}</dt><dd>{k.value}</dd></>))}
           </dl>
-          {game.slug === 'lanternkeeper' && (
-            <p class="small muted">진행은 기기와 Unity 서버에 저장돼요 · <a href={`/games/${game.slug}/privacy/`} class="policy-link">개인정보처리방침</a></p>
+          {game.privacy && (
+            <p class="small muted">{game.privacy.text} · <a href={game.privacy.href} class="policy-link">개인정보처리방침</a></p>
           )}
         </div>
       )}

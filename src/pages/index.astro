@@ -3,11 +3,13 @@ import Base from '../layouts/Base.astro';
 import GameCard from '../components/GameCard.astro';
 import Heatmap from '../components/Heatmap.astro';
 import CommitTimeline from '../components/CommitTimeline.astro';
-import { site, featuredGame, allCommits, posts, fmtDate, commitsFor } from '../lib/data.js';
+import { site, games, gameBySlug, allCommits, posts, fmtDate, commitsFor } from '../lib/data.js';
 
-// 최근 개발 활동: 게임 페이지의 개발 기록과 같은 카드 (칸마다 최신 3개, 거르기 버튼 없이)
-const homeCommits = commitsFor(featuredGame.slug)?.commits ?? [];
-const homeBuild = featuredGame.webgl ? featuredGame.build : null;
+// 최근 개발 활동: 가장 최근에 작업한 게임의 개발 기록 카드 (칸마다 최신 3개, 거르기 버튼 없이)
+const recent = gameBySlug(allCommits[0]?.slug) ?? games[0];
+const homeCommits = recent ? commitsFor(recent.slug)?.commits ?? [] : [];
+const homeBuild = recent?.webgl ? recent.build : null;
+const many = games.length > 1;
 ---
 <Base>
   <section class="intro">
@@ -16,9 +18,15 @@ const homeBuild = featuredGame.webgl ? featuredGame.build : null;
     <p class="lead">{site.lead}</p>
   </section>
 
-  {featuredGame && (
+  {games.length === 1 && (
     <section class="featured">
-      <GameCard game={featuredGame} big />
+      <GameCard game={games[0]} big />
+    </section>
+  )}
+  {many && (
+    <section class="featured">
+      <div class="section-head"><h2>게임</h2><a href="/games/" class="small">전체 보기 →</a></div>
+      <div class="cards">{games.map((g) => <GameCard game={g} />)}</div>
     </section>
   )}
 
@@ -26,10 +34,10 @@ const homeBuild = featuredGame.webgl ? featuredGame.build : null;
     <div class="stack" style="gap: 18px">
       <div class="section-head" style="margin: 0">
         <h2>최근 개발 활동</h2>
-        <span class="mono small muted">GitHub 커밋 자동 연동</span>
+        <span class="mono small muted">{many && recent ? `${recent.title} · ` : ''}GitHub 커밋 자동 연동</span>
       </div>
       <Heatmap commits={allCommits} />
-      <CommitTimeline commits={homeCommits} milestones={featuredGame.milestones} initial={3} build={homeBuild} chips={false} moreHref={`/games/${featuredGame.slug}/#devlog`} />
+      {recent && <CommitTimeline commits={homeCommits} milestones={recent.milestones} initial={3} build={homeBuild} chips={false} moreHref={`/games/${recent.slug}/#devlog`} />}
       <p class="note">게임 저장소의 커밋 메시지만 자동으로 들어오고, 코드는 공개되지 않아요.</p>
     </div>
 
@@ -40,9 +48,9 @@ const homeBuild = featuredGame.webgl ? featuredGame.build : null;
       ) : (
         <div class="stack">
           {posts.slice(0, 3).map((p) => (
-            <a href={`/blog/${p.slug}/`} class="post">
+            <a href={p.url} class="post">
               <span class="t">{p.title}</span>
-              <span class="small muted">{fmtDate(p.date, true)}{p.description && ` · ${p.description}`}</span>
+              <span class="small muted">{fmtDate(p.date, true)}{many && p.game && ` · ${gameBySlug(p.game).title}`}{p.description && ` · ${p.description}`}</span>
             </a>
           ))}
         </div>
@@ -63,6 +71,7 @@ const homeBuild = featuredGame.webgl ? featuredGame.build : null;
   .lead { font-size: 17px; color: var(--ink-2); }
   .lead a { color: var(--accent-ink); }
   .featured { margin-top: 44px; }
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); gap: 24px; }
   .split { display: flex; flex-wrap: wrap; gap: 48px; }
   .split > :first-child { flex: 1 1 460px; min-width: 0; }
   .split > :last-child { flex: 1 1 300px; min-width: 0; }

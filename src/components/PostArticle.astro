@@ -1,0 +1,32 @@
+---
+import { fmtDate } from '../lib/data.js';
+// 글 한 편. back: 맨 위 목록 링크 {href, label}. prev·next: 같은 목록 안의 이전·다음 글.
+const { post, prev, next, back } = Astro.props;
+const { Content } = post;
+---
+<article class="article">
+  <p class="small muted"><a href={back.href}>{back.label}</a> · <time datetime={post.date}>{fmtDate(post.date, true)}</time></p>
+  <h1>{post.title}</h1>
+  {post.description && <p class="lead">{post.description}</p>}
+  <div class="prose"><Content /></div>
+  {(prev || next) && (
+    <nav class="pager" aria-label="다른 글">
+      {prev ? <a href={prev.url} class="prev"><span class="small muted">← 이전 글</span><span class="t">{prev.title}</span></a> : <span></span>}
+      {next ? <a href={next.url} class="next"><span class="small muted">다음 글 →</span><span class="t">{next.title}</span></a> : <span></span>}
+    </nav>
+  )}
+</article>
+
+<style>
+  .article { max-width: 720px; margin: 0 auto; }
+  h1 { font-size: clamp(28px, 4vw, 36px); margin-top: 12px; }
+  .lead { margin-top: 12px; color: var(--muted); font-size: 17px; }
+  .prose { margin-top: 36px; }
+  /* 게임 그림은 도트가 흐려지지 않게, 모서리만 살짝 둥글게 */
+  .prose :global(img) { image-rendering: pixelated; border-radius: 10px; margin: 8px 0; }
+  .pager { margin-top: 56px; padding-top: 24px; border-top: 1px solid var(--line); display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 12px; }
+  .pager a { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; text-decoration: none; }
+  .pager a:hover { border-color: var(--ink-2); color: inherit; }
+  .pager .next { text-align: right; }
+  .pager .t { font-weight: 500; font-size: 15px; }
+</style>

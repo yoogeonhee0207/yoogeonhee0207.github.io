@@ -1,16 +1,20 @@
 ---
 import '../styles/global.css';
-import { site, featuredGame } from '../lib/data.js';
+import { site, gameBySlug, gameNav } from '../lib/data.js';
 
 const { title, description = site.description, image = '/og.jpg' } = Astro.props;
 const fullTitle = title ? `${title} · ${site.logo}` : site.title;
 const path = Astro.url.pathname;
-const nav = [
-  { href: `/games/${featuredGame.slug}/`, label: featuredGame.title, match: '/games/', not: '/games/lanternkeeper/story/' },
-  { href: '/games/lanternkeeper/story/', label: '소설' },
-  { href: '/blog/', label: '블로그' },
-  { href: '/about/', label: '소개' },
-];
+// 주소가 /games/<게임>/… 이면 그 게임 구역: 메뉴가 그 게임 것으로 바뀌고, 로고는 전체 홈으로 돌아간다.
+const zone = gameBySlug(path.match(/^\/games\/([^/]+)\//)?.[1]);
+const nav = zone
+  ? gameNav(zone)
+  : [
+      { href: '/games/', label: '게임' },
+      { href: '/blog/', label: '블로그' },
+      { href: '/about/', label: '소개' },
+    ];
+const current = (n) => path.startsWith(n.href) && !(n.not ?? []).some((x) => path.startsWith(x));
 const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
 ---
 <!doctype html>
@@ -34,11 +38,11 @@ const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
   <header class="site-header">
     <div class="wrap bar">
       <a href="/" class="logo mono"><span class="dot" aria-hidden="true"></span>{site.logo}</a>
-      <nav aria-label="주 메뉴">
+      <nav aria-label={zone ? `${zone.title} 메뉴` : '주 메뉴'}>
         {nav.map((n) => (
-          <a href={n.href} aria-current={path.startsWith(n.match ?? n.href) && !(n.not && path.startsWith(n.not)) ? 'page' : undefined}>{n.label}</a>
+          <a href={n.href} aria-current={current(n) ? 'page' : undefined}>{n.label}</a>
         ))}
-        <a href={site.github}>GitHub</a>
+        {zone ? <a href="/games/" class="all">다른 게임</a> : <a href={site.github}>GitHub</a>}
       </nav>
     </div>
   </header>
@@ -68,6 +72,7 @@ const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
   nav { display: flex; flex-wrap: wrap; gap: 0 22px; font-size: 15px; }
   nav a { text-decoration: none; padding: 10px 0; min-height: 44px; display: inline-flex; align-items: center; }
   nav a[aria-current='page'] { color: var(--accent-ink); font-weight: 500; }
+  nav .all { color: var(--muted); }
   main { padding-top: 48px; padding-bottom: 32px; min-height: 60vh; }
   .site-footer { margin-top: 80px; border-top: 1px solid var(--line); }
   .site-footer .bar { justify-content: space-between; padding-top: 24px; padding-bottom: 24px; }

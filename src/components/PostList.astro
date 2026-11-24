@@ -1,0 +1,28 @@
+---
+import { fmtDate, gameBySlug } from '../lib/data.js';
+// posts: 글 목록 (최신 먼저). showGame: 여러 게임 글이 섞인 목록에서 어느 게임 글인지 보여 준다.
+const { posts = [], showGame = false } = Astro.props;
+---
+<ul class="list">
+  {posts.map((p) => (
+    <li>
+      <a href={p.url}>
+        <time class="mono small muted" datetime={p.date}>{fmtDate(p.date, true)}</time>
+        <span class="t">{p.title}</span>
+        {(p.description || (showGame && p.game)) && (
+          <span class="d small muted">{showGame && p.game && <span class="g">{gameBySlug(p.game).title}</span>}{p.description}</span>
+        )}
+      </a>
+    </li>
+  ))}
+</ul>
+
+<style>
+  .list { list-style: none; margin: 32px 0 0; padding: 0; max-width: 760px; }
+  .list a { display: grid; grid-template-columns: 7em minmax(0, 1fr); gap: 2px 16px; padding: 18px 0; border-bottom: 1px solid var(--line-2); text-decoration: none; }
+  .t { font-weight: 500; font-size: 17px; }
+  .d { grid-column: 2; }
+  .g { color: var(--accent-ink); font-weight: 500; }
+  .g::after { content: ' · '; color: var(--muted); font-weight: 400; }
+  @media (max-width: 560px) { .list a { grid-template-columns: minmax(0, 1fr); } .d { grid-column: 1; } }
+</style>

@@ -1,0 +1,28 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import PostList from '../../../../components/PostList.astro';
+import { games, postsFor } from '../../../../lib/data.js';
+
+// 게임마다 블로그 하나. 글은 src/posts/<게임 slug>/*.md
+export function getStaticPaths() {
+  return games.map((game) => ({ params: { slug: game.slug }, props: { game } }));
+}
+const { game } = Astro.props;
+const list = postsFor(game.slug);
+---
+<Base title={`${game.title} 블로그`} description={`${game.title}를 만드는 과정을 적은 개발 일지`} image={game.cover}>
+  <p class="kicker mono small">{game.title}</p>
+  <h1>블로그</h1>
+  <p class="lead">{game.title}를 만드는 과정을 하루 한 편씩 적어요.</p>
+  {list.length === 0 ? (
+    <p class="empty" style="margin-top: 32px">아직 쓴 글이 없어요.</p>
+  ) : (
+    <PostList posts={list} />
+  )}
+</Base>
+
+<style>
+  .kicker { color: var(--accent-ink); letter-spacing: .04em; }
+  h1 { font-size: 36px; margin-top: 6px; }
+  .lead { margin-top: 10px; color: var(--ink-2); font-size: 17px; }
+</style>

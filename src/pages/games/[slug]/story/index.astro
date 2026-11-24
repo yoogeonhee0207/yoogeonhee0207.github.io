@@ -2,23 +2,32 @@
 import Base from '../../../../layouts/Base.astro';
 import { storyFor } from '../../../../lib/data.js';
 
+import { games } from '../../../../lib/data.js';
+
+// 소설이 있는 게임만 페이지가 생긴다 (src/story/<게임 slug>/*.md). 제목·소개 문장은 게임 JSON의 story.
 // 원고는 게임 저장소 docs/story/ — 고친 뒤 scripts/import-story.py로 다시 옮긴다.
-const chapters = storyFor('lanternkeeper');
+export function getStaticPaths() {
+  return games.filter((g) => storyFor(g.slug).length > 0).map((game) => ({ params: { slug: game.slug }, props: { game } }));
+}
+const { game } = Astro.props;
+const st = game.story ?? {};
+const title = st.title ?? `${game.title} 소설`;
+const chapters = storyFor(game.slug);
 const total = chapters.reduce((n, c) => n + c.chars, 0);
 const approx = (n) => `약 ${(Math.round(n / 100) * 100).toLocaleString('ko-KR')}자`;
 ---
-<Base title="긴밤길 — 등불지기 소설" description="죽은 이를 붙드는 불이 하나둘 꺼져 간다. 스승은 내려가서 돌아오지 않았다. 이제 등마루에 남은 등불지기는 하나뿐이다. — 등불지기 연작 소설">
+<Base title={`${title} — ${game.title} 소설`} description={`${(st.lead ?? []).join(' ')} — ${game.title} 연작 소설`} image={game.cover}>
   <article class="story">
-    <p class="crumb small"><a href="/games/lanternkeeper/">← 등불지기</a></p>
-    <p class="kicker mono small">등불지기 소설</p>
-    <h1>긴밤길</h1>
-    <p class="lead">죽은 이를 붙드는 불이 하나둘 꺼져 간다.<br />스승은 내려가서 돌아오지 않았다. 이제 등마루에 남은 등불지기는 하나뿐이다.</p>
-    <p class="note small">게임의 이야기와 결말이 들어 있어요. 게임을 먼저 하고 싶다면 나중에 읽어 주세요.</p>
+    <p class="crumb small"><a href={`/games/${game.slug}/`}>← {game.title}</a></p>
+    <p class="kicker mono small">{game.title} 소설</p>
+    <h1>{title}</h1>
+    {st.lead?.length > 0 && <p class="lead">{st.lead.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>}
+    {st.note && <p class="note small">{st.note}</p>}
 
     <ol class="toc">
       {chapters.map((c) => (
         <li>
-          <a href={`/games/lanternkeeper/story/${c.slug}/`}>
+          <a href={`/games/${game.slug}/story/${c.slug}/`}>
             <span class="label mono small">{c.label}</span>
             <span class="t">{c.title}</span>
             <span class="len small muted">{approx(c.chars)}</span>

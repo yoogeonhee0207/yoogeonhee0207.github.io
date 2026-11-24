@@ -1,6 +1,6 @@
 # yoogeonhee.dev
 
-yoogeonhee의 게임 개발 블로그. 게임 **등불지기** 하나를 다뤄요 (마을 등마루에서 여러 갈래의 게임으로 들어가는 게임). [Astro](https://astro.build)로 만들고 GitHub Pages로 배포해요.
+yoogeonhee의 게임 개발 블로그. 게임마다 홈 · 소설 · 블로그 · 소개가 따로 있고, 전체 홈과 `/games/`에서 모아 봐요 (지금 게임은 **등불지기** 하나). [Astro](https://astro.build)로 만들고 GitHub Pages로 배포해요.
 
 주소: https://yoogeonhee0207.github.io
 
@@ -11,8 +11,10 @@ src/
   data/site.json            이름·소개·기술·링크·메일
   data/games/<slug>.json    게임 하나 = 파일 하나 (카드·상세 페이지 자동 생성)
   data/commits/<slug>.json  게임 저장소 커밋 기록 (자동 생성, 직접 고치지 않음)
-  posts/*.md                블로그 글 (파일 하나 = 글 하나)
-  pages/                    페이지 (홈·등불지기·블로그·소개. /games/ 는 등불지기 페이지로 넘어감)
+  posts/<slug>/*.md         그 게임 블로그 글 (파일 하나 = 글 하나. posts/*.md 는 게임에 속하지 않는 글)
+  story/<slug>/*.md         그 게임 소설 (scripts/import-story.py가 만듦, 직접 고치지 않음)
+  pages/                    전체 홈·게임 목록·전체 블로그·만든 사람 소개
+  pages/games/[slug]/       게임 구역: 홈 · blog/ · story/ · about/ (게임마다 자동 생성)
   components/  layouts/  lib/data.js  styles/global.css
 public/
   games/<slug>/art/         게임 표지·캐릭터 그림
@@ -23,13 +25,13 @@ scripts/fetch-commits.mjs   커밋 기록 가져오기
 
 ## 자주 하는 일
 
-**글 쓰기**: `src/posts/_글쓰기-예시.md`를 복사해 `src/posts/글-주소.md`로 저장, `draft: true` 지우고 push.
+**글 쓰기**: `src/posts/_글쓰기-예시.md`를 복사해 `src/posts/<게임 slug>/글-주소.md`로 저장, `draft: true` 지우고 push. 그 게임 블로그(`/games/<slug>/blog/글-주소/`)와 전체 블로그 목록에 나와요. 게임에 속하지 않는 글은 `src/posts/글-주소.md` (주소 `/blog/글-주소/`).
 
 **게임 안의 게임(모드·장르) 추가**: `src/data/games/lanternkeeper.json`의 `places`에 한 줄 추가 — `title`(마을의 입구 이름), `kind`(어떤 게임인지), `badge`, `state`(`open` 플레이 가능 / `planned` 예정, 점선 카드), `color`, `text`, `detail`. 게임 페이지 "등마루에서 갈 수 있는 곳"과 홈 카드에 같이 나와요. 칸 제목·소개는 `hub`, 세계관 요약은 `world.lines`.
 
 **세계관 글**: 게임 저장소의 설정 문서는 비공개라 그대로 옮기지 않아요. 뼈대만 짧게 다시 쓰고, 보스의 정체와 엔딩은 적지 않아요.
 
-**다른 게임을 따로 추가** (지금은 쓰지 않음): `src/data/games/`에 JSON을 하나 더 두면 페이지는 생기지만, 메뉴와 홈은 `featured` 게임 하나만 보여 줘요.
+**새 게임 추가**: `src/data/games/<slug>.json`을 하나 더 두면 (등불지기 것을 본떠서, `order`는 다음 번호) 그 게임 구역이 통째로 생겨요 — 홈 `/games/<slug>/`, 블로그 `/games/<slug>/blog/`, 소개 `/games/<slug>/about/`. 그 구역 안에서는 오른쪽 위 메뉴가 그 게임 것으로 바뀌어요. 그림은 `public/games/<slug>/art/`, 글은 `src/posts/<slug>/`, 소설이 있으면 아래 `import-story.py`로 옮기고 JSON에 `story`(제목 `title`, 소개 문장 `lead`, 안내 `note`)를 적어요. 게임이 둘 이상이면 전체 홈이 큰 카드 하나 대신 카드 목록으로 바뀌어요.
 
 **게임 상태 바꾸기**: 게임 JSON의 `status`를 `개발 중` / `데모` / `출시` 중 하나로.
 - `개발 중`: 플레이 화면 대신 "테스트 참여 문의"
@@ -62,11 +64,11 @@ scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibra
 ```
 게임 그림 폴더의 png를 파일 이름 앞머리(`char_`·`enemy_` / `tile_`·`prop_` / `icon_`·`weapon_`·`proj_`·`obj_`·`pickup_` / `fx_` / `ui_`, 보스 `boss_`)로 나눠 `public/games/<slug>/art/gallery_*.webp`를 만들어요. `--own`에 적은 이름(마을)의 타일·소품은 `gallery_village.webp`로 따로 한 장. `boss_`는 `gallery_bosses.webp`에 보스마다 한 줄(자세 그림 포함), `obj_`(소환수)는 아이콘·무기 모음, `ui_`는 `gallery_ui.webp`. 어느 모음에도 안 들어간 그림이 있으면 끝에 이름을 알려 줘요(새 앞머리가 생기면 스크립트에 추가). 게임 JSON의 `gallery`(제목·그림·크기·설명)와 `galleryNote`는 직접 적어요. `gallery`가 없는 게임은 칸이 나오지 않아요. 게임 그림이 바뀌면 다시 실행하고, 출력에 나온 크기가 달라졌으면 `gallery`의 `width`·`height`도 고쳐요.
 
-**소설 『긴밤길』: `scripts/import-story.py`**
+**소설: `scripts/import-story.py <게임 slug> <원고 폴더>`**
 ```
-python3 scripts/import-story.py ../LanternKeeper/docs/story
+python3 scripts/import-story.py lanternkeeper ../LanternKeeper/docs/story
 ```
-게임 저장소의 원고 `00_prologue.md`~`06_epilogue.md`를 `src/story/lanternkeeper/`로 옮겨요. 첫 줄 `# 프롤로그 — 꺼지는 불`이 앞머리(편 이름·제목·글자 수)가 되고 본문은 그대로예요. 목차는 `/games/lanternkeeper/story/`, 편마다 `/games/lanternkeeper/story/<원고 이름>/`. 원고를 고치면 다시 실행해요(옮긴 파일은 손으로 고치지 않음). 게임 페이지 세계관 칸 아래 링크는 게임 JSON `world.story`.
+게임 저장소의 원고 `00_prologue.md`~`06_epilogue.md`를 `src/story/<게임 slug>/`로 옮겨요. 첫 줄 `# 프롤로그 — 꺼지는 불`이 앞머리(편 이름·제목·글자 수)가 되고 본문은 그대로예요. 목차는 `/games/<slug>/story/`, 편마다 `/games/<slug>/story/<원고 이름>/`. 원고가 없는 게임은 메뉴에 소설 칸이 나오지 않아요. 원고를 고치면 다시 실행해요(옮긴 파일은 손으로 고치지 않음). 게임 페이지 세계관 칸 아래 링크는 게임 JSON `world.story`.
 
 ## 커밋 기록 자동 연동
 

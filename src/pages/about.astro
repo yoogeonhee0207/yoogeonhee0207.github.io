@@ -16,7 +16,7 @@ import { site, games } from '../lib/data.js';
       <h2>만들고 있는 게임</h2>
       <ul class="games">
         {games.map((g) => (
-          <li><a href={`/games/${g.slug}/`}>{g.title}</a> <span class="muted small">· {g.genre} · {g.status}</span></li>
+          <li><a href={`/games/${g.slug}/`}>{g.title}</a> <span class="muted small">· {g.genre} · {g.status} · <a href={`/games/${g.slug}/about/`}>게임 소개</a></span></li>
         ))}
       </ul>
     </section>

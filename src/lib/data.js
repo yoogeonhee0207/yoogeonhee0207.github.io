@@ -1,15 +1,16 @@
 // 사이트 데이터를 한곳에서 읽어오는 도우미.
-// 게임: src/data/games/*.json  ·  커밋: src/data/commits/*.json  ·  글: src/posts/*.md  ·  소설: src/story/*/*.md
+// 게임: src/data/games/*.json  ·  커밋: src/data/commits/*.json  ·  소설: src/story/<게임>/*.md
+// 글: src/posts/<게임>/*.md (그 게임 블로그) · src/posts/*.md (게임에 속하지 않는 글)
 import site from '../data/site.json';
 
 const gameMods = import.meta.glob('../data/games/*.json', { eager: true, import: 'default' });
 const commitMods = import.meta.glob('../data/commits/*.json', { eager: true, import: 'default' });
-const postMods = import.meta.glob('../posts/*.md', { eager: true });
+const postMods = import.meta.glob('../posts/**/*.md', { eager: true });
 
 export { site };
 
 export const games = Object.values(gameMods).sort((a, b) => (a.order ?? 99) - (b.order ?? 99));
-export const featuredGame = games.find((g) => g.featured) ?? games[0];
+export const gameBySlug = (slug) => games.find((g) => g.slug === slug) ?? null;
 
 export const commitsFor = (slug) => commitMods[`../data/commits/${slug}.json`] ?? null;
 
@@ -20,10 +21,18 @@ export const allCommits = games
   )
   .sort((a, b) => (a.date === b.date ? a._o - b._o : a.date < b.date ? 1 : -1));
 
+// 글 하나: slug(주소 끝), game(게임 slug 또는 null), url(글 주소)
+// src/posts/<게임>/<글>.md → /games/<게임>/blog/<글>/  ·  src/posts/<글>.md → /blog/<글>/
 export const posts = Object.entries(postMods)
-  .map(([p, m]) => ({ slug: p.split('/').pop().replace(/\.md$/, ''), ...m.frontmatter, Content: m.Content }))
+  .map(([p, m]) => {
+    const parts = p.replace('../posts/', '').replace(/\.md$/, '').split('/');
+    const slug = parts.at(-1);
+    const game = parts.length > 1 && gameBySlug(parts[0]) ? parts[0] : null;
+    return { slug, game, url: game ? `/games/${game}/blog/${slug}/` : `/blog/${slug}/`, ...m.frontmatter, Content: m.Content };
+  })
   .filter((p) => !p.draft)
   .sort((a, b) => new Date(b.date) - new Date(a.date));
+export const postsFor = (slug) => posts.filter((p) => p.game === slug);
 
 // 소설: src/story/<게임 slug>/*.md (scripts/import-story.py가 게임 저장소 원고에서 만듦)
 const storyMods = import.meta.glob('../story/*/*.md', { eager: true });
@@ -32,6 +41,18 @@ export const storyFor = (slug) =>
     .filter(([p]) => p.split('/').at(-2) === slug)
     .map(([p, m]) => ({ slug: p.split('/').pop().replace(/^\d+-/, '').replace(/\.md$/, ''), ...m.frontmatter, Content: m.Content }))
     .sort((a, b) => a.order - b.order);
+
+// 게임 구역 메뉴: 게임 홈 · 소설(원고가 있을 때만) · 블로그 · 소개
+export const gameNav = (game) => {
+  const base = `/games/${game.slug}/`;
+  const subs = ['story/', 'blog/', 'about/'].map((s) => base + s);
+  return [
+    { href: base, label: game.title, not: subs },
+    ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
+    { href: base + 'blog/', label: '블로그' },
+    { href: base + 'about/', label: '소개' },
+  ];
+};
 
 export const STATUS = {
   '개발 중': 'amber',
