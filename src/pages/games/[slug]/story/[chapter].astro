@@ -12,11 +12,12 @@ const { c, prev, next } = Astro.props;
 const { Content } = c;
 const game = gameBySlug(Astro.params.slug);
 const title = game.story?.title ?? `${game.title} 소설`;
+const same = title === game.title; // 소설 제목이 게임 이름과 같을 때 겹쳐 쓰지 않는다
 const base = `/games/${game.slug}/story`;
 ---
-<Base title={`${c.label} ${c.title} — ${title}`} description={`${game.title} 소설 『${title}』 ${c.label} 「${c.title}」`} image={game.cover}>
+<Base title={`${c.label} ${c.title} — ${same ? `${title} 소설` : title}`} description={same ? `소설 『${title}』 ${c.label} 「${c.title}」` : `${game.title} 소설 『${title}』 ${c.label} 「${c.title}」`} image={game.cover}>
   <article class="chapter">
-    <p class="crumb small"><a href={`${base}/`}>← {title}</a></p>
+    <p class="crumb small"><a href={`${base}/`}>← {same ? '소설 목차' : title}</a></p>
     <p class="label mono small">{c.label}</p>
     <h1>{c.title}</h1>
     <div class="novel"><Content /></div>

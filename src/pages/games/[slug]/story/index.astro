@@ -12,14 +12,16 @@ export function getStaticPaths() {
 const { game } = Astro.props;
 const st = game.story ?? {};
 const title = st.title ?? `${game.title} 소설`;
+// 소설 제목이 게임 이름과 같으면 '등불지기 — 등불지기 소설'처럼 겹치지 않게 한다
+const same = title === game.title;
 const chapters = storyFor(game.slug);
 const total = chapters.reduce((n, c) => n + c.chars, 0);
 const approx = (n) => `약 ${(Math.round(n / 100) * 100).toLocaleString('ko-KR')}자`;
 ---
-<Base title={`${title} — ${game.title} 소설`} description={`${(st.lead ?? []).join(' ')} — ${game.title} 연작 소설`} image={game.cover}>
+<Base title={same ? `${title} 소설` : `${title} — ${game.title} 소설`} description={`${(st.lead ?? []).join(' ')} — ${game.title} 연작 소설`} image={game.cover}>
   <article class="story">
     <p class="crumb small"><a href={`/games/${game.slug}/`}>← {game.title}</a></p>
-    <p class="kicker mono small">{game.title} 소설</p>
+    <p class="kicker mono small">{same ? '소설' : `${game.title} 소설`}</p>
     <h1>{title}</h1>
     {st.lead?.length > 0 && <p class="lead">{st.lead.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>}
     {st.note && <p class="note small">{st.note}</p>}
