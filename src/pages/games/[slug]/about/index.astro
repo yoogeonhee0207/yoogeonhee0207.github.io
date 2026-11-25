@@ -19,8 +19,9 @@ const story = storyFor(game.slug);
 const daily = dailyFor(game.slug);
 const last = Object.keys(daily).sort().at(-1);
 const links = [
-  { href: base, label: game.title, text: '플레이 화면 · 등장 캐릭터 · 에셋 · 조작법' },
+  { href: base, label: game.title, text: '플레이 화면 · 등장 캐릭터 · 조작법' },
   ...(story.length > 0 ? [{ href: base + 'story/', label: `소설${game.story?.title ? ` 『${game.story.title}』` : ''}`, text: `${story.length}편` }] : []),
+  ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: '에셋', text: `그림 모음 ${game.gallery.length}장` }] : []),
   { href: base + 'blog/', label: '블로그', text: posts.length > 0 ? `개발 일지 ${posts.length}편` : '아직 쓴 글이 없어요' },
   ...(commits.length > 0 ? [{ href: base + '#devlog', label: '개발 기록', text: `커밋 ${sumDaily(daily)}개${last ? ` · 마지막 작업 ${fmtDate(last, true)}` : ''}` }] : []),
 ];

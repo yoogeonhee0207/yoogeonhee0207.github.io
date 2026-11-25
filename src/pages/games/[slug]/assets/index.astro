@@ -1,0 +1,42 @@
+---
+import Base from '../../../../layouts/Base.astro';
+import { games } from '../../../../lib/data.js';
+
+// 게임 에셋 페이지: 게임 JSON의 gallery (scripts/make-gallery.py가 만든 종류별 모음 그림).
+// gallery가 있는 게임만 페이지와 메뉴 칸이 생긴다.
+export function getStaticPaths() {
+  return games.filter((g) => g.gallery?.length > 0).map((game) => ({ params: { slug: game.slug }, props: { game } }));
+}
+const { game } = Astro.props;
+const art = (f) => `/games/${game.slug}/art/${f}`;
+---
+<Base title={`${game.title} 에셋`} description={`${game.title}에서 쓰는 그림을 종류별로 모았어요.`} image={game.cover}>
+  <p class="kicker mono small">{game.title}</p>
+  <h1>에셋</h1>
+  {game.galleryNote && <p class="lead">{game.galleryNote}</p>}
+  <p class="jump small">
+    {game.gallery.map((g, i) => <a href={`#g${i + 1}`}>{g.title}</a>)}
+  </p>
+  <div class="gallery">
+    {game.gallery.map((g, i) => (
+      <figure id={`g${i + 1}`}>
+        <figcaption><span class="n">{g.title}</span><span class="small muted">{g.text}</span></figcaption>
+        <a href={art(g.img)} aria-label={`${g.title} 크게 보기`}><img src={art(g.img)} alt={g.alt ?? g.title} width={g.width} height={g.height} loading={i === 0 ? 'eager' : 'lazy'} /></a>
+      </figure>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .kicker { color: var(--accent-ink); letter-spacing: .04em; }
+  h1 { font-size: 36px; margin-top: 6px; }
+  .lead { margin-top: 10px; color: var(--ink-2); font-size: 17px; max-width: 720px; }
+  .jump { margin-top: 18px; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .jump a { color: var(--accent-ink); font-weight: 500; text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+  .gallery { margin-top: 28px; display: flex; flex-direction: column; gap: 28px; }
+  .gallery figure { margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; scroll-margin-top: 24px; }
+  .gallery figcaption { display: flex; flex-direction: column; gap: 2px; padding: 14px 18px; border-bottom: 1px solid var(--line); }
+  .gallery .n { font-weight: 700; font-size: 18px; }
+  .gallery a { display: grid; place-items: center; background: #16181d; padding: 12px; }
+  .gallery img { display: block; max-width: 100%; height: auto; image-rendering: pixelated; }
+</style>

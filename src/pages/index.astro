@@ -16,6 +16,7 @@ const rows = games.map((game) => {
     links: [
       { href: base, label: '게임 홈' },
       ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
+      ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: '에셋' }] : []),
       { href: base + 'blog/', label: `블로그 ${postsFor(game.slug).length}` },
       { href: base + 'about/', label: '소개' },
     ],

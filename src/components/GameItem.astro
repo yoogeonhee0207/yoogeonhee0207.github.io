@@ -8,6 +8,7 @@ const last = Object.keys(dailyFor(game.slug)).sort().at(-1);
 const b = game.webgl ? game.build : null;
 const links = [
   ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
+  ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: '에셋' }] : []),
   { href: base + 'blog/', label: `블로그 ${postsFor(game.slug).length}` },
   { href: base + 'about/', label: '소개' },
 ];

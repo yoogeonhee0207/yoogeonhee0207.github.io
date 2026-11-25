@@ -31,7 +31,7 @@ scripts/fetch-commits.mjs   커밋 기록 가져오기
 
 **세계관 글**: 게임 저장소의 설정 문서는 비공개라 그대로 옮기지 않아요. 뼈대만 짧게 다시 쓰고, 보스의 정체와 엔딩은 적지 않아요.
 
-**새 게임 추가**: `src/data/games/<slug>.json`을 하나 더 두면 (등불지기 것을 본떠서, `order`는 다음 번호) 그 게임 구역이 통째로 생겨요 — 홈 `/games/<slug>/`, 블로그 `/games/<slug>/blog/`, 소개 `/games/<slug>/about/`. 그 구역 안에서는 맨 위 메뉴 아래에 그 게임 메뉴 줄이 하나 더 붙어요. 그림은 `public/games/<slug>/art/`, 글은 `src/posts/<slug>/`, 소설이 있으면 아래 `import-story.py`로 옮기고 JSON에 `story`(제목 `title`, 소개 문장 `lead`, 안내 `note`)를 적어요. 전체 홈의 게임 목록에도 한 줄이 저절로 늘어요.
+**새 게임 추가**: `src/data/games/<slug>.json`을 하나 더 두면 (등불지기 것을 본떠서, `order`는 다음 번호) 그 게임 구역이 통째로 생겨요 — 홈 `/games/<slug>/`, 블로그 `/games/<slug>/blog/`, 소개 `/games/<slug>/about/` (`gallery`가 있으면 에셋 `/games/<slug>/assets/`). 그 구역 안에서는 맨 위 메뉴 아래에 그 게임 메뉴 줄이 하나 더 붙어요. 그림은 `public/games/<slug>/art/`, 글은 `src/posts/<slug>/`, 소설이 있으면 아래 `import-story.py`로 옮기고 JSON에 `story`(제목 `title`, 소개 문장 `lead`, 안내 `note`)를 적어요. 전체 홈의 게임 목록에도 한 줄이 저절로 늘어요.
 
 **게임 상태 바꾸기**: 게임 JSON의 `status`를 `개발 중` / `데모` / `출시` 중 하나로.
 - `개발 중`: 플레이 화면 대신 "테스트 참여 문의"
@@ -62,7 +62,7 @@ scripts/publish-webgl.sh lanternkeeper ../LanternKeeper --pre-method SpriteLibra
 ```
 ../.venv/bin/python scripts/make-gallery.py lanternkeeper ../LanternKeeper/Assets/Art --zones catacomb,forest,cave,corridor,castle --own village,hub
 ```
-게임 그림 폴더의 png를 파일 이름 앞머리(`char_`·`enemy_` / `tile_`·`prop_` / `icon_`·`weapon_`·`proj_`·`obj_`·`pickup_` / `fx_` / `ui_`, 보스 `boss_`)로 나눠 `public/games/<slug>/art/gallery_*.webp`를 만들어요. `--own`에 적은 이름(마을)의 타일·소품은 `gallery_village.webp`로 따로 한 장. `boss_`는 `gallery_bosses.webp`에 보스마다 한 줄(자세 그림 포함), `obj_`(소환수)는 아이콘·무기 모음, `ui_`는 `gallery_ui.webp`. 어느 모음에도 안 들어간 그림이 있으면 끝에 이름을 알려 줘요(새 앞머리가 생기면 스크립트에 추가). 게임 JSON의 `gallery`(제목·그림·크기·설명)와 `galleryNote`는 직접 적어요. `gallery`가 없는 게임은 칸이 나오지 않아요. 게임 그림이 바뀌면 다시 실행하고, 출력에 나온 크기가 달라졌으면 `gallery`의 `width`·`height`도 고쳐요.
+게임 그림 폴더의 png를 파일 이름 앞머리(`char_`·`enemy_` / `tile_`·`prop_` / `icon_`·`weapon_`·`proj_`·`obj_`·`pickup_` / `fx_` / `ui_`, 보스 `boss_`)로 나눠 `public/games/<slug>/art/gallery_*.webp`를 만들어요. `--own`에 적은 이름(마을)의 타일·소품은 `gallery_village.webp`로 따로 한 장. `boss_`는 `gallery_bosses.webp`에 보스마다 한 줄(자세 그림 포함), `obj_`(소환수)는 아이콘·무기 모음, `ui_`는 `gallery_ui.webp`. 어느 모음에도 안 들어간 그림이 있으면 끝에 이름을 알려 줘요(새 앞머리가 생기면 스크립트에 추가). 게임 JSON의 `gallery`(제목·그림·크기·설명)와 `galleryNote`는 직접 적어요. 모음 그림은 게임 구역의 에셋 페이지(`/games/<slug>/assets/`)에 나오고, `gallery`가 없는 게임은 그 페이지와 메뉴 칸이 생기지 않아요. 게임 그림이 바뀌면 다시 실행하고, 출력에 나온 크기가 달라졌으면 `gallery`의 `width`·`height`도 고쳐요.
 
 **소설: `scripts/import-story.py <게임 slug> <원고 폴더>`**
 ```

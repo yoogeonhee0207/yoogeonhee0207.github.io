@@ -100,7 +100,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
 
   {game.cast?.length > 0 && (
     <section class="section">
-      <div class="section-head"><h2>등장 캐릭터</h2></div>
+      <div class="section-head"><h2>등장 캐릭터</h2>{game.gallery?.length > 0 && <a href={`/games/${game.slug}/assets/`} class="small">에셋 전체 보기 →</a>}</div>
       <ul class="cast">
         {game.cast.map((c) => (
           <li class:list={{ boss: c.boss, small: c.small }}>
@@ -110,21 +110,6 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
           </li>
         ))}
       </ul>
-    </section>
-  )}
-
-  {game.gallery?.length > 0 && (
-    <section class="section">
-      <div class="section-head"><h2>에셋</h2></div>
-      <div class="gallery">
-        {game.gallery.map((g) => (
-          <figure>
-            <a href={art(g.img)} aria-label={`${g.title} 크게 보기`}><img src={art(g.img)} alt={g.alt ?? g.title} width={g.width} height={g.height} loading="lazy" /></a>
-            <figcaption><span class="n">{g.title}</span><span class="small muted">{g.text}</span></figcaption>
-          </figure>
-        ))}
-      </div>
-      {game.galleryNote && <p class="small muted gallery-note">{game.galleryNote}</p>}
     </section>
   )}
 
@@ -221,14 +206,6 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   .cast li.small img { width: 28px; height: 28px; }
   .cast .boss { background: var(--soft); }
   .cast .n { font-weight: 500; font-size: 15px; margin-top: 6px; }
-
-  .gallery { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); gap: 20px; }
-  .gallery figure { margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; }
-  .gallery a { display: grid; place-items: center; background: #16181d; padding: 8px; flex: 1; }
-  .gallery img { display: block; max-width: 100%; height: auto; }
-  .gallery figcaption { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px 14px; border-top: 1px solid var(--line); }
-  .gallery .n { font-weight: 500; font-size: 15px; }
-  .gallery-note { margin-top: 12px; }
 
   .split { display: flex; flex-wrap: wrap; gap: 48px; }
   .split > * { flex: 1 1 380px; min-width: 0; }
