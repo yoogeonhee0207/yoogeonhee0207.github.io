@@ -2,37 +2,18 @@
 import Base from '../layouts/Base.astro';
 import { site, games } from '../lib/data.js';
 
-// 문의 페이지: 서버가 없는 사이트라 메일로 받는다. 종류를 고르면 제목·본문 틀이 채워진 메일 창이 열린다.
+// 문의 페이지: 서버가 없는 사이트라 구글 설문지(Google Forms)로 받는다. 답은 연결된 구글 시트에 쌓인다.
+// 이 페이지의 양식이 설문지의 formResponse 주소로 바로 보낸다 (방문자는 로그인 없이, 사이트를 떠나지 않고 보냄).
+// 설문지 질문을 고치면 아래 entry 번호도 맞춰야 한다 (설문지 미리보기 화면의 소스에서 entry.N).
 // 게임 구역에서 올 때는 /contact/?game=<slug> 로 그 게임이 골라진 채 열린다.
+const FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSdc5jWXNQJQ2saMQvdOhjZ-0VPbI4S6t-mFffLgfcZpUiS05A';
+const ENTRY = { kind: 'entry.57611925', game: 'entry.814506797', build: 'entry.1057658725', device: 'entry.1189027187', body: 'entry.401458917', reply: 'entry.916453627' };
+// value는 설문지의 객관식 보기 글자와 똑같아야 한다
 const kinds = [
-  {
-    id: 'bug',
-    title: '버그 신고',
-    text: '게임이 멈추거나, 이상하게 보이거나, 진행이 사라졌을 때 알려 주세요.',
-    ask: ['빌드 번호 (타이틀·일시정지 화면 왼쪽 아래의 v0.0.0 · 빌드 0)', '기기와 브라우저 (예: 아이폰 사파리, 윈도우 크롬)', '어디서 무엇을 하다가 생겼는지', '화면 사진이 있으면 함께'],
-    body: ['빌드 번호: ', '기기·브라우저: ', '어디서 무엇을 하다가: ', '', '내용: '],
-  },
-  {
-    id: 'play',
-    title: '플레이 소감 · 테스트 참여',
-    text: '해 보고 느낀 점, 어렵거나 헷갈린 곳, 테스트에 참여하고 싶다는 연락 모두 좋아요.',
-    ask: ['빌드 번호', '어디까지 해 봤는지', '좋았던 것과 불편했던 것'],
-    body: ['빌드 번호: ', '어디까지 해 봤는지: ', '', '내용: '],
-  },
-  {
-    id: 'account',
-    title: '계정 · 진행 지우기',
-    text: '서버에 저장된 진행과 계정 정보를 지우고 싶을 때 보내 주세요.',
-    ask: ["게임 안 계정 창에 보이는 아이디, 또는 '구글 연결됨' 상태", '대략의 마지막 플레이 날짜'],
-    body: ['계정 창에 보이는 아이디 (또는 구글 연결됨): ', '마지막 플레이 날짜: ', '', '지우고 싶은 것: '],
-  },
-  {
-    id: 'etc',
-    title: '그 밖의 문의',
-    text: '협업, 채용, 그 밖에 하고 싶은 말은 여기로 보내 주세요.',
-    ask: [],
-    body: ['내용: '],
-  },
+  { value: '버그 신고', text: '게임이 멈추거나, 이상하게 보이거나, 진행이 사라졌을 때', hint: '어디서 무엇을 하다가 생겼는지 적어 주세요.' },
+  { value: '플레이 소감 · 테스트 참여', text: '해 보고 느낀 점, 어렵거나 헷갈린 곳, 테스트에 참여하고 싶을 때', hint: '어디까지 해 봤는지, 좋았던 것과 불편했던 것을 적어 주세요.' },
+  { value: '계정 · 진행 지우기', text: '서버에 저장된 진행과 계정 정보를 지우고 싶을 때', hint: "게임 안 계정 창에 보이는 아이디(또는 '구글 연결됨' 상태)와 대략의 마지막 플레이 날짜를 적어 주세요." },
+  { value: '그 밖의 문의', text: '협업, 채용, 그 밖에 하고 싶은 말', hint: '' },
 ];
 const faq = [
   { q: '빌드 번호는 어디서 보나요?', a: '게임 타이틀 화면과 일시정지 화면의 왼쪽 아래에 "v0.126.0 · 빌드 25 · 11.25"처럼 적혀 있어요. 게임 소개 페이지의 제작 정보에도 지금 올라가 있는 빌드가 나와요.' },
@@ -41,43 +22,68 @@ const faq = [
 ];
 ---
 <Base title="문의" description="버그 신고, 플레이 소감, 계정·진행 지우기, 그 밖의 문의를 받는 곳">
-  <div class="contact" data-contact data-email={site.email}>
+  <div class="contact">
     <h1>문의</h1>
-    <p class="lead">버그 신고, 플레이 소감, 계정 문의를 메일로 받아요. 아래에서 종류를 고르면 제목과 적을 것이 채워진 메일 창이 열려요.</p>
+    <p class="lead">버그 신고, 플레이 소감, 계정 문의를 여기서 바로 보낼 수 있어요. 로그인은 필요 없어요.</p>
 
-    <label class="pick" hidden={games.length < 2}>
-      <span class="small muted">어느 게임인가요</span>
-      <select data-game>
-        {games.map((g) => <option value={g.slug} data-title={g.title}>{g.title}</option>)}
-        <option value="" data-title="">게임과 상관없는 문의</option>
-      </select>
-    </label>
+    <form class="form" data-form action={`${FORM}/formResponse`} method="post">
+      <fieldset>
+        <legend>문의 종류</legend>
+        <div class="kinds">
+          {kinds.map((k, i) => (
+            <label class="kind">
+              <input type="radio" name={ENTRY.kind} value={k.value} data-hint={k.hint} required checked={i === 0} />
+              <span class="n">{k.value}</span>
+              <span class="small muted">{k.text}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
 
-    <div class="kinds">
-      {kinds.map((k) => (
-        <section class="kind" id={k.id}>
-          <h2>{k.title}</h2>
-          <p class="t">{k.text}</p>
-          {k.ask.length > 0 && (
-            <div>
-              <p class="small muted">적어 주면 좋은 것</p>
-              <ul class="small">{k.ask.map((a) => <li>{a}</li>)}</ul>
-            </div>
-          )}
-          <a class="btn primary" data-mail data-kind={k.title} data-body={k.body.join('\n')} href={`mailto:${site.email}`}>메일 쓰기</a>
-        </section>
-      ))}
-    </div>
+      <label class="field">
+        <span>게임</span>
+        <select name={ENTRY.game} data-game>
+          {games.map((g) => <option value={g.title} data-slug={g.slug}>{g.title}</option>)}
+          <option value="">게임과 상관없는 문의</option>
+        </select>
+      </label>
 
-    <section class="direct">
-      <h2>메일 창이 열리지 않으면</h2>
-      <p class="small" style="color: var(--ink-2)">아래 주소로 직접 보내 주세요. 제목에 게임 이름과 문의 종류를 적어 주면 찾기 쉬워요.</p>
-      <div class="row" style="gap: 10px">
-        <span class="mono addr">{site.email}</span>
-        <button type="button" class="btn" data-copy>주소 복사</button>
-        <span class="small muted" data-copied hidden>복사했어요</span>
+      <div class="two">
+        <label class="field">
+          <span>빌드 번호 <span class="small muted">선택</span></span>
+          <input type="text" name={ENTRY.build} placeholder="v0.126.0 · 빌드 25" autocomplete="off" />
+          <span class="small muted">타이틀·일시정지 화면 왼쪽 아래에 있어요</span>
+        </label>
+        <label class="field">
+          <span>기기와 브라우저 <span class="small muted">선택</span></span>
+          <input type="text" name={ENTRY.device} placeholder="아이폰 사파리, 윈도우 크롬" autocomplete="off" />
+        </label>
       </div>
-    </section>
+
+      <label class="field">
+        <span>내용</span>
+        <textarea name={ENTRY.body} rows="7" required></textarea>
+        <span class="small muted" data-hint></span>
+      </label>
+
+      <label class="field">
+        <span>답장 받을 연락처 <span class="small muted">선택</span></span>
+        <input type="text" name={ENTRY.reply} placeholder="메일 주소나 연락받을 곳" autocomplete="off" />
+        <span class="small muted">답장이 필요할 때만 적어 주세요. 계정을 지워 달라는 문의는 처리 결과를 알려 드릴 곳이 필요해요.</span>
+      </label>
+
+      <div class="row" style="gap: 12px">
+        <button type="submit" class="btn primary" data-send>보내기</button>
+        <span class="small muted" data-state aria-live="polite"></span>
+      </div>
+      <p class="small muted">적어 주신 내용은 Google 설문지에 저장되고, 게임을 고치고 답장하는 데에만 써요. 보내기가 되지 않으면 <a href={`${FORM}/viewform`}>구글 설문지에서 직접</a> 보낼 수 있어요.</p>
+    </form>
+
+    <div class="done" data-done hidden>
+      <h2>보냈어요</h2>
+      <p>문의가 접수됐어요. 고마워요.</p>
+      <button type="button" class="btn" data-again>하나 더 보내기</button>
+    </div>
 
     <section class="faq">
       <h2>자주 묻는 것</h2>
@@ -93,46 +99,76 @@ const faq = [
 </Base>
 
 <script>
-  const root = document.querySelector('[data-contact]');
-  const email = root?.dataset.email;
-  const sel = root?.querySelector('[data-game]');
-  // 게임 구역에서 오면 ?game=<slug> 로 그 게임을 골라 둔다
+  const form = document.querySelector('[data-form]');
+  const done = document.querySelector('[data-done]');
+  const state = form?.querySelector('[data-state]');
+  const send = form?.querySelector('[data-send]');
+  const hint = form?.querySelector('span[data-hint]');
+  const sel = form?.querySelector('[data-game]');
+  // 게임 구역에서 오면 ?game=<slug>, 종류는 #play 처럼 주소 끝으로 골라 둔다
   const want = new URLSearchParams(location.search).get('game');
-  if (sel && want !== null && [...sel.options].some((o) => o.value === want)) sel.value = want;
-  const fill = () => {
-    const game = sel?.selectedOptions[0]?.dataset.title ?? '';
-    root.querySelectorAll('[data-mail]').forEach((a) => {
-      const subject = `${game ? `[${game}] ` : ''}${a.dataset.kind}`;
-      const body = `${game ? `게임: ${game}\n` : ''}${a.dataset.body}`;
-      a.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    });
-  };
-  if (root && email) { fill(); sel?.addEventListener('change', fill); }
-  const copy = root?.querySelector('[data-copy]');
-  copy?.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(email); root.querySelector('[data-copied]').hidden = false; } catch {}
+  if (sel && want !== null) {
+    const opt = [...sel.options].find((o) => (o.dataset.slug ?? '') === want);
+    if (opt) sel.value = opt.value;
+  }
+  const radios = [...(form?.querySelectorAll('input[type=radio]') ?? [])];
+  const byHash = { '#bug': 0, '#play': 1, '#account': 2, '#etc': 3 }[location.hash];
+  if (byHash !== undefined && radios[byHash]) radios[byHash].checked = true;
+  const showHint = () => { if (hint) hint.textContent = radios.find((r) => r.checked)?.dataset.hint ?? ''; };
+  radios.forEach((r) => r.addEventListener('change', showHint));
+  showHint();
+
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    send.disabled = true;
+    state.textContent = '보내는 중…';
+    try {
+      // 구글 설문지는 다른 사이트에서 보낸 요청의 답을 읽지 못하게 하므로(no-cors) 보냈는지까지만 안다
+      await fetch(form.action, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(new FormData(form)) });
+      form.hidden = true;
+      done.hidden = false;
+      done.scrollIntoView({ block: 'center' });
+    } catch {
+      state.textContent = '보내지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.';
+    } finally {
+      send.disabled = false;
+    }
+  });
+  done?.querySelector('[data-again]')?.addEventListener('click', () => {
+    form.querySelector('textarea').value = '';
+    state.textContent = '';
+    done.hidden = true;
+    form.hidden = false;
   });
 </script>
 
 <style>
-  .contact { max-width: 860px; }
+  .contact { max-width: 720px; }
   h1 { font-size: 36px; }
-  .lead { margin-top: 10px; color: var(--ink-2); font-size: 17px; max-width: 680px; }
-  .pick { margin-top: 24px; display: flex; flex-direction: column; gap: 6px; max-width: 320px; }
-  .pick[hidden] { display: none; }
-  select { min-height: 44px; padding: 0 12px; border: 1px solid var(--chip); border-radius: 8px; background: var(--bg); color: var(--ink); font: 500 15px var(--sans); }
-  .kinds { margin-top: 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 20px; }
-  .kind { border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 24px; }
-  .kind h2 { font-size: 19px; }
-  .kind .t { color: var(--ink-2); font-size: 15px; }
-  .kind ul { margin: 4px 0 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 2px; }
-  .kind .btn { margin-top: auto; align-self: flex-start; }
-  .direct, .faq { margin-top: 48px; display: flex; flex-direction: column; gap: 12px; }
-  .direct h2, .faq h2 { font-size: 20px; }
-  .addr { overflow-wrap: anywhere; }
-  [data-copied][hidden] { display: none; }
+  .lead { margin-top: 10px; color: var(--ink-2); font-size: 17px; }
+  .form { margin-top: 28px; display: flex; flex-direction: column; gap: 22px; }
+  .form[hidden], .done[hidden] { display: none; }
+  fieldset { border: 0; margin: 0; padding: 0; min-width: 0; }
+  legend, .field > span:first-child { font-weight: 500; font-size: 15px; padding: 0; margin-bottom: 8px; display: block; }
+  .kinds { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 10px; }
+  .kind { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 10px; align-items: start; padding: 14px 16px; border: 1px solid var(--line); border-radius: 12px; cursor: pointer; }
+  .kind:has(input:checked) { border-color: var(--accent); background: var(--soft); }
+  .kind input { grid-row: span 2; margin-top: 5px; accent-color: var(--accent); width: 16px; height: 16px; }
+  .kind .n { font-weight: 500; }
+  .kind .small { grid-column: 2; }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .field > span:first-child { margin-bottom: 2px; }
+  .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 22px 20px; }
+  input[type='text'], select, textarea { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--chip); border-radius: 8px; background: var(--bg); color: var(--ink); font: 400 16px/1.5 var(--sans); }
+  textarea { resize: vertical; }
+  input[type='text']:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: var(--accent); }
+  ::placeholder { color: var(--muted); opacity: .7; }
+  .form a, .faq a { color: var(--accent-ink); }
+  .done { margin-top: 28px; padding: 28px; border: 1px solid var(--accent); border-radius: 12px; background: var(--soft); display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .done h2 { font-size: 22px; }
+  .faq { margin-top: 56px; display: flex; flex-direction: column; gap: 12px; }
+  .faq h2 { font-size: 20px; }
   details { border-bottom: 1px solid var(--line-2); padding: 12px 0; }
   summary { cursor: pointer; font-weight: 500; min-height: 32px; }
   details p { margin-top: 8px; color: var(--ink-2); font-size: 15px; }
-  .faq a { color: var(--accent-ink); }
 </style>

@@ -3,7 +3,7 @@ import Base from '../../../layouts/Base.astro';
 import { site } from '../../../lib/data.js';
 
 // 게임 안 구글 로그인(Google OAuth 동의 화면)이 가리키는 주소라 경로를 바꾸지 않는다.
-const updated = '2026-11-25';
+const updated = '2026-11-26';
 ---
 <Base title="등불지기 개인정보처리방침" description="등불지기가 진행 저장과 로그인에 쓰는 정보와 보관 방법을 안내해요.">
   <article class="policy">
@@ -40,12 +40,13 @@ const updated = '2026-11-25';
 
     <section>
       <h2>4. 지우고 싶을 때</h2>
-      <p>아래 메일로 게임 안 계정 창에 보이는 아이디(또는 '구글 연결됨' 상태와 대략의 마지막 플레이 날짜)를 알려 주시면 서버에 있는 진행과 계정 정보를 지우고 답장드려요. 기기에 남은 진행은 브라우저의 사이트 데이터를 지우면 함께 지워져요.</p>
+      <p><a href="/contact/?game=lanternkeeper#account">문의 페이지</a>의 '계정 · 진행 지우기'나 아래 메일로 게임 안 계정 창에 보이는 아이디(또는 '구글 연결됨' 상태와 대략의 마지막 플레이 날짜)를 알려 주시면 서버에 있는 진행과 계정 정보를 지우고 답장드려요. 기기에 남은 진행은 브라우저의 사이트 데이터를 지우면 함께 지워져요.</p>
     </section>
 
     <section>
       <h2>5. 문의</h2>
       <ul class="links">
+        <li><span class="muted">문의</span> <a href="/contact/?game=lanternkeeper">문의 페이지</a> — 적어 주신 내용과 연락처는 Google 설문지에 저장되고, 문의에 답하는 데에만 써요.</li>
         {site.email && <li><span class="muted">메일</span> <span>{site.email}</span></li>}
       </ul>
       <p class="small muted">이 방침이 바뀌면 이 페이지에 시행일과 함께 고쳐 올려요.</p>

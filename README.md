@@ -13,7 +13,7 @@ src/
   data/commits/<slug>.json  게임 저장소 커밋 기록 (자동 생성, 직접 고치지 않음)
   posts/<slug>/*.md         그 게임 블로그 글 (파일 하나 = 글 하나. posts/*.md 는 게임에 속하지 않는 글)
   story/<slug>/*.md         그 게임 소설 (scripts/import-story.py가 만듦, 직접 고치지 않음)
-  pages/                    전체 홈·게임 목록·전체 블로그·만든 사람 소개·문의(contact.astro)
+  pages/                    전체 홈·게임 목록·전체 블로그·만든 사람 소개·문의(contact.astro — 구글 설문지로 보냄)
   pages/games/[slug]/       게임 구역: 홈 · blog/ · story/ · about/ (게임마다 자동 생성)
   components/  layouts/  lib/data.js  styles/global.css
 public/
