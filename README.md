@@ -27,7 +27,7 @@ scripts/fetch-commits.mjs   커밋 기록 가져오기
 
 **글 쓰기**: `src/posts/_글쓰기-예시.md`를 복사해 `src/posts/<게임 slug>/글-주소.md`로 저장, `draft: true` 지우고 push. 그 게임 블로그(`/games/<slug>/blog/글-주소/`)와 전체 블로그 목록에 나와요. 게임에 속하지 않는 글은 `src/posts/글-주소.md` (주소 `/blog/글-주소/`).
 
-**게임 안의 게임(모드·장르) 추가**: `src/data/games/lanternkeeper.json`의 `places`에 한 줄 추가 — `title`(마을의 입구 이름), `kind`(어떤 게임인지), `badge`, `state`(`open` 플레이 가능 / `planned` 예정, 점선 카드), `color`, `text`, `detail`. 게임 페이지 "등마루에서 갈 수 있는 곳"과 홈 카드에 같이 나와요. 칸 제목·소개는 `hub`, 세계관 요약은 `world.lines`.
+**게임 안의 게임(모드·장르) 추가**: `src/data/games/lanternkeeper.json`의 `places`에 한 줄 추가 — `title`(마을의 입구 이름), `kind`(어떤 게임인지), `badge`, `state`(`open` 플레이 가능 / `planned` 예정, 점선 카드), `color`, `text`, `detail`. 게임 페이지 "마을에서 갈 수 있는 곳"과 홈 카드에 같이 나와요. 칸 제목·소개는 `hub`, 세계관 요약은 `world.lines`.
 
 **세계관 글**: 게임 저장소의 설정 문서는 비공개라 그대로 옮기지 않아요. 뼈대만 짧게 다시 쓰고, 보스의 정체와 엔딩은 적지 않아요.
 
