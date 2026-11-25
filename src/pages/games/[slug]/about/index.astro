@@ -57,7 +57,7 @@ const links = [
     <section class="block maker">
       <h2>만든 사람</h2>
       <p class="small" style="color: var(--ink-2)">{site.name} · {site.bio}</p>
-      <p class="small"><a href="/about/">만든 사람 소개 →</a> <span class="muted">·</span> <a href="/about/#contact">테스트 참여 · 문의 →</a></p>
+      <p class="small"><a href="/about/">만든 사람 소개 →</a> <span class="muted">·</span> <a href={`/contact/?game=${game.slug}`}>테스트 참여 · 문의 →</a></p>
     </section>
   </div>
 </Base>

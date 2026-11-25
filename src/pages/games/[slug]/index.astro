@@ -51,7 +51,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ffcf7a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
         <p class="big">지금은 테스트 빌드만 있어요</p>
         <p class="sub">PC와 모바일 브라우저에서 플레이할 수 있는 테스트 빌드가 있어요. 테스트에 참여하고 싶다면 연락 주세요.</p>
-        <a href="/about/#contact" class="btn primary">테스트 참여 문의</a>
+        <a href={`/contact/?game=${game.slug}#play`} class="btn primary">테스트 참여 문의</a>
       </div>
     )}
   </section>

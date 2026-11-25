@@ -13,7 +13,7 @@ src/
   data/commits/<slug>.json  게임 저장소 커밋 기록 (자동 생성, 직접 고치지 않음)
   posts/<slug>/*.md         그 게임 블로그 글 (파일 하나 = 글 하나. posts/*.md 는 게임에 속하지 않는 글)
   story/<slug>/*.md         그 게임 소설 (scripts/import-story.py가 만듦, 직접 고치지 않음)
-  pages/                    전체 홈·게임 목록·전체 블로그·만든 사람 소개
+  pages/                    전체 홈·게임 목록·전체 블로그·만든 사람 소개·문의(contact.astro)
   pages/games/[slug]/       게임 구역: 홈 · blog/ · story/ · about/ (게임마다 자동 생성)
   components/  layouts/  lib/data.js  styles/global.css
 public/
@@ -34,7 +34,7 @@ scripts/fetch-commits.mjs   커밋 기록 가져오기
 **새 게임 추가**: `src/data/games/<slug>.json`을 하나 더 두면 (등불지기 것을 본떠서, `order`는 다음 번호) 그 게임 구역이 통째로 생겨요 — 홈 `/games/<slug>/`, 블로그 `/games/<slug>/blog/`, 소개 `/games/<slug>/about/` (`gallery`가 있으면 에셋 `/games/<slug>/assets/`). 그 구역 안에서는 맨 위 메뉴 아래에 그 게임 메뉴 줄이 하나 더 붙어요. 그림은 `public/games/<slug>/art/`, 글은 `src/posts/<slug>/`, 소설이 있으면 아래 `import-story.py`로 옮기고 JSON에 `story`(제목 `title`, 소개 문장 `lead`, 안내 `note`)를 적어요. 전체 홈의 게임 목록에도 한 줄이 저절로 늘어요.
 
 **게임 상태 바꾸기**: 게임 JSON의 `status`를 `개발 중` / `데모` / `출시` 중 하나로.
-- `개발 중`: 플레이 화면 대신 "테스트 참여 문의"
+- `개발 중`: 플레이 화면 대신 "테스트 참여 문의" (문의 페이지 `/contact/?game=<slug>`로 감)
 - `데모`·`출시` + `webgl` 경로가 있으면: ▶ 버튼으로 페이지 안에서 바로 플레이
 
 **Unity WebGL 빌드 넣기**

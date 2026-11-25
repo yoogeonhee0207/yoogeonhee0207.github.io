@@ -24,8 +24,8 @@ import { site, games } from '../lib/data.js';
     <section class="block" id="contact">
       <h2>연락하기</h2>
       <p class="small" style="color: var(--ink-2)">게임 테스트 참여, 협업, 채용 문의 모두 환영해요.</p>
+      <a href="/contact/" class="btn primary" style="align-self: flex-start">문의 페이지로</a>
       <ul class="links">
-        {site.email && <li><span class="muted">메일</span> <span>{site.email}</span></li>}
         <li><span class="muted">GitHub</span> <a href={site.github}>{site.github.replace('https://', '')}</a></li>
         {site.itch && <li><span class="muted">itch.io</span> <a href={site.itch}>{site.itch.replace('https://', '')}</a></li>}
       </ul>

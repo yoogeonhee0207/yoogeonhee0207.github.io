@@ -1,0 +1,138 @@
+---
+import Base from '../layouts/Base.astro';
+import { site, games } from '../lib/data.js';
+
+// 문의 페이지: 서버가 없는 사이트라 메일로 받는다. 종류를 고르면 제목·본문 틀이 채워진 메일 창이 열린다.
+// 게임 구역에서 올 때는 /contact/?game=<slug> 로 그 게임이 골라진 채 열린다.
+const kinds = [
+  {
+    id: 'bug',
+    title: '버그 신고',
+    text: '게임이 멈추거나, 이상하게 보이거나, 진행이 사라졌을 때 알려 주세요.',
+    ask: ['빌드 번호 (타이틀·일시정지 화면 왼쪽 아래의 v0.0.0 · 빌드 0)', '기기와 브라우저 (예: 아이폰 사파리, 윈도우 크롬)', '어디서 무엇을 하다가 생겼는지', '화면 사진이 있으면 함께'],
+    body: ['빌드 번호: ', '기기·브라우저: ', '어디서 무엇을 하다가: ', '', '내용: '],
+  },
+  {
+    id: 'play',
+    title: '플레이 소감 · 테스트 참여',
+    text: '해 보고 느낀 점, 어렵거나 헷갈린 곳, 테스트에 참여하고 싶다는 연락 모두 좋아요.',
+    ask: ['빌드 번호', '어디까지 해 봤는지', '좋았던 것과 불편했던 것'],
+    body: ['빌드 번호: ', '어디까지 해 봤는지: ', '', '내용: '],
+  },
+  {
+    id: 'account',
+    title: '계정 · 진행 지우기',
+    text: '서버에 저장된 진행과 계정 정보를 지우고 싶을 때 보내 주세요.',
+    ask: ["게임 안 계정 창에 보이는 아이디, 또는 '구글 연결됨' 상태", '대략의 마지막 플레이 날짜'],
+    body: ['계정 창에 보이는 아이디 (또는 구글 연결됨): ', '마지막 플레이 날짜: ', '', '지우고 싶은 것: '],
+  },
+  {
+    id: 'etc',
+    title: '그 밖의 문의',
+    text: '협업, 채용, 그 밖에 하고 싶은 말은 여기로 보내 주세요.',
+    ask: [],
+    body: ['내용: '],
+  },
+];
+const faq = [
+  { q: '빌드 번호는 어디서 보나요?', a: '게임 타이틀 화면과 일시정지 화면의 왼쪽 아래에 "v0.126.0 · 빌드 25 · 11.25"처럼 적혀 있어요. 게임 소개 페이지의 제작 정보에도 지금 올라가 있는 빌드가 나와요.' },
+  { q: '다른 기기에서 이어서 할 수 있나요?', a: '구글로 로그인하면 진행이 서버에도 저장돼서 다른 기기에서 같은 구글 계정으로 이어 할 수 있어요. 게스트로 시작하면 그 기기의 브라우저에 저장돼요.' },
+  { q: '브라우저 기록을 지우면 진행도 지워지나요?', a: '기기에 저장된 진행은 브라우저의 사이트 데이터를 지우면 함께 지워져요. 구글로 로그인해 둔 진행은 서버에 남아 있어서 다시 로그인하면 이어 할 수 있어요.' },
+];
+---
+<Base title="문의" description="버그 신고, 플레이 소감, 계정·진행 지우기, 그 밖의 문의를 받는 곳">
+  <div class="contact" data-contact data-email={site.email}>
+    <h1>문의</h1>
+    <p class="lead">버그 신고, 플레이 소감, 계정 문의를 메일로 받아요. 아래에서 종류를 고르면 제목과 적을 것이 채워진 메일 창이 열려요.</p>
+
+    <label class="pick" hidden={games.length < 2}>
+      <span class="small muted">어느 게임인가요</span>
+      <select data-game>
+        {games.map((g) => <option value={g.slug} data-title={g.title}>{g.title}</option>)}
+        <option value="" data-title="">게임과 상관없는 문의</option>
+      </select>
+    </label>
+
+    <div class="kinds">
+      {kinds.map((k) => (
+        <section class="kind" id={k.id}>
+          <h2>{k.title}</h2>
+          <p class="t">{k.text}</p>
+          {k.ask.length > 0 && (
+            <div>
+              <p class="small muted">적어 주면 좋은 것</p>
+              <ul class="small">{k.ask.map((a) => <li>{a}</li>)}</ul>
+            </div>
+          )}
+          <a class="btn primary" data-mail data-kind={k.title} data-body={k.body.join('\n')} href={`mailto:${site.email}`}>메일 쓰기</a>
+        </section>
+      ))}
+    </div>
+
+    <section class="direct">
+      <h2>메일 창이 열리지 않으면</h2>
+      <p class="small" style="color: var(--ink-2)">아래 주소로 직접 보내 주세요. 제목에 게임 이름과 문의 종류를 적어 주면 찾기 쉬워요.</p>
+      <div class="row" style="gap: 10px">
+        <span class="mono addr">{site.email}</span>
+        <button type="button" class="btn" data-copy>주소 복사</button>
+        <span class="small muted" data-copied hidden>복사했어요</span>
+      </div>
+    </section>
+
+    <section class="faq">
+      <h2>자주 묻는 것</h2>
+      {faq.map((f) => (
+        <details>
+          <summary>{f.q}</summary>
+          <p>{f.a}</p>
+        </details>
+      ))}
+      <p class="small muted">받는 정보와 지우는 방법은 게임마다 있는 개인정보처리방침에 적어 두었어요{games.filter((g) => g.privacy).map((g) => <> · <a href={g.privacy.href}>{g.title}</a></>)}.</p>
+    </section>
+  </div>
+</Base>
+
+<script>
+  const root = document.querySelector('[data-contact]');
+  const email = root?.dataset.email;
+  const sel = root?.querySelector('[data-game]');
+  // 게임 구역에서 오면 ?game=<slug> 로 그 게임을 골라 둔다
+  const want = new URLSearchParams(location.search).get('game');
+  if (sel && want !== null && [...sel.options].some((o) => o.value === want)) sel.value = want;
+  const fill = () => {
+    const game = sel?.selectedOptions[0]?.dataset.title ?? '';
+    root.querySelectorAll('[data-mail]').forEach((a) => {
+      const subject = `${game ? `[${game}] ` : ''}${a.dataset.kind}`;
+      const body = `${game ? `게임: ${game}\n` : ''}${a.dataset.body}`;
+      a.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    });
+  };
+  if (root && email) { fill(); sel?.addEventListener('change', fill); }
+  const copy = root?.querySelector('[data-copy]');
+  copy?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(email); root.querySelector('[data-copied]').hidden = false; } catch {}
+  });
+</script>
+
+<style>
+  .contact { max-width: 860px; }
+  h1 { font-size: 36px; }
+  .lead { margin-top: 10px; color: var(--ink-2); font-size: 17px; max-width: 680px; }
+  .pick { margin-top: 24px; display: flex; flex-direction: column; gap: 6px; max-width: 320px; }
+  .pick[hidden] { display: none; }
+  select { min-height: 44px; padding: 0 12px; border: 1px solid var(--chip); border-radius: 8px; background: var(--bg); color: var(--ink); font: 500 15px var(--sans); }
+  .kinds { margin-top: 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr)); gap: 20px; }
+  .kind { border: 1px solid var(--line); border-radius: 12px; padding: 22px; display: flex; flex-direction: column; gap: 12px; scroll-margin-top: 24px; }
+  .kind h2 { font-size: 19px; }
+  .kind .t { color: var(--ink-2); font-size: 15px; }
+  .kind ul { margin: 4px 0 0; padding-left: 18px; color: var(--ink-2); display: flex; flex-direction: column; gap: 2px; }
+  .kind .btn { margin-top: auto; align-self: flex-start; }
+  .direct, .faq { margin-top: 48px; display: flex; flex-direction: column; gap: 12px; }
+  .direct h2, .faq h2 { font-size: 20px; }
+  .addr { overflow-wrap: anywhere; }
+  [data-copied][hidden] { display: none; }
+  details { border-bottom: 1px solid var(--line-2); padding: 12px 0; }
+  summary { cursor: pointer; font-weight: 500; min-height: 32px; }
+  details p { margin-top: 8px; color: var(--ink-2); font-size: 15px; }
+  .faq a { color: var(--accent-ink); }
+</style>
