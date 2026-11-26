@@ -30,4 +30,4 @@ date: 2026-11-27
 
 1~3번은 빌드 31에 들어 있어요. 테스트에 참여하고 싶다면 [문의 페이지](/contact/?game=lanternkeeper#play)로 알려 주세요.
 
-게임 개발은 Claude Code와 함께 하고, 에셋 이미지는 Codex와 힉스필드로 만들고 있어요.
+게임 개발은 Claude Code와 함께 하고, 에셋 이미지는 Codex로 만들고 있어요.
