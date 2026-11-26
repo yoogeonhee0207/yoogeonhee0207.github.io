@@ -9,7 +9,7 @@
   "summary": "마을에서 빌드를 짜고 등불 하나로 어두운 던전을 내려가는 게임. 지금은 미로 던전 본편을 플레이할 수 있고, 같은 조작으로 하는 새 모드가 마을에 하나씩 늘어나요.",
   "description": "등불지기는 등불 하나에 의지해 지하 던전 다섯 곳을 내려가는 탑다운 로그라이트예요. 마을 제단에서 기본 공격 하나·스킬 넷·패시브 둘로 빌드를 짜고, 열린 던전을 골라 들어가요. 기본 공격은 등불 빛 안의 적에게 자동으로 나가고, 스킬은 버튼으로 마력을 써서 쓰고, 대시로 몸을 피해요. 적이 떨어뜨린 영혼 조각으로 게이지를 채우면 들고 온 기술을 한 단계씩 키우고, 판이 끝나면 모은 조각으로 능력을 강화하거나 상점에서 포션을 사서 다시 내려갑니다.",
   "cover": "/games/lanternkeeper/art/cover.webp",
-  "coverAlt": "등불지기 타이틀 그림: 등불을 든 주인공 앞에 해골왕, 등불을 삼키는 자, 거미 여왕이 서 있는 지하 던전",
+  "coverAlt": "등불지기 타이틀 그림: '등불지기' 현판이 걸린 어두운 지하 회랑에서 등불을 든 주인공이 뒷모습으로 서 있는 장면",
   "webgl": "/games/lanternkeeper/play/index.html",
   "build": { "number": 31, "version": "0.135.0", "date": "2026-11-27", "rev": "b794536" },
   "itch": "",
@@ -30,7 +30,7 @@
     "text": "게임을 켜면 마을에 서 있어요. 마을을 걸어 입구 앞에 서면 그곳으로 들어가요. 지금은 던전·제단·상점·도감이 열려 있고, 본편과 같은 조작으로 하는 새 모드의 입구가 하나씩 늘어나요."
   },
   "places": [
-    {"title": "던전", "kind": "본편 · 미로 로그라이트", "badge": "플레이 가능", "state": "open", "color": "amber", "text": "마을의 던전 입구에서 열린 던전을 골라 들어가요. 들어갈 때마다 새로 만들어지는 미로를 원뿔 모양 등불 빛에 기대어 헤쳐 나가요. 지나온 길은 작은 미니맵에 남고, 미니맵을 누르면 방 전체 지도가 펼쳐져요. 잠든 적은 가까이 가면 깨어나 쫓아오고, 멀리 따돌리면 제자리로 돌아가 다시 잠들어요. 쉼터에서 숨을 고르고, 화로를 모두 밝혀야 보스 문이 열립니다. 보스는 예고한 뒤 공격하고, 공격이 끝나면 잠깐 빈틈을 보여요. 보스를 잡으면 마을로 돌아오고 다음 던전이 열려요. 깊은 던전일수록 영혼 조각을 더 많이 줘요.", "detail": "던전 1 무너진 지하묘지 → 해골왕 · 던전 2 지하 뿌리 숲 → 거미 여왕 · 던전 3 숨은 굴 → 굴지기 · 던전 4 화로 회랑 → 꺼진 부수장 · 던전 5 저주받은 성채 → 등불을 삼키는 자"},
+    {"title": "던전", "kind": "본편 · 미로 로그라이트", "badge": "플레이 가능", "state": "open", "color": "amber", "text": "마을의 던전 입구에서 열린 던전을 골라 들어가요. 들어갈 때마다 새로 만들어지는 미로를 원뿔 모양 등불 빛에 기대어 헤쳐 나가요. 지나온 길은 작은 미니맵에 남고, 미니맵을 누르면 방 전체 지도가 펼쳐져요. 잠든 적은 가까이 가면 깨어나 쫓아오고, 멀리 따돌리면 제자리로 돌아가 다시 잠들어요. 쉼터에서 숨을 고르고, 화로를 모두 밝혀야 보스 문이 열립니다. 보스는 예고한 뒤 공격하고, 공격이 끝나면 잠깐 빈틈을 보여요. 보스를 잡으면 마을로 돌아오고 다음 던전이 열려요. 깊은 던전일수록 영혼 조각을 더 많이 줘요. 마지막 던전인 성채를 깨면 던전 고르기 창에 [어려움] 탭이 열려요. 어려움에서는 가방의 소모품을 쓸 수 없고 적이 더 강하고 등불이 어두운 대신, 영혼 조각을 더 많이 줘요.", "detail": "던전 1 무너진 지하묘지 → 해골왕 · 던전 2 지하 뿌리 숲 → 거미 여왕 · 던전 3 숨은 굴 → 굴지기 · 던전 4 화로 회랑 → 꺼진 부수장 · 던전 5 저주받은 성채 → 등불을 삼키는 자"},
     {"title": "제단", "kind": "빌드 · 강화", "badge": "플레이 가능", "state": "open", "color": "green", "text": "들고 갈 기술을 골라요. 기본 공격 하나, 스킬 버튼에 넣을 액티브 넷, 패시브 둘. 액티브를 연장·불·지킴 중 같은 종류로 모으면 시너지가 붙어요. 영혼 조각으로 체력·공격력·마력·치명타 같은 기본 능력 열 가지를 다섯 단계까지 강화하면 모든 판에 이어져요.", "detail": "기술 29종(기본 공격 2 · 액티브 27) · 패시브 8종 · 잠금 없이 처음부터 전부 고를 수 있어요"},
     {"title": "상점", "kind": "소모품", "badge": "플레이 가능", "state": "open", "color": "green", "text": "영혼 조각으로 체력 포션·마력 포션, 판을 끝내고 조각을 전부 챙겨 나오는 탈출의 등불, 쓰러졌을 때 쓸지 골라 한 번 일어나는 되살림 촛불, 기본 공격을 한 단계 높여 시작하는 불씨 기름을 사요. 던전 안 쉼터에는 간이 상점이 있어요.", "detail": "쓰러지면 이번 판에 모은 조각의 절반을 잃어요"},
     {"title": "기억의 길", "kind": "이야기 모드 · 과거", "badge": "플레이 가능 · 다듬는 중", "state": "open", "color": "blue", "text": "던전에서 모은 남은 말로 그 구역의 지난 일을 걸어서 보는 모드. 싸움 없이 걷기만 해요. 길 위의 불씨에 다가가면 장면 글이 뜨고, 글에 맞춰 그림자가 나타나 움직여요. 길 끝의 무덤 방에서 화로를 켜면 그 길이 끝나요.", "detail": "마을 비석(도감)에서 들어가요 · 구역을 깨고 그 구역의 남은 말 다섯 개를 모으면 열려요 · 길은 구역마다 하나씩 다섯"},
@@ -120,7 +120,8 @@
     "보스 패턴 다섯 종 — 빈틈·다가가기 공통, 해골왕·거미 여왕·굴지기·꺼진 부수장·등불을 삼키는 자": "보스 5종",
     "타일·소품·UI 틀·타이틀을 한 그림체로 다시 뽑아 교체": "그림 전체 새로",
     "구글 로그인 (계정 창 로그인은 구글 하나)": "구글 로그인",
-    "기억의 길 M-4 — 도감에서 들어가기, 구역별 열림, 본 기억, 세이브 v8": "기억의 길"
+    "기억의 길 M-4 — 도감에서 들어가기, 구역별 열림, 본 기억, 세이브 v8": "기억의 길",
+    "어려운 모드 — 엔딩 뒤 던전 고르기 [어려움] 탭, 소모품 끔·적 강화·등불 어둡게·보스 마력 포션, 세이브 v10": "어려운 모드"
   },
   "en": {
     "title": "Lantern Keeper",
@@ -133,7 +134,8 @@
     ],
     "summary": "Build your loadout in the village, then descend into dark dungeons with a single lantern. The maze dungeon main mode is playable now, and new modes with the same controls open up in the village one by one.",
     "description": "Lantern Keeper is a top-down roguelite where you descend through five underground dungeons, relying on a single lantern. At the village Altar you build a loadout of one basic attack, four skills, and two passives, then pick an open dungeon and go in. Your basic attack fires on its own at enemies in your lantern's light, skills spend Mana from their buttons, and a dash gets you out of harm's way. Fill the gauge with Soul Shards dropped by enemies to level up the skills you brought, and when the run ends, spend the shards to enhance your abilities or buy potions at the shop before heading back down.",
-    "coverAlt": "Lantern Keeper title art: the hero holding a lantern faces the Skeleton King, the Lantern Devourer, and the Spider Queen in an underground dungeon",
+    "cover": "/games/lanternkeeper/art/cover_en.webp",
+    "coverAlt": "Lantern Keeper title art: seen from behind, the hero holds up a lantern in a dark underground hall under a hanging 'Lantern Keeper' sign",
     "world": {
       "title": "World",
       "story": {
@@ -166,7 +168,7 @@
         "title": "Dungeon",
         "kind": "Main mode · maze roguelite",
         "badge": "Playable",
-        "text": "Pick an open dungeon at the village dungeon entrance. Each time you enter, a new maze is made, and you push through it by the light of your cone-shaped lantern. The path you have walked stays on a small minimap; tap the minimap to unfold the map of the whole room. Sleeping enemies wake and chase you when you get close, and if you lose them, they go back to their spot and sleep again. Catch your breath at the Rest Stop, and light every brazier to open the boss door. Bosses warn before they attack and leave a brief opening afterward. Defeat the boss to return to the village and open the next dungeon. The deeper the dungeon, the more Soul Shards it gives.",
+        "text": "Pick an open dungeon at the village dungeon entrance. Each time you enter, a new maze is made, and you push through it by the light of your cone-shaped lantern. The path you have walked stays on a small minimap; tap the minimap to unfold the map of the whole room. Sleeping enemies wake and chase you when you get close, and if you lose them, they go back to their spot and sleep again. Catch your breath at the Rest Stop, and light every brazier to open the boss door. Bosses warn before they attack and leave a brief opening afterward. Defeat the boss to return to the village and open the next dungeon. The deeper the dungeon, the more Soul Shards it gives. Clear the Cursed Citadel, the last dungeon, and a [Hard] tab opens in the dungeon select window. In Hard mode you cannot use bag items, enemies are tougher and your lantern is dimmer, but you earn more Soul Shards.",
         "detail": "Dungeon 1 Ruined Catacombs → Skeleton King · Dungeon 2 Sunken Root Forest → Spider Queen · Dungeon 3 Hidden Hollow → Hollow Warden · Dungeon 4 Brazier Hall → Snuffed Deputy · Dungeon 5 Cursed Citadel → Lantern Devourer"
       },
       {
@@ -433,7 +435,8 @@
       "보스 패턴 다섯 종 — 빈틈·다가가기 공통, 해골왕·거미 여왕·굴지기·꺼진 부수장·등불을 삼키는 자": "5 bosses",
       "타일·소품·UI 틀·타이틀을 한 그림체로 다시 뽑아 교체": "All-new art",
       "구글 로그인 (계정 창 로그인은 구글 하나)": "Google sign-in",
-      "기억의 길 M-4 — 도감에서 들어가기, 구역별 열림, 본 기억, 세이브 v8": "Memory Road"
+      "기억의 길 M-4 — 도감에서 들어가기, 구역별 열림, 본 기억, 세이브 v8": "Memory Road",
+      "어려운 모드 — 엔딩 뒤 던전 고르기 [어려움] 탭, 소모품 끔·적 강화·등불 어둡게·보스 마력 포션, 세이브 v10": "Hard mode"
     }
   }
 }
