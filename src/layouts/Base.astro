@@ -7,7 +7,8 @@ import { langOf, L, otherPath, t } from '../lib/i18n.js';
 const path = Astro.url.pathname;
 const lang = langOf(path);
 const site = siteIn(lang);
-const { title, description = site.description, image = '/og.jpg', alt } = Astro.props;
+// 공유 미리보기 그림: 따로 주지 않으면 사이트 공용 그림 (영어 페이지는 영어 현판 그림)
+const { title, description = site.description, image = lang === 'en' ? '/og_en.jpg' : '/og.jpg', alt } = Astro.props;
 const fullTitle = title ? `${title} · ${site.logo}` : site.title;
 const altHref = alt ?? otherPath(path);
 // 맨 위 줄은 어디서나 같은 전체 메뉴. 주소가 /games/<게임>/… 이면 그 아래에 그 게임 구역의 메뉴 줄이 하나 더 붙는다.
