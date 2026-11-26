@@ -20,9 +20,20 @@ const h = heatmap(commits, weeks);
   <div class="stats small">
     <span><b>{h.total}</b> {t(lang, 'heat.commits')}</span>
     <span><b>{h.activeDays}</b>{lang === 'en' ? ' ' : ''}{t(lang, 'heat.days')}</span>
-    {h.last && <span>{t(lang, 'heat.last')} <b>{daysAgo(h.last, lang)}</b></span>}
+    {h.last && (
+      <span>{t(lang, 'heat.last')} <b data-ago={h.last} data-today={t(lang, 'ago.today')} data-yesterday={t(lang, 'ago.yesterday')} data-days={t(lang, 'ago.days', '{n}')}>{daysAgo(h.last, lang)}</b></span>
+    )}
   </div>
 </div>
+
+<script>
+  // '마지막 업데이트 ○일 전'은 사이트를 만든 날 기준이라, 배포 뒤 날이 지나면 어긋난다 → 보는 사람의 오늘(한국 시간)로 다시 센다
+  const today = new Date().toLocaleString('sv-SE', { timeZone: 'Asia/Seoul' }).slice(0, 10);
+  document.querySelectorAll('[data-ago]').forEach((el) => {
+    const d = Math.round((new Date(today) - new Date(el.dataset.ago)) / 86400000);
+    el.textContent = d <= 0 ? el.dataset.today : d === 1 ? el.dataset.yesterday : el.dataset.days.replace('{n}', d);
+  });
+</script>
 
 <style>
   .heat-box { border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: flex; flex-direction: column; gap: 12px; }
