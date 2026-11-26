@@ -19,7 +19,8 @@ const own = storyFor(game.slug, lang);
 const fallback = lang === 'en' && own.length === 0; // 영어 번역 전: 한국어 편으로
 const chapters = fallback ? storyFor(game.slug) : own;
 const chLang = fallback ? 'ko' : lang;
-const total = chapters.reduce((n, c) => n + (c.chars ?? 0), 0);
+const size = (c) => c.words ?? c.chars ?? 0; // 영어 원고는 낱말 수(words), 한국어는 글자 수(chars)
+const total = chapters.reduce((n, c) => n + size(c), 0);
 const approx = (n) => t(lang, fallback ? 'story.approxKo' : 'story.approx', num(lang, Math.round(n / 100) * 100));
 const chHref = (c) => L(chLang, `/games/${game.slug}/story/${c.slug}/`);
 ---
@@ -38,7 +39,7 @@ const chHref = (c) => L(chLang, `/games/${game.slug}/story/${c.slug}/`);
           <a href={chHref(c)} hreflang={fallback ? 'ko' : undefined}>
             <span class="label mono small">{c.label}</span>
             <span class="t">{c.title}</span>
-            <span class="len small muted">{approx(c.chars)}</span>
+            <span class="len small muted">{approx(size(c))}</span>
           </a>
         </li>
       ))}

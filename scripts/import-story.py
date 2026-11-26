@@ -1,8 +1,12 @@
 """게임 저장소의 소설 원고를 블로그 소설 페이지로 옮긴다.
 
 사용법 (블로그 폴더에서):
-    python3 scripts/import-story.py <게임 slug> <원고 폴더>
+    python3 scripts/import-story.py <게임 slug> <원고 폴더> [--en]
     예) python3 scripts/import-story.py lanternkeeper ../LanternKeeper/docs/story
+        python3 scripts/import-story.py lanternkeeper ../LanternKeeper/docs/story/en --en
+
+--en: 영어 원고(docs/story/en/)를 `src/story/<게임 slug>/en/`에 쓴다 (주소 /en/games/<slug>/story/).
+      글자 수(chars) 대신 낱말 수(words)를 센다. 첫 줄은 `# Chapter 1 — 제목` 모양.
 
 원고 `00_prologue.md` ~ `06_epilogue.md`의 맨 위 제목 줄(`# 프롤로그 — 꺼지는 불`)을
 앞머리(order·label·title·chars)로 바꿔 `src/story/<게임 slug>/`에 쓴다.
@@ -14,13 +18,15 @@ import re
 import sys
 from pathlib import Path
 
-if len(sys.argv) != 3:
-    sys.exit("사용법: python3 scripts/import-story.py <게임 slug> <원고 폴더>")
-slug_game, src = sys.argv[1], Path(sys.argv[2])
+args = [a for a in sys.argv[1:] if a != "--en"]
+english = "--en" in sys.argv[1:]
+if len(args) != 2:
+    sys.exit("사용법: python3 scripts/import-story.py <게임 slug> <원고 폴더> [--en]")
+slug_game, src = args[0], Path(args[1])
 root = Path(__file__).resolve().parent.parent
 if not (root / f"src/data/games/{slug_game}.json").exists():
     sys.exit(f"게임이 없습니다: src/data/games/{slug_game}.json")
-out = root / "src/story" / slug_game
+out = root / "src/story" / slug_game / ("en" if english else "")
 out.mkdir(parents=True, exist_ok=True)
 
 files = sorted(p for p in src.glob("[0-9][0-9]_*.md"))
@@ -39,7 +45,12 @@ for p in files:
     label, title = m.groups()
     order = int(p.name[:2])
     slug = p.stem.split("_", 1)[1]
-    chars = len(re.sub(r"\s", "", re.sub(r"^#.*$", "", body, flags=re.M)))
-    front = f'---\norder: {order}\nlabel: "{label}"\ntitle: "{title}"\nchars: {chars}\n---\n'
+    text_only = re.sub(r"^#.*$", "", body, flags=re.M)
+    if english:
+        words = len(re.findall(r"[A-Za-z0-9'’-]+", text_only))
+        front = f'---\norder: {order}\nlabel: "{label}"\ntitle: "{title}"\nwords: {words}\n---\n'
+    else:
+        chars = len(re.sub(r"\s", "", text_only))
+        front = f'---\norder: {order}\nlabel: "{label}"\ntitle: "{title}"\nchars: {chars}\n---\n'
     (out / f"{order:02d}-{slug}.md").write_text(front + body.lstrip("\n"), encoding="utf-8")
-    print(f"{order:02d} {label} — {title} ({chars:,}자)")
+    print(f"{order:02d} {label} — {title} ({words:,} words)" if english else f"{order:02d} {label} — {title} ({chars:,}자)")
