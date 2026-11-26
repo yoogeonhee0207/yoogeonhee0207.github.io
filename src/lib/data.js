@@ -1,7 +1,10 @@
 // 사이트 데이터를 한곳에서 읽어오는 도우미.
 // 게임: src/data/games/*.json  ·  커밋: src/data/commits/*.json  ·  소설: src/story/<게임>/*.md
 // 글: src/posts/<게임>/*.md (그 게임 블로그) · src/posts/*.md (게임에 속하지 않는 글)
-import site from '../data/site.json';
+import siteData from '../data/site.json';
+import { loc, L, t } from './i18n.js';
+
+const site = siteData;
 
 const gameMods = import.meta.glob('../data/games/*.json', { eager: true, import: 'default' });
 const commitMods = import.meta.glob('../data/commits/*.json', { eager: true, import: 'default' });
@@ -46,26 +49,32 @@ export const posts = Object.entries(postMods)
   .sort((a, b) => new Date(b.date) - new Date(a.date));
 export const postsFor = (slug) => posts.filter((p) => p.game === slug);
 
-// 소설: src/story/<게임 slug>/*.md (scripts/import-story.py가 게임 저장소 원고에서 만듦)
+// 소설: src/story/<게임 slug>/*.md, 영어는 src/story/<게임 slug>/en/*.md (scripts/import-story.py가 게임 저장소 원고에서 만듦)
 const storyMods = import.meta.glob('../story/*/*.md', { eager: true });
-export const storyFor = (slug) =>
-  Object.entries(storyMods)
-    .filter(([p]) => p.split('/').at(-2) === slug)
+const storyEnMods = import.meta.glob('../story/*/en/*.md', { eager: true });
+export const storyFor = (slug, lang = 'ko') =>
+  Object.entries(lang === 'en' ? storyEnMods : storyMods)
+    .filter(([p]) => p.split('/').at(lang === 'en' ? -3 : -2) === slug)
     .map(([p, m]) => ({ slug: p.split('/').pop().replace(/^\d+-/, '').replace(/\.md$/, ''), ...m.frontmatter, Content: m.Content }))
     .sort((a, b) => a.order - b.order);
 
 // 게임 구역 메뉴 줄 (게임 이름 옆에 붙음): 게임 홈 · 소설(원고가 있을 때만) · 에셋(gallery가 있을 때만) · 블로그 · 소개
-export const gameNav = (game) => {
-  const base = `/games/${game.slug}/`;
+// 소설 칸은 한국어 원고가 있으면 영어 쪽에도 둔다 (영어 번역이 없으면 그 페이지가 한국어 목차를 보여 줌)
+export const gameNav = (game, lang = 'ko') => {
+  const base = L(lang, `/games/${game.slug}/`);
   const subs = ['story/', 'assets/', 'blog/', 'about/'].map((s) => base + s);
   return [
-    { href: base, label: '게임 홈', not: subs },
-    ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
-    ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: '에셋' }] : []),
-    { href: base + 'blog/', label: '블로그' },
-    { href: base + 'about/', label: '소개' },
+    { href: base, label: t(lang, 'zone.home'), not: subs },
+    ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: t(lang, 'zone.story') }] : []),
+    ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: t(lang, 'zone.assets') }] : []),
+    { href: base + 'blog/', label: t(lang, 'zone.blog') },
+    { href: base + 'about/', label: t(lang, 'zone.about') },
   ];
 };
+
+/** 게임·사이트 정보의 그 언어 모습 (src/lib/i18n.js loc) */
+export const gameIn = (game, lang) => loc(game, lang);
+export const siteIn = (lang) => loc(site, lang);
 
 export const STATUS = {
   '개발 중': 'amber',
@@ -115,8 +124,8 @@ export function heatmap(source, weeks = 16) {
   return { cols, total: sumDaily(counts), activeDays: days.length, last: days.sort().at(-1) };
 }
 
-export const daysAgo = (date) => {
+export const daysAgo = (date, lang = 'ko') => {
   if (!date) return '';
   const diff = Math.round((new Date(kstToday()) - new Date(date)) / 86400000);
-  return diff <= 0 ? '오늘' : diff === 1 ? '어제' : `${diff}일 전`;
+  return diff <= 0 ? t(lang, 'ago.today') : diff === 1 ? t(lang, 'ago.yesterday') : t(lang, 'ago.days', diff);
 };

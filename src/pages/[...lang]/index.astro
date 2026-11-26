@@ -1,32 +1,38 @@
 ---
-import Base from '../layouts/Base.astro';
-import Heatmap from '../components/Heatmap.astro';
-import { site, games, gameBySlug, allCommits, allDaily, sumDaily, dailyFor, posts, postsFor, storyFor, fmtDate, STATUS } from '../lib/data.js';
+import Base from '../../layouts/Base.astro';
+import Heatmap from '../../components/Heatmap.astro';
+import { siteIn, games, gameBySlug, gameIn, allCommits, allDaily, sumDaily, dailyFor, posts, postsFor, storyFor, fmtDate, STATUS } from '../../lib/data.js';
+import { langOf, withLang, L, t, num } from '../../lib/i18n.js';
+
+export const getStaticPaths = () => withLang();
+const lang = langOf(Astro.url.pathname);
+const site = siteIn(lang);
 
 // 전체 홈: 어느 게임에도 속하지 않는 화면. 만든 사람 → 게임 목록(줄) → 전체 활동·최근 글 순서.
 // 게임 그림을 크게 걸지 않는다 (게임 홈 /games/<게임>/ 과 헷갈리지 않게).
-const rows = games.map((game) => {
-  const base = `/games/${game.slug}/`;
+const rows = games.map((g) => {
+  const game = gameIn(g, lang);
+  const base = L(lang, `/games/${game.slug}/`);
   const last = Object.keys(dailyFor(game.slug)).sort().at(-1);
   const b = game.webgl ? game.build : null;
   return {
     game,
     base,
-    when: [b && `v${b.version} · 빌드 ${b.number}`, last && `마지막 작업 ${fmtDate(last)}`].filter(Boolean).join(' · '),
+    when: [b && t(lang, 'build.tag', b.version, b.number), last && t(lang, 'lastWork', fmtDate(last))].filter(Boolean).join(' · '),
     links: [
-      { href: base, label: '게임 홈' },
-      ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
-      ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: '에셋' }] : []),
-      { href: base + 'blog/', label: `블로그 ${postsFor(game.slug).length}` },
-      { href: base + 'about/', label: '소개' },
+      { href: base, label: t(lang, 'zone.home') },
+      ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: t(lang, 'zone.story') }] : []),
+      ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: t(lang, 'zone.assets') }] : []),
+      { href: base + 'blog/', label: t(lang, 'link.blog', postsFor(game.slug).length) },
+      { href: base + 'about/', label: t(lang, 'zone.about') },
     ],
   };
 });
 const stats = [
-  { n: games.length, label: '게임' },
-  { n: posts.length, label: '글' },
-  { n: sumDaily(allDaily), label: '커밋' },
-  { n: Object.keys(allDaily).length, label: '작업한 날' },
+  { n: games.length, label: t(lang, 'stat.games') },
+  { n: posts.length, label: t(lang, 'stat.posts') },
+  { n: sumDaily(allDaily), label: t(lang, 'stat.commits') },
+  { n: Object.keys(allDaily).length, label: t(lang, 'stat.days') },
 ];
 ---
 <Base>
@@ -35,19 +41,19 @@ const stats = [
     <h1>{site.headline[0]}<br />{site.headline[1]}</h1>
     <p class="lead">{site.lead}</p>
     <div class="row" style="gap: 10px; margin-top: 6px">
-      <a href="/games/" class="btn primary">게임 보기</a>
-      <a href="/blog/" class="btn">블로그</a>
-      <a href="/about/" class="btn">소개</a>
+      <a href={L(lang, '/games/')} class="btn primary">{t(lang, 'home.gamesBtn')}</a>
+      <a href={L(lang, '/blog/')} class="btn">{t(lang, 'nav.blog')}</a>
+      <a href={L(lang, '/about/')} class="btn">{t(lang, 'nav.about')}</a>
     </div>
     <dl class="stats">
-      {stats.map((s) => (<div><dt>{s.label}</dt><dd class="mono">{s.n.toLocaleString('ko-KR')}</dd></div>))}
+      {stats.map((s) => (<div><dt>{s.label}</dt><dd class="mono">{num(lang, s.n)}</dd></div>))}
     </dl>
   </section>
 
   <section class="section">
     <div class="section-head">
-      <h2>게임</h2>
-      <span class="mono small muted">게임마다 홈 · 블로그 · 소개가 따로 있어요</span>
+      <h2>{t(lang, 'home.games')}</h2>
+      <span class="mono small muted">{t(lang, 'home.gamesNote')}</span>
     </div>
     <ul class="games">
       {rows.map((r, i) => (
@@ -57,7 +63,7 @@ const stats = [
             <div class="row" style="gap: 6px 10px">
               <a href={r.base} class="name">{r.game.title}</a>
               {r.game.titleEn && <span class="en">{r.game.titleEn}</span>}
-              <span class={`badge ${STATUS[r.game.status] ?? 'gray'}`}>{r.game.status}</span>
+              <span class={`badge ${STATUS[r.game.status] ?? 'gray'}`}>{t(lang, `status.${r.game.status}`)}</span>
             </div>
             <p class="mono small muted">{r.game.genre}</p>
             <p class="sum">{r.game.summary}</p>
@@ -74,8 +80,8 @@ const stats = [
   <section class="section split">
     <div class="stack" style="gap: 18px">
       <div class="section-head" style="margin: 0">
-        <h2>개발 활동</h2>
-        <span class="mono small muted">모든 게임 · GitHub 커밋 자동 연동</span>
+        <h2>{t(lang, 'home.activity')}</h2>
+        <span class="mono small muted">{t(lang, 'home.activityNote')}</span>
       </div>
       <Heatmap commits={allDaily} />
       {allCommits.length > 0 && (
@@ -84,33 +90,33 @@ const stats = [
             <li>
               <time class="mono small muted" datetime={c.date}>{fmtDate(c.date)}</time>
               <span class={`type ${c.type}`}>{c.type}</span>
-              <span class="msg"><a href={`/games/${c.slug}/#devlog`} class="g">{c.game}</a> {c.msg}</span>
+              <span class="msg" lang="ko"><a href={L(lang, `/games/${c.slug}/#devlog`)} class="g">{gameIn(gameBySlug(c.slug), lang).title}</a> {c.msg}</span>
             </li>
           ))}
         </ul>
       )}
-      <p class="note">게임 저장소의 커밋 메시지만 자동으로 들어오고, 코드는 공개되지 않아요.</p>
+      <p class="note">{t(lang, 'home.commitNote')}</p>
     </div>
 
     <div class="stack" style="gap: 18px">
-      <div class="section-head" style="margin: 0"><h2>최근 글</h2>{posts.length > 3 && <a href="/blog/" class="small">전체 보기 →</a>}</div>
+      <div class="section-head" style="margin: 0"><h2>{t(lang, 'home.recent')}</h2>{posts.length > 3 && <a href={L(lang, '/blog/')} class="small">{t(lang, 'home.all')}</a>}</div>
       {posts.length === 0 ? (
-        <p class="empty small">아직 쓴 글이 없어요. 첫 글이 올라오면 여기에 보여요.</p>
+        <p class="empty small">{t(lang, 'home.noPosts')}</p>
       ) : (
         <div class="stack">
           {posts.slice(0, 3).map((p) => (
-            <a href={p.url} class="post">
-              <span class="t">{p.title}</span>
-              <span class="small muted">{fmtDate(p.date, true)}{p.game && ` · ${gameBySlug(p.game).title}`}</span>
+            <a href={p.url} class="post" hreflang={lang === 'en' ? 'ko' : undefined}>
+              <span class="t" lang="ko">{p.title}</span>
+              <span class="small muted">{fmtDate(p.date, true)}{p.game && ` · ${gameIn(gameBySlug(p.game), lang).title}`}{lang === 'en' && ` · ${t(lang, 'koreanOnly')}`}</span>
             </a>
           ))}
         </div>
       )}
       <div class="about">
-        <h2>만든 사람</h2>
+        <h2>{t(lang, 'home.maker')}</h2>
         <p class="small" style="color: var(--ink-2)">{site.name} · {site.bio}</p>
         <div class="row" style="gap: 6px">{site.skills.map((s) => <span class="chip">{s}</span>)}</div>
-        <a href="/about/" class="small" style="font-weight: 500; color: var(--accent-ink)">소개 페이지 →</a>
+        <a href={L(lang, '/about/')} class="small" style="font-weight: 500; color: var(--accent-ink)">{t(lang, 'home.aboutLink')}</a>
       </div>
     </div>
   </section>

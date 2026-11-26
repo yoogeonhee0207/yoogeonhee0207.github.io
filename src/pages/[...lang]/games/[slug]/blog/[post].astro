@@ -1,0 +1,18 @@
+---
+import Base from '../../../../../layouts/Base.astro';
+import PostArticle from '../../../../../components/PostArticle.astro';
+import { games, postsFor, gameBySlug } from '../../../../../lib/data.js';
+
+export function getStaticPaths() {
+  // 글 목록은 최신 글이 먼저 → 바로 뒤가 이전 글, 바로 앞이 다음 글. 같은 게임 글끼리만 잇는다.
+  return games.flatMap((game) => {
+    const list = postsFor(game.slug);
+    return list.map((post, i) => ({ params: { lang: undefined, slug: game.slug, post: post.slug }, props: { post, prev: list[i + 1], next: list[i - 1] } })); // 글은 한국어만
+  });
+}
+const { post, prev, next } = Astro.props;
+const game = gameBySlug(Astro.params.slug);
+---
+<Base title={post.title} description={post.description} image={game.cover} alt={`/en/games/${game.slug}/blog/`}>
+  <PostArticle post={post} prev={prev} next={next} back={{ href: `/games/${game.slug}/blog/`, label: `${game.title} 블로그` }} />
+</Base>

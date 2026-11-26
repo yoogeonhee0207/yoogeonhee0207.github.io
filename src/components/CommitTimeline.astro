@@ -1,5 +1,7 @@
 ---
-import { TYPES, fmtDate } from '../lib/data.js';
+import { fmtDate } from '../lib/data.js';
+import { langOf, t } from '../lib/i18n.js';
+const lang = langOf(Astro.url.pathname);
 // commits: [{sha,date,type,msg,dev?}]  milestones: { "커밋 메시지": "표시할 이름" }
 // build: 게임 JSON의 build ({number, version}). dev: true 인 커밋(올린 빌드 뒤에 쌓인 것)이 있으면
 // '개발 중'과 '빌드에 포함됨' 두 칸으로 나눠 보여 준다. 없으면 예전처럼 한 목록.
@@ -9,25 +11,25 @@ const { commits = [], milestones = {}, initial = 20, step = initial, build = nul
 const dev = commits.filter((c) => c.dev);
 const groups = dev.length > 0
   ? [
-      { id: 'dev', title: '개발 중', tag: '', note: `다음 빌드에 들어갈 내용`, items: dev },
-      { id: 'in', title: build ? '' : '빌드에 포함', tag: build ? `v${build.version} · 빌드 ${build.number}` : '', note: '에 들어간 내용', items: commits.filter((c) => !c.dev) },
+      { id: 'dev', title: t(lang, 'tl.dev'), tag: '', note: t(lang, 'tl.devNote'), items: dev },
+      { id: 'in', title: build ? '' : t(lang, 'tl.in'), tag: build ? t(lang, 'build.tag', build.version, build.number) : '', note: t(lang, 'tl.inNote'), items: commits.filter((c) => !c.dev) },
     ]
   : [{ id: 'all', title: '', tag: '', note: '', items: commits }];
 const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.filter((c) => c.type === b).length - commits.filter((c) => c.type === a).length);
 ---
-<div class="tl" data-timeline data-initial={initial} data-step={step}>
+<div class="tl" data-timeline data-initial={initial} data-step={step} data-more-text={t(lang, 'tl.moreLeft', '{n}')}>
   {chips && types.length > 1 && (
-    <div class="chips" role="group" aria-label="커밋 종류로 거르기">
-      <button type="button" class="f" data-f="all" aria-pressed="true">전체 <span>{commits.length}</span></button>
-      {types.map((t) => (
-        <button type="button" class="f" data-f={t} aria-pressed="false" title={TYPES[t] ?? t}>
-          {t} <span>{commits.filter((c) => c.type === t).length}</span>
+    <div class="chips" role="group" aria-label={t(lang, 'tl.filter')}>
+      <button type="button" class="f" data-f="all" aria-pressed="true">{t(lang, 'tl.all')} <span>{commits.length}</span></button>
+      {types.map((ty) => (
+        <button type="button" class="f" data-f={ty} aria-pressed="false" title={t(lang, `type.${ty}`)}>
+          {ty} <span>{commits.filter((c) => c.type === ty).length}</span>
         </button>
       ))}
     </div>
   )}
   {commits.length === 0 ? (
-    <p class="empty">아직 가져온 커밋 기록이 없어요.</p>
+    <p class="empty">{t(lang, 'tl.empty')}</p>
   ) : (
     <div class="groups">{groups.map((g) => (
       <section class={`group ${g.id}`} data-group>
@@ -45,7 +47,7 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
             <li data-type={c.type} class:list={[c.type, { ms: milestones[c.msg] }]} hidden={i >= initial}>
               <time class="mono" datetime={c.date}>{fmtDate(c.date)}</time>
               <div class="body">
-                <p class="msg"><span class={`type ${c.type}`}>{c.type}</span>{c.msg}</p>
+                <p class="msg" lang="ko"><span class={`type ${c.type}`}>{c.type}</span>{c.msg}</p>
                 {milestones[c.msg] && <span class="ms-tag">★ {milestones[c.msg]}</span>}
               </div>
             </li>
@@ -55,8 +57,8 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
     ))}</div>
   )}
   {moreHref
-    ? <a href={moreHref} class="more more-link">개발 기록 전체 보기 →</a>
-    : groups.some((g) => g.items.length > initial) && <button type="button" class="more" data-more>더 보기</button>}
+    ? <a href={moreHref} class="more more-link">{t(lang, 'tl.allLink')}</a>
+    : groups.some((g) => g.items.length > initial) && <button type="button" class="more" data-more>{t(lang, 'tl.more')}</button>}
 </div>
 
 <script>
@@ -82,7 +84,7 @@ const types = [...new Set(commits.map((c) => c.type))].sort((a, b) => commits.fi
       });
       if (more) {
         more.hidden = !rest;
-        more.textContent = `더 보기 · ${rest}개 남음`;
+        more.textContent = root.dataset.moreText.replace('{n}', rest);
       }
     };
     chips.forEach((b) =>

@@ -1,6 +1,12 @@
 ---
-import Base from '../layouts/Base.astro';
-import { site, games } from '../lib/data.js';
+import Base from '../../layouts/Base.astro';
+import { games, gameIn } from '../../lib/data.js';
+import { langOf, withLang, L, t } from '../../lib/i18n.js';
+
+export const getStaticPaths = () => withLang();
+const lang = langOf(Astro.url.pathname);
+const en = lang === 'en';
+// 영어 페이지도 설문지에는 한국어 보기 글자(value)를 보낸다 — 화면 글자(label·text·hint)만 영어
 
 // 문의 페이지: 서버가 없는 사이트라 구글 설문지(Google Forms)로 받는다. 답은 연결된 구글 시트에 쌓인다.
 // 이 페이지의 양식이 설문지의 formResponse 주소로 바로 보낸다 (방문자는 로그인 없이, 사이트를 떠나지 않고 보냄).
@@ -10,30 +16,42 @@ const FORM = 'https://docs.google.com/forms/d/e/1FAIpQLSdc5jWXNQJQ2saMQvdOhjZ-0V
 const ENTRY = { kind: 'entry.57611925', game: 'entry.814506797', build: 'entry.1057658725', device: 'entry.1189027187', body: 'entry.401458917', reply: 'entry.916453627' };
 // value는 설문지의 객관식 보기 글자와 똑같아야 한다
 const kinds = [
-  { value: '버그 신고', text: '게임이 멈추거나, 이상하게 보이거나, 진행이 사라졌을 때', hint: '어디서 무엇을 하다가 생겼는지 적어 주세요.' },
-  { value: '플레이 소감 · 테스트 참여', text: '해 보고 느낀 점, 어렵거나 헷갈린 곳, 테스트에 참여하고 싶을 때', hint: '어디까지 해 봤는지, 좋았던 것과 불편했던 것을 적어 주세요.' },
-  { value: '계정 · 진행 지우기', text: '서버에 저장된 진행과 계정 정보를 지우고 싶을 때', hint: "게임 안 계정 창에 보이는 아이디(또는 '구글 연결됨' 상태)와 대략의 마지막 플레이 날짜를 적어 주세요." },
-  { value: '그 밖의 문의', text: '협업, 채용, 그 밖에 하고 싶은 말', hint: '' },
-];
-const faq = [
+  { value: '버그 신고', text: '게임이 멈추거나, 이상하게 보이거나, 진행이 사라졌을 때', hint: '어디서 무엇을 하다가 생겼는지 적어 주세요.',
+    en: { label: 'Bug report', text: 'The game froze, looks wrong, or your progress disappeared', hint: 'Tell us where you were and what you were doing when it happened.' } },
+  { value: '플레이 소감 · 테스트 참여', text: '해 보고 느낀 점, 어렵거나 헷갈린 곳, 테스트에 참여하고 싶을 때', hint: '어디까지 해 봤는지, 좋았던 것과 불편했던 것을 적어 주세요.',
+    en: { label: 'Feedback · Join the test', text: 'What you felt playing, what was hard or confusing, or if you want to join the test', hint: 'Tell us how far you got, and what you liked or found awkward.' } },
+  { value: '계정 · 진행 지우기', text: '서버에 저장된 진행과 계정 정보를 지우고 싶을 때', hint: "게임 안 계정 창에 보이는 아이디(또는 '구글 연결됨' 상태)와 대략의 마지막 플레이 날짜를 적어 주세요.",
+    en: { label: 'Delete account · progress', text: 'You want your progress and account info on the server deleted', hint: "Write the ID shown in the in-game Account window (or that it says 'Google linked') and roughly when you last played." } },
+  { value: '그 밖의 문의', text: '협업, 채용, 그 밖에 하고 싶은 말', hint: '', en: { label: 'Other', text: 'Collaboration, jobs, or anything else', hint: '' } },
+].map((k) => ({ ...k, label: en ? k.en.label : k.value, text: en ? k.en.text : k.text, hint: en ? k.en.hint : k.hint }));
+const faqKo = [
   { q: '빌드 번호는 어디서 보나요?', a: '게임 타이틀 화면과 일시정지 화면의 왼쪽 아래에 "v0.126.0 · 빌드 25 · 11.25"처럼 적혀 있어요. 게임 소개 페이지의 제작 정보에도 지금 올라가 있는 빌드가 나와요.' },
   { q: '다른 기기에서 이어서 할 수 있나요?', a: '구글로 로그인하면 진행이 서버에도 저장돼서 다른 기기에서 같은 구글 계정으로 이어 할 수 있어요. 게스트로 시작하면 그 기기의 브라우저에 저장돼요.' },
   { q: '브라우저 기록을 지우면 진행도 지워지나요?', a: '기기에 저장된 진행은 브라우저의 사이트 데이터를 지우면 함께 지워져요. 구글로 로그인해 둔 진행은 서버에 남아 있어서 다시 로그인하면 이어 할 수 있어요.' },
 ];
+const faqEn = [
+  { q: 'Where do I find the build number?', a: 'It is at the bottom left of the title screen and the pause screen, like "v0.126.0 · Build 25 · 11.25". The Details section on the game page also shows the build that is up now.' },
+  { q: 'Can I continue on another device?', a: 'If you sign in with Google, your progress is also saved on the server, so you can continue on another device with the same Google account. If you start as a guest, it is saved in that device\'s browser.' },
+  { q: 'Will clearing my browser data erase my progress?', a: 'Progress saved on the device is erased along with the browser\'s site data. Progress from a Google sign-in stays on the server, so you can sign in again and continue.' },
+];
+const faq = en ? faqEn : faqKo;
+const s = en
+  ? { title: 'Contact', desc: 'Bug reports, feedback, account·progress deletion, and other questions', lead: 'Send bug reports, feedback, or account questions right here. No sign-in needed.', kind: 'Type', game: 'Game', noGame: 'Not about a game', build: 'Build number', optional: 'optional', buildPh: 'v0.126.0 · Build 25', buildNote: 'Bottom left of the title·pause screen', device: 'Device and browser', devicePh: 'iPhone Safari, Windows Chrome', body: 'Message', reply: 'Where to reply', replyPh: 'Email address or another way to reach you', replyNote: 'Only if you need a reply. Account deletion requests need somewhere to send the result.', send: 'Send', privacy: 'What you write is stored in Google Forms and used only to fix the game and reply. If sending fails, you can send it ', direct: 'directly in Google Forms', sent: 'Sent', thanks: 'Your message was received. Thank you.', again: 'Send another', faq: 'FAQ', policy: 'What we collect and how to delete it is in each game\'s privacy policy', sending: 'Sending…', fail: "Couldn't send. Check your internet connection and try again." }
+  : { title: '문의', desc: '버그 신고, 플레이 소감, 계정·진행 지우기, 그 밖의 문의를 받는 곳', lead: '버그 신고, 플레이 소감, 계정 문의를 여기서 바로 보낼 수 있어요. 로그인은 필요 없어요.', kind: '문의 종류', game: '게임', noGame: '게임과 상관없는 문의', build: '빌드 번호', optional: '선택', buildPh: 'v0.126.0 · 빌드 25', buildNote: '타이틀·일시정지 화면 왼쪽 아래에 있어요', device: '기기와 브라우저', devicePh: '아이폰 사파리, 윈도우 크롬', body: '내용', reply: '답장 받을 연락처', replyPh: '메일 주소나 연락받을 곳', replyNote: '답장이 필요할 때만 적어 주세요. 계정을 지워 달라는 문의는 처리 결과를 알려 드릴 곳이 필요해요.', send: '보내기', privacy: '적어 주신 내용은 Google 설문지에 저장되고, 게임을 고치고 답장하는 데에만 써요. 보내기가 되지 않으면 ', direct: '구글 설문지에서 직접', sent: '보냈어요', thanks: '문의가 접수됐어요. 고마워요.', again: '하나 더 보내기', faq: '자주 묻는 것', policy: '받는 정보와 지우는 방법은 게임마다 있는 개인정보처리방침에 적어 두었어요', sending: '보내는 중…', fail: '보내지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.' };
 ---
-<Base title="문의" description="버그 신고, 플레이 소감, 계정·진행 지우기, 그 밖의 문의를 받는 곳">
+<Base title={s.title} description={s.desc}>
   <div class="contact">
-    <h1>문의</h1>
-    <p class="lead">버그 신고, 플레이 소감, 계정 문의를 여기서 바로 보낼 수 있어요. 로그인은 필요 없어요.</p>
+    <h1>{s.title}</h1>
+    <p class="lead">{s.lead}</p>
 
-    <form class="form" data-form action={`${FORM}/formResponse`} method="post">
+    <form class="form" data-form data-sending={s.sending} data-fail={s.fail} action={`${FORM}/formResponse`} method="post">
       <fieldset>
-        <legend>문의 종류</legend>
+        <legend>{s.kind}</legend>
         <div class="kinds">
           {kinds.map((k, i) => (
             <label class="kind">
               <input type="radio" name={ENTRY.kind} value={k.value} data-hint={k.hint} required checked={i === 0} />
-              <span class="n">{k.value}</span>
+              <span class="n">{k.label}</span>
               <span class="small muted">{k.text}</span>
             </label>
           ))}
@@ -41,59 +59,59 @@ const faq = [
       </fieldset>
 
       <label class="field">
-        <span>게임</span>
+        <span>{s.game}</span>
         <select name={ENTRY.game} data-game>
-          {games.map((g) => <option value={g.title} data-slug={g.slug}>{g.title}</option>)}
-          <option value="">게임과 상관없는 문의</option>
+          {games.map((g) => <option value={g.title} data-slug={g.slug}>{gameIn(g, lang).title}</option>)}
+          <option value="">{s.noGame}</option>
         </select>
       </label>
 
       <div class="two">
         <label class="field">
-          <span>빌드 번호 <span class="small muted">선택</span></span>
-          <input type="text" name={ENTRY.build} placeholder="v0.126.0 · 빌드 25" autocomplete="off" />
-          <span class="small muted">타이틀·일시정지 화면 왼쪽 아래에 있어요</span>
+          <span>{s.build} <span class="small muted">{s.optional}</span></span>
+          <input type="text" name={ENTRY.build} placeholder={s.buildPh} autocomplete="off" />
+          <span class="small muted">{s.buildNote}</span>
         </label>
         <label class="field">
-          <span>기기와 브라우저 <span class="small muted">선택</span></span>
-          <input type="text" name={ENTRY.device} placeholder="아이폰 사파리, 윈도우 크롬" autocomplete="off" />
+          <span>{s.device} <span class="small muted">{s.optional}</span></span>
+          <input type="text" name={ENTRY.device} placeholder={s.devicePh} autocomplete="off" />
         </label>
       </div>
 
       <label class="field">
-        <span>내용</span>
+        <span>{s.body}</span>
         <textarea name={ENTRY.body} rows="7" required></textarea>
         <span class="small muted" data-hint></span>
       </label>
 
       <label class="field">
-        <span>답장 받을 연락처 <span class="small muted">선택</span></span>
-        <input type="text" name={ENTRY.reply} placeholder="메일 주소나 연락받을 곳" autocomplete="off" />
-        <span class="small muted">답장이 필요할 때만 적어 주세요. 계정을 지워 달라는 문의는 처리 결과를 알려 드릴 곳이 필요해요.</span>
+        <span>{s.reply} <span class="small muted">{s.optional}</span></span>
+        <input type="text" name={ENTRY.reply} placeholder={s.replyPh} autocomplete="off" />
+        <span class="small muted">{s.replyNote}</span>
       </label>
 
       <div class="row" style="gap: 12px">
-        <button type="submit" class="btn primary" data-send>보내기</button>
+        <button type="submit" class="btn primary" data-send>{s.send}</button>
         <span class="small muted" data-state aria-live="polite"></span>
       </div>
-      <p class="small muted">적어 주신 내용은 Google 설문지에 저장되고, 게임을 고치고 답장하는 데에만 써요. 보내기가 되지 않으면 <a href={`${FORM}/viewform`}>구글 설문지에서 직접</a> 보낼 수 있어요.</p>
+      <p class="small muted">{s.privacy}<a href={`${FORM}/viewform`}>{s.direct}</a>{en ? '.' : ' 보낼 수 있어요.'}</p>
     </form>
 
     <div class="done" data-done hidden>
-      <h2>보냈어요</h2>
-      <p>문의가 접수됐어요. 고마워요.</p>
-      <button type="button" class="btn" data-again>하나 더 보내기</button>
+      <h2>{s.sent}</h2>
+      <p>{s.thanks}</p>
+      <button type="button" class="btn" data-again>{s.again}</button>
     </div>
 
     <section class="faq">
-      <h2>자주 묻는 것</h2>
+      <h2>{s.faq}</h2>
       {faq.map((f) => (
         <details>
           <summary>{f.q}</summary>
           <p>{f.a}</p>
         </details>
       ))}
-      <p class="small muted">받는 정보와 지우는 방법은 게임마다 있는 개인정보처리방침에 적어 두었어요{games.filter((g) => g.privacy).map((g) => <> · <a href={g.privacy.href}>{g.title}</a></>)}.</p>
+      <p class="small muted">{s.policy}{games.filter((g) => g.privacy).map((g) => <> · <a href={L(lang, g.privacy.href)}>{gameIn(g, lang).title}</a></>)}.</p>
     </section>
   </div>
 </Base>
@@ -121,7 +139,7 @@ const faq = [
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     send.disabled = true;
-    state.textContent = '보내는 중…';
+    state.textContent = form.dataset.sending;
     try {
       // 구글 설문지는 다른 사이트에서 보낸 요청의 답을 읽지 못하게 하므로(no-cors) 보냈는지까지만 안다
       await fetch(form.action, { method: 'POST', mode: 'no-cors', body: new URLSearchParams(new FormData(form)) });
@@ -129,7 +147,7 @@ const faq = [
       done.hidden = false;
       done.scrollIntoView({ block: 'center' });
     } catch {
-      state.textContent = '보내지 못했어요. 인터넷 연결을 확인하고 다시 눌러 주세요.';
+      state.textContent = form.dataset.fail;
     } finally {
       send.disabled = false;
     }

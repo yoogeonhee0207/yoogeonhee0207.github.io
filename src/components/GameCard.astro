@@ -1,14 +1,17 @@
 ---
-import { STATUS } from '../lib/data.js';
-const { game, big = false } = Astro.props;
+import { STATUS, gameIn } from '../lib/data.js';
+import { langOf, L, t } from '../lib/i18n.js';
+const lang = langOf(Astro.url.pathname);
+const { game: raw, big = false } = Astro.props;
+const game = gameIn(raw, lang);
 ---
-<a href={`/games/${game.slug}/`} class:list={['card', { big }]}>
+<a href={L(lang, `/games/${game.slug}/`)} class:list={['card', { big }]}>
   <div class="cover">
     <img src={game.cover} alt={game.coverAlt ?? ''} class="pixel" loading={big ? 'eager' : 'lazy'} width="640" height="360" />
   </div>
   <div class="body">
     <div class="row" style="gap: 8px">
-      <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{game.status}</span>
+      <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{t(lang, `status.${game.status}`)}</span>
       <span class="mono small muted">{game.genre}</span>
     </div>
     <h3>{game.title} {game.titleEn && <span class="en">{game.titleEn}</span>}</h3>
@@ -23,7 +26,7 @@ const { game, big = false } = Astro.props;
     <div class="row tags">
       {game.tags?.map((t) => <span class="chip">{t}</span>)}
     </div>
-    {big && <span class="go">게임 페이지 보기 →</span>}
+    {big && <span class="go">{t(lang, 'card.go')}</span>}
   </div>
 </a>
 

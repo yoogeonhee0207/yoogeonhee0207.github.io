@@ -19,5 +19,16 @@
   ],
   "github": "https://github.com/yoogeonhee0207",
   "itch": "",
-  "email": "yoogeonhee0207@gmail.com"
+  "email": "yoogeonhee0207@gmail.com",
+  "en": {
+    "title": "yoogeonhee.dev · Game Dev Blog",
+    "description": "yoogeonhee's dev blog — making games in Unity and writing down how they get made",
+    "headline": [
+      "I make games in Unity,",
+      "and write down how they get made."
+    ],
+    "lead": "I make games you can play right in PC and mobile browsers. Each game has its own about page and dev log.",
+    "bio": "Making games in Unity that you can play right in PC and mobile browsers.",
+    "tagline": "Unity · C# · Gameplay programming"
+  }
 }
