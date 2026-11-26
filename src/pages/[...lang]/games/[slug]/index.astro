@@ -1,21 +1,23 @@
 ---
-import Base from '../../../layouts/Base.astro';
-import CommitTimeline from '../../../components/CommitTimeline.astro';
-import Heatmap from '../../../components/Heatmap.astro';
-import { games, commitsFor, dailyFor, STATUS, site } from '../../../lib/data.js';
+import Base from '../../../../layouts/Base.astro';
+import CommitTimeline from '../../../../components/CommitTimeline.astro';
+import Heatmap from '../../../../components/Heatmap.astro';
+import { games, commitsFor, dailyFor, STATUS, gameIn } from '../../../../lib/data.js';
+import { langOf, withLang, L, t } from '../../../../lib/i18n.js';
 
 export function getStaticPaths() {
-  return games.map((game) => ({ params: { slug: game.slug }, props: { game } }));
+  return withLang(games.map((game) => ({ params: { slug: game.slug }, props: { game } })));
 }
 
-const { game } = Astro.props;
+const lang = langOf(Astro.url.pathname);
+const game = gameIn(Astro.props.game, lang);
 const commits = commitsFor(game.slug)?.commits ?? [];
 const playable = game.status !== '개발 중' && !!game.webgl;
 // 올라가 있는 WebGL 빌드 표시 (scripts/publish-webgl.sh가 게임 JSON의 build를 관리)
 const b = game.webgl ? game.build : null;
 const info = [
   ...(game.info ?? []),
-  ...(b ? [{ label: '빌드', value: `v${b.version} · 빌드 ${b.number} · ${b.date.replaceAll('-', '.')}` }] : []),
+  ...(b ? [{ label: t(lang, 'build.label'), value: t(lang, 'build.full', b.version, b.number, b.date.replaceAll('-', '.')) }] : []),
 ];
 const art = (f) => `/games/${game.slug}/art/${f}`;
 ---
@@ -23,7 +25,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   <section class="head">
     <div class="stack" style="gap: 10px; max-width: 660px">
       <div class="row" style="gap: 8px">
-        <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{game.status}</span>
+        <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{t(lang, `status.${game.status}`)}</span>
         <span class="mono small muted">{game.genre}</span>
       </div>
       <h1>{game.title} {game.titleEn && <span class="en">{game.titleEn}</span>}</h1>
@@ -31,45 +33,45 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
       <div class="row" style="gap: 6px">{game.tags?.map((t) => <span class="chip">{t}</span>)}</div>
     </div>
     <div class="row" style="gap: 10px">
-      {commits.length > 0 && <a href="#devlog" class="btn">개발 기록</a>}
+      {commits.length > 0 && <a href="#devlog" class="btn">{t(lang, 'game.devlogBtn')}</a>}
       {game.itch && <a href={game.itch} class="btn">itch.io</a>}
     </div>
   </section>
 
-  <section class="stage" data-stage data-src={b ? `${game.webgl}?v=${b.number}` : game.webgl}>
+  <section class="stage" data-frame-title={t(lang, 'game.frame')} data-stage data-src={b ? `${game.webgl}?v=${b.number}` : game.webgl}>
     <img src={game.cover} alt={game.coverAlt ?? ''} class="pixel bg" width="640" height="360" />
     <div class="shade" aria-hidden="true"></div>
     {playable ? (
       <div class="panel">
-        <button type="button" class="play" data-play aria-label={`${game.title} 시작`}>
+        <button type="button" class="play" data-play aria-label={t(lang, 'game.start', game.title)}>
           <svg width="34" height="34" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z" fill="#16181d" /></svg>
         </button>
-        <p>클릭하면 브라우저에서 바로 실행돼요</p>
+        <p>{t(lang, 'game.click')}</p>
       </div>
     ) : (
       <div class="panel">
         <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#ffcf7a" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
-        <p class="big">지금은 테스트 빌드만 있어요</p>
-        <p class="sub">PC와 모바일 브라우저에서 플레이할 수 있는 테스트 빌드가 있어요. 테스트에 참여하고 싶다면 연락 주세요.</p>
-        <a href={`/contact/?game=${game.slug}#play`} class="btn primary">테스트 참여 문의</a>
+        <p class="big">{t(lang, 'game.testOnly')}</p>
+        <p class="sub">{t(lang, 'game.testSub')}</p>
+        <a href={L(lang, `/contact/?game=${game.slug}#play`)} class="btn primary">{t(lang, 'game.testBtn')}</a>
       </div>
     )}
   </section>
   {playable && (
     <div class="row stage-bar">
-      <button type="button" class="btn" data-full hidden>전체 화면</button>
-      <span class="note">처음 불러올 때 몇 초 걸릴 수 있어요.</span>
+      <button type="button" class="btn" data-full hidden>{t(lang, 'game.full')}</button>
+      <span class="note">{t(lang, 'game.loadNote')}</span>
     </div>
   )}
 
   {game.world && (
     <section class="section">
-      <div class="section-head"><h2>{game.world.title ?? '세계관'}</h2></div>
+      <div class="section-head"><h2>{game.world.title ?? t(lang, 'game.world')}</h2></div>
       <div class="world">
         {game.world.lines.map((l) => <p>{l}</p>)}
       </div>
       {game.world.story && (
-        <a class="story-link" href={game.world.story.href}>
+        <a class="story-link" href={L(lang, game.world.story.href)}>
           <span class="t">{game.world.story.label} →</span>
           {game.world.story.text && <span class="small muted">{game.world.story.text}</span>}
         </a>
@@ -79,7 +81,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
 
   {game.places?.length > 0 && (
     <section class="section">
-      <div class="section-head"><h2>{game.hub?.title ?? '게임 안의 게임들'}</h2></div>
+      <div class="section-head"><h2>{game.hub?.title ?? t(lang, 'game.hub')}</h2></div>
       {game.hub?.text && <p class="hub-lead">{game.hub.text}</p>}
       <div class="modes">
         {game.places.map((m) => (
@@ -100,7 +102,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
 
   {game.cast?.length > 0 && (
     <section class="section">
-      <div class="section-head"><h2>등장 캐릭터</h2>{game.gallery?.length > 0 && <a href={`/games/${game.slug}/assets/`} class="small">에셋 전체 보기 →</a>}</div>
+      <div class="section-head"><h2>{t(lang, 'game.cast')}</h2>{game.gallery?.length > 0 && <a href={L(lang, `/games/${game.slug}/assets/`)} class="small">{t(lang, 'game.allAssets')}</a>}</div>
       <ul class="cast">
         {game.cast.map((c) => (
           <li class:list={{ boss: c.boss, small: c.small }}>
@@ -116,7 +118,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   <section class="section split">
       {game.controls?.length > 0 && (
         <div class="stack" style="gap: 12px">
-          <h2 class="h">조작법</h2>
+          <h2 class="h">{t(lang, 'game.controls')}</h2>
           <dl class="keys">
             {game.controls.map((k) => (<><dt class="mono">{k.key}</dt><dd>{k.action}</dd></>))}
           </dl>
@@ -124,12 +126,12 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
       )}
       {info.length > 0 && (
         <div class="stack" style="gap: 12px">
-          <h2 class="h">제작 정보</h2>
+          <h2 class="h">{t(lang, 'game.info')}</h2>
           <dl class="info">
             {info.map((k) => (<><dt>{k.label}</dt><dd>{k.value}</dd></>))}
           </dl>
           {game.privacy && (
-            <p class="small muted">{game.privacy.text} · <a href={game.privacy.href} class="policy-link">개인정보처리방침</a></p>
+            <p class="small muted">{game.privacy.text} · <a href={L(lang, game.privacy.href)} class="policy-link">{t(lang, 'game.privacy')}</a></p>
           )}
         </div>
       )}
@@ -137,8 +139,8 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
 
   <section id="devlog" class="section devlog">
     <div class="devlog-head">
-      <h2 class="h">개발 기록</h2>
-      <p class="note">게임 저장소의 커밋 메시지가 자동으로 들어와요. ★ 표시는 주요 단계예요.</p>
+      <h2 class="h">{t(lang, 'game.devlog')}</h2>
+      <p class="note">{t(lang, 'game.devlogNote')}</p>
     </div>
     {commits.length > 0 && <div class="devlog-heat"><Heatmap commits={dailyFor(game.slug)} weeks={24} wide /></div>}
     <CommitTimeline commits={commits} milestones={game.milestones} initial={2} step={20} build={b} />
@@ -152,7 +154,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   play?.addEventListener('click', () => {
     const iframe = document.createElement('iframe');
     iframe.src = stage.dataset.src;
-    iframe.title = '게임 플레이 화면';
+    iframe.title = stage.dataset.frameTitle;
     iframe.allow = 'fullscreen; autoplay; gamepad';
     iframe.setAttribute('allowfullscreen', '');
     stage.replaceChildren(iframe);
@@ -212,8 +214,8 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
   .devlog-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; margin-bottom: 16px; }
   .devlog-heat { margin-bottom: 16px; }
   .h { font-size: 22px; }
-  .keys { margin: 0; display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 10px 16px; font-size: 15px; align-items: baseline; }
-  .keys dt { font-size: 13px; padding: 2px 8px; border: 1px solid var(--chip); border-bottom-width: 2px; border-radius: 6px; justify-self: start; white-space: nowrap; }
+  .keys { margin: 0; display: grid; grid-template-columns: fit-content(45%) minmax(0, 1fr); /* 영어 키 이름이 길어 휴대폰에서 넘쳤음 — 45%에서 접힘 */ gap: 10px 16px; font-size: 15px; align-items: baseline; }
+  .keys dt { font-size: 13px; padding: 2px 8px; border: 1px solid var(--chip); border-bottom-width: 2px; border-radius: 6px; justify-self: start; white-space: normal; }
   .info { margin: 0; display: grid; grid-template-columns: 5.5em minmax(0, 1fr); gap: 8px 16px; font-size: 15px; }
   .info dt { color: var(--muted); }
   .policy-link { color: var(--accent-ink); }

@@ -1,25 +1,33 @@
 ---
 import '../styles/global.css';
-import { site, gameBySlug, gameNav } from '../lib/data.js';
+import { siteIn, gameBySlug, gameIn, gameNav } from '../lib/data.js';
+import { langOf, L, otherPath, t } from '../lib/i18n.js';
 
-const { title, description = site.description, image = '/og.jpg' } = Astro.props;
-const fullTitle = title ? `${title} · ${site.logo}` : site.title;
+// alt: 다른 언어로 갈 주소 (같은 페이지가 다른 언어에 없을 때만 — 예: 한국어 개발 일지 → 영어 블로그 목록)
 const path = Astro.url.pathname;
+const lang = langOf(path);
+const site = siteIn(lang);
+const { title, description = site.description, image = '/og.jpg', alt } = Astro.props;
+const fullTitle = title ? `${title} · ${site.logo}` : site.title;
+const altHref = alt ?? otherPath(path);
 // 맨 위 줄은 어디서나 같은 전체 메뉴. 주소가 /games/<게임>/… 이면 그 아래에 그 게임 구역의 메뉴 줄이 하나 더 붙는다.
-const zone = gameBySlug(path.match(/^\/games\/([^/]+)\//)?.[1]);
+const zoneRaw = gameBySlug(path.match(/^(?:\/en)?\/games\/([^/]+)\//)?.[1]);
+const zone = zoneRaw ? gameIn(zoneRaw, lang) : null;
 const nav = [
-  { href: '/', label: '홈', exact: true },
-  { href: '/games/', label: '게임' },
-  { href: '/blog/', label: '블로그' },
-  { href: '/about/', label: '소개' },
-  { href: '/contact/', label: '문의' },
+  { href: L(lang, '/'), label: t(lang, 'nav.home'), exact: true },
+  { href: L(lang, '/games/'), label: t(lang, 'nav.games') },
+  { href: L(lang, '/blog/'), label: t(lang, 'nav.blog') },
+  { href: L(lang, '/about/'), label: t(lang, 'nav.about') },
+  { href: L(lang, '/contact/'), label: t(lang, 'nav.contact') },
 ];
-const zoneNav = zone ? gameNav(zone) : [];
+const zoneNav = zone ? gameNav(zone, lang) : [];
+const koPath = lang === 'ko' ? path : altHref;
+const enPath = lang === 'en' ? path : altHref;
 const current = (n) => (n.exact ? path === n.href : path.startsWith(n.href)) && !(n.not ?? []).some((x) => path.startsWith(x));
 const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
 ---
 <!doctype html>
-<html lang="ko">
+<html lang={lang}>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -31,6 +39,8 @@ const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
   <meta property="og:type" content="website" />
   <meta name="twitter:card" content="summary_large_image" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  {!alt && <link rel="alternate" hreflang="ko" href={new URL(koPath, Astro.site ?? Astro.url).href} />}
+  {!alt && <link rel="alternate" hreflang="en" href={new URL(enPath, Astro.site ?? Astro.url).href} />}
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet" />
@@ -38,19 +48,20 @@ const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
 <body>
   <header class="site-header">
     <div class="wrap bar">
-      <a href="/" class="logo mono"><span class="dot" aria-hidden="true"></span>{site.logo}</a>
-      <nav aria-label="주 메뉴">
+      <a href={L(lang, '/')} class="logo mono"><span class="dot" aria-hidden="true"></span>{site.logo}</a>
+      <nav aria-label={t(lang, 'nav.main')}>
         {nav.map((n) => (
           <a href={n.href} aria-current={current(n) ? (zone ? 'true' : 'page') : undefined}>{n.label}</a>
         ))}
         <a href={site.github}>GitHub</a>
+        <a href={altHref} class="lang mono" hreflang={lang === 'ko' ? 'en' : 'ko'} lang={lang === 'ko' ? 'en' : 'ko'} aria-label={t(lang, 'lang.switchLabel')}>{t(lang, 'lang.switch')}</a>
       </nav>
     </div>
     {zone && (
       <div class="zone">
         <div class="wrap zbar">
-          <a href={`/games/${zone.slug}/`} class="zname"><span class="sq" aria-hidden="true"></span>{zone.title}</a>
-          <nav aria-label={`${zone.title} 메뉴`}>
+          <a href={L(lang, `/games/${zone.slug}/`)} class="zname"><span class="sq" aria-hidden="true"></span>{zone.title}</a>
+          <nav aria-label={t(lang, 'nav.zone', zone.title)}>
             {zoneNav.map((n) => (
               <a href={n.href} aria-current={current(n) ? 'page' : undefined}>{n.label}</a>
             ))}
@@ -70,7 +81,7 @@ const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
       <span class="row" style="gap: 18px">
         <a href={site.github}>GitHub</a>
         {site.itch && <a href={site.itch}>itch.io</a>}
-        <a href="/contact/">문의</a>
+        <a href={L(lang, '/contact/')}>{t(lang, 'nav.contact')}</a>
       </span>
     </div>
   </footer>
@@ -85,6 +96,8 @@ const imageUrl = new URL(image, Astro.site ?? Astro.url).href;
   nav { display: flex; flex-wrap: wrap; gap: 0 22px; font-size: 15px; }
   nav a { text-decoration: none; padding: 10px 0; min-height: 44px; display: inline-flex; align-items: center; }
   nav a[aria-current] { color: var(--accent-ink); font-weight: 500; }
+  /* 언어 바꾸기: 메뉴 끝의 작은 테두리 칸 */
+  nav a.lang { font-size: 13px; padding: 0 10px; min-height: 30px; align-self: center; border: 1px solid var(--line); border-radius: 999px; }
   /* 게임 구역 줄: 연한 바탕에 게임 이름 + 그 게임 메뉴 */
   .zone { background: var(--soft); border-top: 1px solid var(--line); }
   .zbar { display: flex; flex-wrap: wrap; align-items: center; gap: 0 28px; }

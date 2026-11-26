@@ -1,0 +1,30 @@
+---
+import Base from '../../../../../layouts/Base.astro';
+import PostList from '../../../../../components/PostList.astro';
+import { games, postsFor, gameIn } from '../../../../../lib/data.js';
+import { langOf, withLang, t } from '../../../../../lib/i18n.js';
+
+// 게임마다 블로그 하나. 글은 src/posts/<게임 slug>/*.md
+export function getStaticPaths() {
+  return withLang(games.map((game) => ({ params: { slug: game.slug }, props: { game } })));
+}
+const lang = langOf(Astro.url.pathname);
+const game = gameIn(Astro.props.game, lang);
+const list = postsFor(game.slug);
+---
+<Base title={t(lang, 'gblog.title', game.title)} description={t(lang, 'gblog.desc', game.title)} image={game.cover}>
+  <p class="kicker mono small">{game.title}</p>
+  <h1>{t(lang, 'zone.blog')}</h1>
+  <p class="lead">{t(lang, 'gblog.lead', game.title)}{lang === 'en' && <> {t(lang, 'gblog.koNote')}</>}</p>
+  {list.length === 0 ? (
+    <p class="empty" style="margin-top: 32px">{t(lang, 'blog.empty')}</p>
+  ) : (
+    <PostList posts={list} />
+  )}
+</Base>
+
+<style>
+  .kicker { color: var(--accent-ink); letter-spacing: .04em; }
+  h1 { font-size: 36px; margin-top: 6px; }
+  .lead { margin-top: 10px; color: var(--ink-2); font-size: 17px; }
+</style>

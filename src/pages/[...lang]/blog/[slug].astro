@@ -1,7 +1,7 @@
 ---
-import Base from '../../layouts/Base.astro';
-import PostArticle from '../../components/PostArticle.astro';
-import { posts } from '../../lib/data.js';
+import Base from '../../../layouts/Base.astro';
+import PostArticle from '../../../components/PostArticle.astro';
+import { posts } from '../../../lib/data.js';
 
 // 게임에 속하지 않는 글(src/posts/*.md)은 여기서 보여 준다.
 // 게임 글은 /games/<게임>/blog/<글>/ 로 옮겼으므로, 예전 주소 /blog/<글>/ 로 오면 새 주소로 넘긴다
@@ -16,11 +16,11 @@ export function getStaticPaths() {
     taken.add(p.slug);
     paths.push({ params: { slug: p.slug }, props: { to: p.url } });
   }
-  return paths;
+  return paths.map((x) => ({ ...x, params: { ...x.params, lang: undefined } })); // 글은 한국어만
 }
 const { post, prev, next, to } = Astro.props;
 if (to) return Astro.redirect(to);
 ---
-<Base title={post.title} description={post.description}>
+<Base title={post.title} description={post.description} alt="/en/blog/">
   <PostArticle post={post} prev={prev} next={next} back={{ href: '/blog/', label: '블로그' }} />
 </Base>

@@ -1,17 +1,20 @@
 ---
-import Base from '../../../../layouts/Base.astro';
-import { games, commitsFor, dailyFor, sumDaily, postsFor, storyFor, STATUS, site, fmtDate } from '../../../../lib/data.js';
+import Base from '../../../../../layouts/Base.astro';
+import { games, commitsFor, dailyFor, sumDaily, postsFor, storyFor, STATUS, siteIn, gameIn, fmtDate } from '../../../../../lib/data.js';
+import { langOf, withLang, L, t } from '../../../../../lib/i18n.js';
 
 // 게임 소개: 그 게임이 어떤 게임이고 어떻게 만들고 있는지. 만든 사람 소개는 /about/ 하나를 같이 쓴다.
 export function getStaticPaths() {
-  return games.map((game) => ({ params: { slug: game.slug }, props: { game } }));
+  return withLang(games.map((game) => ({ params: { slug: game.slug }, props: { game } })));
 }
-const { game } = Astro.props;
-const base = `/games/${game.slug}/`;
+const lang = langOf(Astro.url.pathname);
+const game = gameIn(Astro.props.game, lang);
+const site = siteIn(lang);
+const base = L(lang, `/games/${game.slug}/`);
 const b = game.webgl ? game.build : null;
 const info = [
   ...(game.info ?? []),
-  ...(b ? [{ label: '빌드', value: `v${b.version} · 빌드 ${b.number} · ${b.date.replaceAll('-', '.')}` }] : []),
+  ...(b ? [{ label: t(lang, 'build.label'), value: t(lang, 'build.full', b.version, b.number, b.date.replaceAll('-', '.')) }] : []),
 ];
 const commits = commitsFor(game.slug)?.commits ?? [];
 const posts = postsFor(game.slug);
@@ -19,17 +22,17 @@ const story = storyFor(game.slug);
 const daily = dailyFor(game.slug);
 const last = Object.keys(daily).sort().at(-1);
 const links = [
-  { href: base, label: game.title, text: '플레이 화면 · 등장 캐릭터 · 조작법' },
-  ...(story.length > 0 ? [{ href: base + 'story/', label: `소설${game.story?.title ? ` 『${game.story.title}』` : ''}`, text: `${story.length}편` }] : []),
-  ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: '에셋', text: `그림 모음 ${game.gallery.length}장` }] : []),
-  { href: base + 'blog/', label: '블로그', text: posts.length > 0 ? `개발 일지 ${posts.length}편` : '아직 쓴 글이 없어요' },
-  ...(commits.length > 0 ? [{ href: base + '#devlog', label: '개발 기록', text: `커밋 ${sumDaily(daily)}개${last ? ` · 마지막 작업 ${fmtDate(last, true)}` : ''}` }] : []),
+  { href: base, label: game.title, text: t(lang, 'about.playText') },
+  ...(story.length > 0 ? [{ href: base + 'story/', label: `${t(lang, 'about.novel')}${game.story?.title ? (lang === 'en' ? ` ${game.story.title}` : ` 『${game.story.title}』`) : ''}`, text: t(lang, 'about.chapters', story.length) }] : []),
+  ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: t(lang, 'about.assets'), text: t(lang, 'about.assetsText', game.gallery.length) }] : []),
+  { href: base + 'blog/', label: t(lang, 'zone.blog'), text: posts.length > 0 ? t(lang, 'about.posts', posts.length) : t(lang, 'about.noPosts') },
+  ...(commits.length > 0 ? [{ href: base + '#devlog', label: t(lang, 'game.devlog'), text: `${t(lang, 'about.commits', sumDaily(daily))}${last ? ` · ${t(lang, 'lastWork', fmtDate(last, true))}` : ''}` }] : []),
 ];
 ---
-<Base title={`${game.title} 소개`} description={game.summary} image={game.cover}>
+<Base title={t(lang, 'about.title', game.title)} description={game.summary} image={game.cover}>
   <div class="about">
     <div class="row" style="gap: 8px">
-      <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{game.status}</span>
+      <span class={`badge ${STATUS[game.status] ?? 'gray'}`}>{t(lang, `status.${game.status}`)}</span>
       <span class="mono small muted">{game.genre}</span>
     </div>
     <h1>{game.title} {game.titleEn && <span class="en">{game.titleEn}</span>}</h1>
@@ -38,7 +41,7 @@ const links = [
 
     {info.length > 0 && (
       <section class="block">
-        <h2>제작 정보</h2>
+        <h2>{t(lang, 'game.info')}</h2>
         <dl class="info">
           {info.map((k) => (<><dt>{k.label}</dt><dd>{k.value}</dd></>))}
         </dl>
@@ -46,7 +49,7 @@ const links = [
     )}
 
     <section class="block">
-      <h2>둘러보기</h2>
+      <h2>{t(lang, 'about.browse')}</h2>
       <ul class="links">
         {links.map((l) => (
           <li><a href={l.href}>{l.label}</a> <span class="muted small">· {l.text}</span></li>
@@ -55,9 +58,9 @@ const links = [
     </section>
 
     <section class="block maker">
-      <h2>만든 사람</h2>
+      <h2>{t(lang, 'about.maker')}</h2>
       <p class="small" style="color: var(--ink-2)">{site.name} · {site.bio}</p>
-      <p class="small"><a href="/about/">만든 사람 소개 →</a> <span class="muted">·</span> <a href={`/contact/?game=${game.slug}`}>테스트 참여 · 문의 →</a></p>
+      <p class="small"><a href={L(lang, '/about/')}>{t(lang, 'about.makerLink')}</a> <span class="muted">·</span> <a href={L(lang, `/contact/?game=${game.slug}`)}>{t(lang, 'about.contactLink')}</a></p>
     </section>
   </div>
 </Base>

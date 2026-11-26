@@ -1,0 +1,65 @@
+---
+import Base from '../../../../../layouts/Base.astro';
+import { games, storyFor, gameIn } from '../../../../../lib/data.js';
+import { langOf, withLang, L, t, num } from '../../../../../lib/i18n.js';
+
+// 소설이 있는 게임만 페이지가 생긴다 (src/story/<게임 slug>/*.md). 제목·소개 문장은 게임 JSON의 story.
+// 원고는 게임 저장소 docs/story/(영어는 docs/story/en/) — 고친 뒤 scripts/import-story.py로 다시 옮긴다.
+// 영어 번역이 아직 없으면 영어 페이지는 안내 한 줄과 한국어 편으로 가는 목차를 보여 준다.
+export function getStaticPaths() {
+  return withLang(games.filter((g) => storyFor(g.slug).length > 0).map((game) => ({ params: { slug: game.slug }, props: { game } })));
+}
+const lang = langOf(Astro.url.pathname);
+const game = gameIn(Astro.props.game, lang);
+const st = game.story ?? {};
+const title = st.title ?? t(lang, "story.gameNovel", game.title);
+// 소설 제목이 게임 이름과 같으면 '등불지기 — 등불지기 소설'처럼 겹치지 않게 한다
+const same = title === game.title;
+const own = storyFor(game.slug, lang);
+const fallback = lang === 'en' && own.length === 0; // 영어 번역 전: 한국어 편으로
+const chapters = fallback ? storyFor(game.slug) : own;
+const chLang = fallback ? 'ko' : lang;
+const size = (c) => c.words ?? c.chars ?? 0; // 영어 원고는 낱말 수(words), 한국어는 글자 수(chars)
+const total = chapters.reduce((n, c) => n + size(c), 0);
+const approx = (n) => t(lang, fallback ? 'story.approxKo' : 'story.approx', num(lang, Math.round(n / 100) * 100));
+const chHref = (c) => L(chLang, `/games/${game.slug}/story/${c.slug}/`);
+---
+<Base title={same ? t(lang, 'story.gameNovel', title) : `${title} — ${t(lang, 'story.gameNovel', game.title)}`} description={t(lang, 'story.desc', (st.lead ?? []).join(' '), game.title)} image={game.cover}>
+  <article class="story">
+    <p class="crumb small"><a href={L(lang, `/games/${game.slug}/`)}>← {game.title}</a></p>
+    <p class="kicker mono small">{same ? t(lang, 'story.novel') : t(lang, 'story.gameNovel', game.title)}</p>
+    <h1>{title}</h1>
+    {st.lead?.length > 0 && <p class="lead">{st.lead.map((l, i) => <>{i > 0 && <br />}{l}</>)}</p>}
+    {st.note && <p class="note small">{st.note}</p>}
+    {fallback && <p class="note small">{t(lang, 'story.koOnly')}</p>}
+
+    <ol class="toc" lang={chLang}>
+      {chapters.map((c) => (
+        <li>
+          <a href={chHref(c)} hreflang={fallback ? 'ko' : undefined}>
+            <span class="label mono small">{c.label}</span>
+            <span class="t">{c.title}</span>
+            <span class="len small muted">{approx(size(c))}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+    <p class="small muted">{t(lang, 'story.total', chapters.length, approx(total))}</p>
+  </article>
+</Base>
+
+<style>
+  .story { max-width: 720px; margin: 0 auto; }
+  .crumb a { text-decoration: none; }
+  .kicker { margin-top: 24px; color: var(--accent-ink); letter-spacing: .04em; }
+  h1 { font-size: clamp(30px, 5vw, 40px); margin-top: 6px; }
+  .lead { margin-top: 14px; color: var(--ink-2); font-size: 17px; }
+  .note { margin-top: 14px; padding: 10px 14px; border-left: 2px solid var(--accent); background: var(--soft); border-radius: 0 8px 8px 0; color: var(--ink-2); }
+  .toc { list-style: none; margin: 32px 0 14px; padding: 0; border-top: 1px solid var(--line); }
+  .toc li { border-bottom: 1px solid var(--line); }
+  .toc a { display: grid; grid-template-columns: 76px 1fr auto; align-items: baseline; gap: 12px; padding: 16px 4px; text-decoration: none; }
+  .toc a:hover { color: inherit; background: var(--soft); }
+  .toc .label { color: var(--muted); }
+  .toc .t { font-weight: 500; font-size: 17px; min-width: 0; }
+  @media (max-width: 480px) { .toc a { grid-template-columns: 64px 1fr; } .toc .len { grid-column: 2; } }
+</style>

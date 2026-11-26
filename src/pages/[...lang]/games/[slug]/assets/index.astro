@@ -1,18 +1,20 @@
 ---
-import Base from '../../../../layouts/Base.astro';
-import { games } from '../../../../lib/data.js';
+import Base from '../../../../../layouts/Base.astro';
+import { games, gameIn } from '../../../../../lib/data.js';
+import { langOf, withLang, t } from '../../../../../lib/i18n.js';
 
 // 게임 에셋 페이지: 게임 JSON의 gallery (scripts/make-gallery.py가 만든 종류별 모음 그림).
 // gallery가 있는 게임만 페이지와 메뉴 칸이 생긴다.
 export function getStaticPaths() {
-  return games.filter((g) => g.gallery?.length > 0).map((game) => ({ params: { slug: game.slug }, props: { game } }));
+  return withLang(games.filter((g) => g.gallery?.length > 0).map((game) => ({ params: { slug: game.slug }, props: { game } })));
 }
-const { game } = Astro.props;
+const lang = langOf(Astro.url.pathname);
+const game = gameIn(Astro.props.game, lang);
 const art = (f) => `/games/${game.slug}/art/${f}`;
 ---
-<Base title={`${game.title} 에셋`} description={`${game.title}에서 쓰는 그림을 종류별로 모았어요.`} image={game.cover}>
+<Base title={t(lang, 'assets.title', game.title)} description={t(lang, 'assets.desc', game.title)} image={game.cover}>
   <p class="kicker mono small">{game.title}</p>
-  <h1>에셋</h1>
+  <h1>{t(lang, 'assets.h')}</h1>
   {game.galleryNote && <p class="lead">{game.galleryNote}</p>}
   <p class="jump small">
     {game.gallery.map((g, i) => <a href={`#g${i + 1}`}>{g.title}</a>)}
@@ -21,7 +23,7 @@ const art = (f) => `/games/${game.slug}/art/${f}`;
     {game.gallery.map((g, i) => (
       <figure id={`g${i + 1}`}>
         <figcaption><span class="n">{g.title}</span><span class="small muted">{g.text}</span></figcaption>
-        <a href={art(g.img)} aria-label={`${g.title} 크게 보기`}><img src={art(g.img)} alt={g.alt ?? g.title} width={g.width} height={g.height} loading={i === 0 ? 'eager' : 'lazy'} /></a>
+        <a href={art(g.img)} aria-label={t(lang, 'assets.zoom', g.title)}><img src={art(g.img)} alt={g.alt ?? g.title} width={g.width} height={g.height} loading={i === 0 ? 'eager' : 'lazy'} /></a>
       </figure>
     ))}
   </div>

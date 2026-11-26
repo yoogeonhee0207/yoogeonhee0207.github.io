@@ -1,13 +1,17 @@
 ---
-import Base from '../../layouts/Base.astro';
-import GameItem from '../../components/GameItem.astro';
-import { games } from '../../lib/data.js';
+import Base from '../../../layouts/Base.astro';
+import GameItem from '../../../components/GameItem.astro';
+import { games } from '../../../lib/data.js';
+import { langOf, withLang, t } from '../../../lib/i18n.js';
+
+export const getStaticPaths = () => withLang();
+const lang = langOf(Astro.url.pathname);
 
 // 게임을 모아 보는 페이지. 게임마다 홈 · 소설 · 블로그 · 소개가 따로 있다 (src/data/games/*.json 하나 = 게임 하나).
 ---
-<Base title="게임" description="만들고 있는 게임들. 게임마다 소개와 개발 일지가 따로 있어요.">
-  <h1>게임</h1>
-  <p class="lead">만들고 있는 게임이에요. 게임마다 소개와 블로그가 따로 있어요.</p>
+<Base title={t(lang, 'games.title')} description={t(lang, 'games.desc')}>
+  <h1>{t(lang, 'games.title')}</h1>
+  <p class="lead">{t(lang, 'games.lead')}</p>
   <div class="grid">
     {games.map((g) => <GameItem game={g} />)}
   </div>

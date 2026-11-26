@@ -1,21 +1,24 @@
 ---
 import GameCard from './GameCard.astro';
-import { dailyFor, postsFor, storyFor, fmtDate } from '../lib/data.js';
+import { dailyFor, postsFor, storyFor, fmtDate, gameIn } from '../lib/data.js';
+import { langOf, L, t } from '../lib/i18n.js';
+const lang = langOf(Astro.url.pathname);
 // 게임 목록의 한 칸: 카드 + 그 게임 구역으로 가는 링크(소설·블로그·소개)와 올린 빌드·마지막 작업일
-const { game } = Astro.props;
-const base = `/games/${game.slug}/`;
+const { game: raw } = Astro.props;
+const game = gameIn(raw, lang);
+const base = L(lang, `/games/${game.slug}/`);
 const last = Object.keys(dailyFor(game.slug)).sort().at(-1);
 const b = game.webgl ? game.build : null;
 const links = [
-  ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: '소설' }] : []),
-  ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: '에셋' }] : []),
-  { href: base + 'blog/', label: `블로그 ${postsFor(game.slug).length}` },
-  { href: base + 'about/', label: '소개' },
+  ...(storyFor(game.slug).length > 0 ? [{ href: base + 'story/', label: t(lang, 'zone.story') }] : []),
+  ...(game.gallery?.length > 0 ? [{ href: base + 'assets/', label: t(lang, 'zone.assets') }] : []),
+  { href: base + 'blog/', label: t(lang, 'link.blog', postsFor(game.slug).length) },
+  { href: base + 'about/', label: t(lang, 'zone.about') },
 ];
-const when = [b && `v${b.version} · 빌드 ${b.number}`, last && `마지막 작업 ${fmtDate(last)}`].filter(Boolean).join(' · ');
+const when = [b && t(lang, 'build.tag', b.version, b.number), last && t(lang, 'lastWork', fmtDate(last))].filter(Boolean).join(' · ');
 ---
 <div class="item">
-  <GameCard game={game} />
+  <GameCard game={raw} />
   <div class="meta small">
     {links.map((l) => <a href={l.href}>{l.label}</a>)}
     {when && <span class="muted mono when">{when}</span>}

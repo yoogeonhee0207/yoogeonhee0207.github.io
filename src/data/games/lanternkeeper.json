@@ -77,7 +77,7 @@
     {"key": "1 ~ 4 · 스킬 버튼", "action": "액티브 스킬 (마력을 써요, 누르고 있으면 준비될 때마다 다시 써요)"},
     {"key": "Space · 큰 버튼", "action": "대시 (짧게 몸을 옮겨 피해요)"},
     {"key": "5 · 6", "action": "체력 포션 · 마력 포션"},
-    {"key": "처음 켤 때", "action": "구글로 계속하기 · 게스트로 시작 (진행은 서버에도 저장되고, 구글이면 다른 기기에서도 이어 해요)"},
+    {"key": "처음 켤 때", "action": "언어 고르기(한국어 · English, 마을 설정에서 바꿀 수 있어요), 그다음 구글로 계속하기 · 게스트로 시작 (진행은 서버에도 저장되고, 구글이면 다른 기기에서도 이어 해요)"},
     {"key": "건물 위 이름표 터치", "action": "마을에서 던전·제단·상점·도감으로 들어가기"},
     {"key": "B · J · 아이콘 줄", "action": "마을에서 가방(가진 소모품) · 도감(주운 남은 말) 열기"},
     {"key": "M · 미니맵 터치", "action": "방 전체 지도 열기 · 닫기"},
@@ -90,7 +90,8 @@
     {"label": "제작 방식", "value": "게임 개발(기획·코드)은 Claude Code로, 에셋 이미지는 Codex와 힉스필드로 만들었어요. 방향 결정과 플레이 테스트는 직접 했어요"},
     {"label": "규모", "value": "던전 5 · 보스 5 · 적 17종 · 던전마다 방 6개 · 기술 29 (기본 공격 2 · 액티브 27) · 패시브 8 · 강화 10종 · 음악 9곡"},
     {"label": "플랫폼", "value": "PC · 모바일 브라우저 (WebGL)"},
-    {"label": "사운드·폰트", "value": "음악 AlkaKrab (Pixel Fantasy Music Pack) · 효과음 Kenney, artisticdude, Leohpaz · 폰트 Galmuri"}
+    {"label": "사운드·폰트", "value": "음악 AlkaKrab (Pixel Fantasy Music Pack) · 효과음 Kenney, artisticdude, Leohpaz · 폰트 Galmuri"},
+    {"label": "언어", "value": "한국어 · 영어"}
   ],
   "milestones": {
     "기획·설계 문서와 Unity 프로젝트 초기 설정": "개발 시작",
@@ -120,5 +121,319 @@
     "타일·소품·UI 틀·타이틀을 한 그림체로 다시 뽑아 교체": "그림 전체 새로",
     "구글 로그인 (계정 창 로그인은 구글 하나)": "구글 로그인",
     "기억의 길 M-4 — 도감에서 들어가기, 구역별 열림, 본 기억, 세이브 v8": "기억의 길"
+  },
+  "en": {
+    "title": "Lantern Keeper",
+    "titleEn": "등불지기",
+    "genre": "Top-down roguelite action",
+    "tags": [
+      "Unity 6",
+      "16-bit pixel art",
+      "Made with AI"
+    ],
+    "summary": "Build your loadout in the village, then descend into dark dungeons with a single lantern. The maze dungeon main mode is playable now, and new modes with the same controls open up in the village one by one.",
+    "description": "Lantern Keeper is a top-down roguelite where you descend through five underground dungeons, relying on a single lantern. At the village Altar you build a loadout of one basic attack, four skills, and two passives, then pick an open dungeon and go in. Your basic attack fires on its own at enemies in your lantern's light, skills spend Mana from their buttons, and a dash gets you out of harm's way. Fill the gauge with Soul Shards dropped by enemies to level up the skills you brought, and when the run ends, spend the shards to enhance your abilities or buy potions at the shop before heading back down.",
+    "coverAlt": "Lantern Keeper title art: the hero holding a lantern faces the Skeleton King, the Lantern Devourer, and the Spider Queen in an underground dungeon",
+    "world": {
+      "title": "World",
+      "story": {
+        "label": "Read the novel Lantern Keeper",
+        "text": "A serial novel of seven chapters telling the Lantern Keeper's story · includes the ending"
+      },
+      "lines": [
+        "In this world, a lantern is the fire that leads the souls of the dead to the far side, and a Lantern Keeper is the one who guides them along the way.",
+        "The dungeon beneath the village was once the funeral road the souls went down. From the burial grounds it runs through a road of roots and a hidden hollow, down a hall lined with braziers, to the citadel guarding the Door to the Far Side.",
+        "Now that road is blocked, and the lanterns above are going out one by one. The last Lantern Keeper takes up a single lantern and goes down to open the way again."
+      ]
+    },
+    "story": {
+      "title": "Lantern Keeper",
+      "lead": [
+        "One by one, the fires that hold the dead are going out.",
+        "The teacher went down and never came back. Now only one Lantern Keeper is left."
+      ],
+      "note": "This contains the game's story and ending. If you would rather play the game first, read it later."
+    },
+    "privacy": {
+      "text": "Progress is saved on your device and on Unity's servers"
+    },
+    "hub": {
+      "title": "Places in the village",
+      "text": "When you start the game, you are standing in the village. Walk to an entrance to go in. The dungeon, Altar, Shop, and Codex are open now, and entrances to new modes with the same controls as the main game open one by one."
+    },
+    "places": [
+      {
+        "title": "Dungeon",
+        "kind": "Main mode · maze roguelite",
+        "badge": "Playable",
+        "text": "Pick an open dungeon at the village dungeon entrance. Each time you enter, a new maze is made, and you push through it by the light of your cone-shaped lantern. The path you have walked stays on a small minimap; tap the minimap to unfold the map of the whole room. Sleeping enemies wake and chase you when you get close, and if you lose them, they go back to their spot and sleep again. Catch your breath at the Rest Stop, and light every brazier to open the boss door. Bosses warn before they attack and leave a brief opening afterward. Defeat the boss to return to the village and open the next dungeon. The deeper the dungeon, the more Soul Shards it gives.",
+        "detail": "Dungeon 1 Ruined Catacombs → Skeleton King · Dungeon 2 Sunken Root Forest → Spider Queen · Dungeon 3 Hidden Hollow → Hollow Warden · Dungeon 4 Brazier Hall → Snuffed Deputy · Dungeon 5 Cursed Citadel → Lantern Devourer"
+      },
+      {
+        "title": "Altar",
+        "kind": "Loadout · Enhance",
+        "badge": "Playable",
+        "text": "Choose the skills you take with you: one basic attack, four skills for the skill buttons, and two passives. Gather skills of the same kind — Tools, Fire, or Ward — to gain a synergy. Spend Soul Shards to enhance ten base stats such as HP, attack, Mana, and crit up to five levels; they carry over to every run.",
+        "detail": "29 skills (2 basic attacks · 27 skills) · 8 passives · all available from the start, no unlocking"
+      },
+      {
+        "title": "Shop",
+        "kind": "Consumables",
+        "badge": "Playable",
+        "text": "Spend Soul Shards on Health and Mana Potions, an Escape Lantern that ends the run and brings home every shard, a Revival Candle that lets you rise once when you fall, and Ember Oil that starts your basic attack one level higher. There is a Wayside Stall at the Rest Stop inside the dungeon.",
+        "detail": "Fall, and you lose half the shards gathered this run"
+      },
+      {
+        "title": "Memory Road",
+        "kind": "Story mode · the past",
+        "badge": "Playable · being polished",
+        "text": "A mode where you walk through the past of an area using the Echoes you gathered in the dungeon. No fighting, only walking. Approach an ember on the road and a scene appears in text, with shadows rising and moving along with it. Light the brazier in the tomb at the end of the road to finish it.",
+        "detail": "Enter from the village gravestone (Codex) · opens once you clear an area and gather its five Echoes · one road per area, five in all"
+      },
+      {
+        "title": "Until Dawn",
+        "kind": "Night mode",
+        "badge": "Designed · coming later",
+        "text": "A mode where you put to rest everything that rises each night in the graveyard outside the village before the sun comes up. The further into the nights, the more and stronger the enemies. Whatever you fail to put down rises again the next night.",
+        "detail": "Shares loadout and enhancements with the dungeon · your furthest night is recorded"
+      }
+    ],
+    "cast": [
+      {
+        "name": "Lantern Keeper",
+        "role": "Hero"
+      },
+      {
+        "name": "Skeleton Soldier",
+        "role": "Catacombs"
+      },
+      {
+        "name": "Bat",
+        "role": "Catacombs · Root Forest"
+      },
+      {
+        "name": "Ghoul",
+        "role": "Catacombs"
+      },
+      {
+        "name": "Skeleton Archer",
+        "role": "Catacombs · Root Forest"
+      },
+      {
+        "name": "Poison Slime",
+        "role": "Root Forest"
+      },
+      {
+        "name": "Spider",
+        "role": "Root Forest"
+      },
+      {
+        "name": "Spiderling",
+        "role": "Summoned by the Spider Queen"
+      },
+      {
+        "name": "Miner",
+        "role": "Hidden Hollow · charge"
+      },
+      {
+        "name": "The Hushed",
+        "role": "Hidden Hollow"
+      },
+      {
+        "name": "Slinger",
+        "role": "Hidden Hollow"
+      },
+      {
+        "name": "Procession Bearer",
+        "role": "Brazier Hall · front guard"
+      },
+      {
+        "name": "Fire Moth",
+        "role": "Brazier Hall · swarm"
+      },
+      {
+        "name": "Ash Clump",
+        "role": "Brazier Hall"
+      },
+      {
+        "name": "Snuffed Keeper",
+        "role": "Brazier Hall · Citadel"
+      },
+      {
+        "name": "Light-Eating Wraith",
+        "role": "Citadel · passes walls"
+      },
+      {
+        "name": "Cursed Archer",
+        "role": "Citadel"
+      },
+      {
+        "name": "Cursed Knight",
+        "role": "Citadel"
+      },
+      {
+        "name": "Skeleton King",
+        "role": "Area 1 boss"
+      },
+      {
+        "name": "Spider Queen",
+        "role": "Area 2 boss"
+      },
+      {
+        "name": "Hollow Warden",
+        "role": "Area 3 boss"
+      },
+      {
+        "name": "Snuffed Deputy",
+        "role": "Area 4 boss"
+      },
+      {
+        "name": "Lantern Devourer",
+        "role": "Area 5 boss"
+      }
+    ],
+    "gallery": [
+      {
+        "title": "Characters",
+        "text": "The hero walking (front·back), 17 enemies idle · 4 moving frames, and 5 people of the old kingdom who appear on the Memory Road",
+        "alt": "Pixel art of the hero and 17 enemies in walking poses"
+      },
+      {
+        "title": "Bosses",
+        "text": "Idle · attack · opening · walking poses of the 5 bosses (the last boss doesn't move, only breathes)",
+        "alt": "Pixel art of the five bosses' poses, one row each"
+      },
+      {
+        "title": "Village",
+        "text": "Village floor tiles and props like houses · dungeon entrance · Altar · Codex gravestone · lantern strings",
+        "alt": "Pixel art of the village tiles, houses, dungeon entrance, and props"
+      },
+      {
+        "title": "Dungeon tiles · props",
+        "text": "Doors · floors · walls and props of the Catacombs · Root Forest · Hidden Hollow · Brazier Hall · Citadel, plus altar · braziers",
+        "alt": "Pixel art of tiles and props from the five areas"
+      },
+      {
+        "title": "Icons · skills",
+        "text": "Icons for 29 skills · passives · enhancements, the village icon bar (Altar · Bag · Codex · Shop · gear), weapons and projectiles, the floating lantern, potions and Soul Shards",
+        "alt": "Pixel art of card·enhancement icons, weapons, projectiles, and pickups"
+      },
+      {
+        "title": "Effects",
+        "text": "Skill effects, combat effects like hits · deaths · heals, and floor · warning markers",
+        "alt": "Pixel art of combat effects and floor warning markers"
+      },
+      {
+        "title": "Screen UI",
+        "text": "Buttons (including pressed) · cards · window frames, HP · Mana · EXP bars, enemy health bars, joystick · dash button, rear warning, scroll bar",
+        "alt": "Pixel art of in-game UI pieces like buttons, frames, bars, and the joystick"
+      }
+    ],
+    "galleryNote": "Every piece of art used in the game, gathered by type (the title art is the cover on the game home). The asset images were made with Codex and Higgsfield.",
+    "controls": [
+      {
+        "key": "WASD · Arrow keys",
+        "action": "Move"
+      },
+      {
+        "key": "Auto",
+        "action": "Basic attack (aims at the nearest enemy in your lantern's light; enemies behind walls aren't hit)"
+      },
+      {
+        "key": "1 – 4 · Skill buttons",
+        "action": "Skills (spend Mana; hold to recast whenever ready)"
+      },
+      {
+        "key": "Space · Big button",
+        "action": "Dash (a quick dodge)"
+      },
+      {
+        "key": "5 · 6",
+        "action": "Health Potion · Mana Potion"
+      },
+      {
+        "key": "First launch",
+        "action": "Choose your language (Korean · English, changeable in the village settings), then Continue with Google · Start as Guest (progress is also saved on the server; with Google you can continue on other devices)"
+      },
+      {
+        "key": "Tap a name tag over a building",
+        "action": "Enter the dungeon·Altar·Shop·Codex from the village"
+      },
+      {
+        "key": "B · J · Icon bar",
+        "action": "Open the Bag (your consumables) · Codex (Echoes found) in the village"
+      },
+      {
+        "key": "M · Tap the minimap",
+        "action": "Open · close the map of the whole room"
+      },
+      {
+        "key": "Mobile",
+        "action": "Touch the left half of the screen to bring up a joystick"
+      }
+    ],
+    "info": [
+      {
+        "label": "Engine",
+        "value": "Unity 6 · C# · URP 2D lights · UI Toolkit"
+      },
+      {
+        "label": "Started",
+        "value": "2026.11.18"
+      },
+      {
+        "label": "Role",
+        "value": "Solo developer · made with AI (Claude Code · Codex · Higgsfield)"
+      },
+      {
+        "label": "How it's made",
+        "value": "Game development (design·code) is done with Claude Code, and the asset images with Codex and Higgsfield. Direction and playtesting are done by me"
+      },
+      {
+        "label": "Scope",
+        "value": "5 dungeons · 5 bosses · 17 enemies · 6 rooms per dungeon · 29 skills (2 basic attacks · 27 skills) · 8 passives · 10 enhancements · 9 music tracks"
+      },
+      {
+        "label": "Platform",
+        "value": "PC · mobile browsers (WebGL)"
+      },
+      {
+        "label": "Sound·Font",
+        "value": "Music AlkaKrab (Pixel Fantasy Music Pack) · SFX Kenney, artisticdude, Leohpaz · Font Galmuri"
+      },
+      {
+        "label": "Language",
+        "value": "Korean · English"
+      }
+    ],
+    "milestones": {
+      "기획·설계 문서와 Unity 프로젝트 초기 설정": "Development begins",
+      "거미 여왕 (부채꼴 거미줄·새끼 거미 소환·2페이즈 빛 축소) + 2구역 보스방": "2 bosses done",
+      "원뿔 등불 + 붉은 눈 거리 어둠 (D-1)": "Cone lantern",
+      "미로 생성 + 전투방 연결, 적 미리 배치·깨어남 (D-5)": "Maze mode",
+      "조각 게이지 → 업그레이드 3택1 (D-7)": "Shard gauge",
+      "생존 모드(뱀서라이크) 기획 기록": "Survival mode design",
+      "스토리 문장 추가 (첫 판 인트로·구역 입장·보스 등장)": "Story",
+      "음악 6곡·효과음 35가지와 음량 조절 추가": "Sound",
+      "미로 런 이어하기 (저장 확장 saveVersion 2)": "Continue run",
+      "쉼터 방 추가 (구역마다 4번째 방, 제단에서 3택1)": "Rest Stop room",
+      "등불 켜기 방 추가 (구역마다 2번째 방, 화로 3개를 켜야 문이 열림)": "Brazier room",
+      "3구역 저주받은 성채 뼈대 추가 (꺼진 등불지기·성채 소품·debug.startZone)": "Area 3",
+      "3구역 보스 '등불을 삼키는 자'(빛 흡수·탄막·소환·원뿔 빛) 추가, 2구역 뒤에 3구역 연결": "3 bosses done",
+      "미로 방에 지나간 길만 보여 주는 반투명 미니맵 추가": "Minimap",
+      "해금을 강화로 전환 (강화 화면·세이브 v3·수치 카드 삭제)": "Enhance",
+      "등마루 허브 H-3 완성 (타이틀 덮개 → 마을이 기본 화면)": "Village",
+      "판 정산·소모품·상점 (이어하기 삭제, 보스방 문 클리어, 세이브 v5)": "Shop",
+      "스킬 버튼·대시·마나 (액티브 4종 버튼 발동, 마나 포션)": "Skill buttons·dash",
+      "제단 빌드 탭 (B-3 — 평타·액티브 4·패시브 2 칸, 시너지 줄)": "Altar loadout",
+      "유령 까마귀 (W-9)": "14 skills",
+      "강화에 마나 회복·최대 마나 추가, 기본 공격 속도 +15%": "Mana enhancements",
+      "새 기술 4종 — 관 뚜껑 방패·붉은 실·등불 폭발·등불 결계 (K-4)": "30 skills",
+      "던전 5곳으로 — 숨은 굴·화로 회랑 연결, 새 적 6종·보스 2종 그림": "5 dungeons",
+      "보스 패턴 다섯 종 — 빈틈·다가가기 공통, 해골왕·거미 여왕·굴지기·꺼진 부수장·등불을 삼키는 자": "5 bosses",
+      "타일·소품·UI 틀·타이틀을 한 그림체로 다시 뽑아 교체": "All-new art",
+      "구글 로그인 (계정 창 로그인은 구글 하나)": "Google sign-in",
+      "기억의 길 M-4 — 도감에서 들어가기, 구역별 열림, 본 기억, 세이브 v8": "Memory Road"
+    }
   }
 }

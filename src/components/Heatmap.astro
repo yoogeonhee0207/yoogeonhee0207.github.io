@@ -1,24 +1,26 @@
 ---
 import { heatmap, daysAgo } from '../lib/data.js';
+import { langOf, t } from '../lib/i18n.js';
+const lang = langOf(Astro.url.pathname);
 // commits: 커밋 배열 또는 날짜별 개수(dailyFor — 기록 전체 기준)
 // wide: 잔디와 숫자를 한 줄(가로 띠)로 — 폭이 넓은 칸에서 씀
 const { commits, weeks = 16, wide = false } = Astro.props;
 const h = heatmap(commits, weeks);
 ---
 <div class:list={["heat-box", { wide }]}>
-  <div class="heat" role="img" aria-label={`최근 ${weeks}주 동안 ${h.activeDays}일, 커밋 ${h.total}개`}>
+  <div class="heat" role="img" aria-label={t(lang, 'heat.aria', weeks, h.activeDays, h.total)}>
     {h.cols.map((col) => (
       <div class="col">
         {col.map((d) => (
-          <span class={`cell l${d.level}${d.future ? ' future' : ''}`} title={d.future ? '' : `${d.date} · 커밋 ${d.count}개`}></span>
+          <span class={`cell l${d.level}${d.future ? ' future' : ''}`} title={d.future ? '' : t(lang, 'heat.cell', d.date, d.count)}></span>
         ))}
       </div>
     ))}
   </div>
   <div class="stats small">
-    <span><b>{h.total}</b> 커밋</span>
-    <span><b>{h.activeDays}</b>일 작업</span>
-    {h.last && <span>마지막 업데이트 <b>{daysAgo(h.last)}</b></span>}
+    <span><b>{h.total}</b> {t(lang, 'heat.commits')}</span>
+    <span><b>{h.activeDays}</b>{lang === 'en' ? ' ' : ''}{t(lang, 'heat.days')}</span>
+    {h.last && <span>{t(lang, 'heat.last')} <b>{daysAgo(h.last, lang)}</b></span>}
   </div>
 </div>
 

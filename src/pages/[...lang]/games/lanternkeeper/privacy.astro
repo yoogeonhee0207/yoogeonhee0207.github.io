@@ -1,11 +1,64 @@
 ---
-import Base from '../../../layouts/Base.astro';
-import { site } from '../../../lib/data.js';
+import Base from '../../../../layouts/Base.astro';
+import { site } from '../../../../lib/data.js';
+import { langOf, withLang } from '../../../../lib/i18n.js';
+
+export const getStaticPaths = () => withLang();
+const en = langOf(Astro.url.pathname) === 'en';
 
 // 게임 안 구글 로그인(Google OAuth 동의 화면)이 가리키는 주소라 경로를 바꾸지 않는다.
 const updated = '2026-11-26';
 ---
-<Base title="등불지기 개인정보처리방침" description="등불지기가 진행 저장과 로그인에 쓰는 정보와 보관 방법을 안내해요.">
+<Base title={en ? "Lantern Keeper Privacy Policy" : "등불지기 개인정보처리방침"} description={en ? "The information Lantern Keeper uses to save progress and sign in, and how it is kept." : "등불지기가 진행 저장과 로그인에 쓰는 정보와 보관 방법을 안내해요."}>
+  {en ? (<>
+  <article class="policy" lang="en">
+    <p class="crumb small"><a href="/en/games/lanternkeeper/">← Lantern Keeper</a></p>
+    <h1>Lantern Keeper Privacy Policy</h1>
+    <p class="muted small">Effective {updated} · Operated by {site.name} (solo developer)</p>
+    <p class="small muted">This is a translation of the Korean policy. If they differ, the <a href="/games/lanternkeeper/privacy/" hreflang="ko">Korean version</a> applies.</p>
+
+    <p class="lead">Lantern Keeper handles only the information it needs to save your progress and let you continue on other devices. There are no ads, and we never sell or hand over your information.</p>
+
+    <section>
+      <h2>1. What information is used</h2>
+      <ul>
+        <li><b>Game progress</b> — save data such as shards collected, enhancement levels, chosen skills, stories found, and settings.</li>
+        <li><b>Play history</b> — results of your last 30 runs: when a run ended, how long it took, rooms reached, enemies defeated, shards gained or lost, skills and cards chosen, and where you fell. Used only to improve the game; it contains no name or contact details.</li>
+        <li><b>Player number</b> — an anonymous number created automatically the first time you start the game. It is not tied to your name or contact details.</li>
+        <li><b>ID·password</b> — only if you create an account yourself. The sign-in service stores the password encrypted; even the developer cannot see it.</li>
+        <li><b>Google account unique ID</b> — only when you sign in with [Continue with Google]. Used only to recognize that the same Google account has come back. Your Google email, name, and profile picture are not stored.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>2. Where it is stored</h2>
+      <ul>
+        <li><b>Your device</b> — progress is first saved inside your browser (or the PC app).</li>
+        <li><b>Unity Gaming Services</b> — so you can continue on other devices, your player number, account info, progress save, and play history are kept on Unity Technologies' servers (Authentication·Cloud Save). Unity's handling follows the <a href="https://unity.com/legal/game-player-and-app-user-privacy-policy">Unity Privacy Policy</a>.</li>
+        <li><b>Google</b> — the Google sign-in window is shown and handled by Google itself. Lantern Keeper only receives a sign-in token and passes it to Unity.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2>3. How long it is kept</h2>
+      <p>Until you ask us to delete your account or the game service ends. Anonymous progress unused for a long time may be cleaned up under Unity's policy.</p>
+    </section>
+
+    <section>
+      <h2>4. If you want it deleted</h2>
+      <p>Send us the ID shown in the in-game Account window (or that it says 'Google linked', with roughly when you last played) through 'Delete account · progress' on the <a href="/en/contact/?game=lanternkeeper#account">contact page</a> or by the email below. We will delete your progress and account info on the server and reply. Progress left on your device is erased along with your browser's site data.</p>
+    </section>
+
+    <section>
+      <h2>5. Contact</h2>
+      <ul class="links">
+        <li><span class="muted">Contact</span> <a href="/en/contact/?game=lanternkeeper">Contact page</a> — what you write and your contact details are stored in Google Forms and used only to answer you.</li>
+        {site.email && <li><span class="muted">Email</span> <span>{site.email}</span></li>}
+      </ul>
+      <p class="small muted">If this policy changes, we will update this page with the new effective date.</p>
+    </section>
+  </article>
+  </>) : (<>
   <article class="policy">
     <p class="crumb small"><a href="/games/lanternkeeper/">← 등불지기</a></p>
     <h1>등불지기 개인정보처리방침</h1>
@@ -52,6 +105,7 @@ const updated = '2026-11-26';
       <p class="small muted">이 방침이 바뀌면 이 페이지에 시행일과 함께 고쳐 올려요.</p>
     </section>
   </article>
+  </>)}
 </Base>
 
 <style>
