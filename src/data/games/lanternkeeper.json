@@ -11,7 +11,7 @@
   "cover": "/games/lanternkeeper/art/cover.webp",
   "coverAlt": "등불지기 타이틀 그림: '등불지기' 현판이 걸린 어두운 지하 회랑에서 등불을 든 주인공이 뒷모습으로 서 있는 장면",
   "webgl": "/games/lanternkeeper/play/index.html",
-  "build": { "number": 34, "version": "0.146.1", "date": "2026-11-27", "rev": "56870e7" },
+  "build": { "number": 35, "version": "0.148.0", "date": "2026-11-28", "rev": "5ce1660" },
   "itch": "",
   "repo": "yoogeonhee0207/LanternKeeper",
   "world": {
